@@ -1,4 +1,4 @@
-package re.st.animalshelter.entity;
+package re.st.animalshelter.model.entity;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;

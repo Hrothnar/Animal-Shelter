@@ -1,7 +1,6 @@
 package re.st.animalshelter.listener;
 
 import com.pengrad.telegrambot.BotUtils;
-import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
@@ -17,7 +16,6 @@ import re.st.animalshelter.service.NotificationTaskService;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -25,11 +23,11 @@ import java.util.Collections;
 @ExtendWith(MockitoExtension.class)
 public class TelegramBotUpdatesListenerTest {
     @Mock
-    private TelegramBot telegramBot;
+    private com.pengrad.telegrambot.TelegramBot telegramBot;
     @Mock
     private NotificationTaskService notificationTaskService;
     @InjectMocks
-    private TelegramBotUpdatesListener telegramBotUpdatesListener;
+    private TelegramBotListener telegramBotUpdatesListener;
 
     @Test
     public void handleStartTest() throws URISyntaxException, IOException {

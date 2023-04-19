@@ -8,16 +8,15 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class TelegramBotConfiguration {
-
     private final String token;
 
-    //внедрение токена бота из переменной среды
-    @Autowired
+
+    @Autowired //внедрение токена бота из переменной среды
     public TelegramBotConfiguration(@Value("${telegram.bot.token}") String token) {
         this.token = token;
     }
 
-    @Bean
+    @Bean //создание bean класса TelegramBot
     public TelegramBot getBot() {
         return new TelegramBot(token);
     }
