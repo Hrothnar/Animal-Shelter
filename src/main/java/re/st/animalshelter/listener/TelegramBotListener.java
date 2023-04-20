@@ -6,9 +6,9 @@ import com.pengrad.telegrambot.model.CallbackQuery;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
-import com.pengrad.telegrambot.request.EditMessageText;
-import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.request.*;
 
+import com.pengrad.telegrambot.response.BaseResponse;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -17,7 +17,9 @@ import org.springframework.stereotype.Component;
 import re.st.animalshelter.enumeration.Button;
 import re.st.animalshelter.enumeration.Command;
 import re.st.animalshelter.enumeration.Dialogue;
+import re.st.animalshelter.enumeration.Extension;
 import re.st.animalshelter.enumeration.animal.Shelter;
+import re.st.animalshelter.model.Photo;
 import re.st.animalshelter.service.CatService;
 import re.st.animalshelter.service.DogService;
 import re.st.animalshelter.service.UserService;
@@ -26,10 +28,9 @@ import re.st.animalshelter.utility.AddCommand;
 import re.st.animalshelter.utility.Flashback;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 @EnableScheduling
 @Component
@@ -40,14 +41,13 @@ public class TelegramBotListener implements UpdatesListener {
     private final DogService dogService;
     private final AddCommand addCommand;
     private final AddButtonUtil addButtonUtil;
-    private Map<Integer, LinkedList<Flashback>> memory = new LinkedHashMap<>(10);
+    private final Map<Integer, LinkedList<Flashback>> memory = new LinkedHashMap<>(10);
+    private final static int START_DIALOGUE = -1;
     public final static Logger LOGGER = Logger.getLogger(TelegramBotListener.class);
 
-
-//        private final Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
+//    private final Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
 //    private final Pattern pattern = Pattern.compile("(\\d{1,2}\\.\\d{1,2}\\.\\d{4} \\d{1,2}:\\d{1,2})\\s+([А-я\\d\\s,.?!:]+)");
 //    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
-//    private final NotificationTaskService notificationTaskService;
 
     @Autowired
     public TelegramBotListener(TelegramBot telegramBot,
@@ -78,9 +78,9 @@ public class TelegramBotListener implements UpdatesListener {
                         if (!userService.isExist(chatId)) {
                             userService.createUser(message); // заносим в БД пользователя, если его ещё там нет
                         }
-                        flashback = new Flashback(message, Dialogue.START, Button.START, Shelter.NONE);
-                        createMemoryCell(flashback, ++messageId);
-                        sendResponse(flashback);
+                        flashback = new Flashback(message, Dialogue.START, Button.START, Shelter.NONE, Extension.MD);
+                        remember(flashback);
+                        sendResponse(flashback, START_DIALOGUE);
                     }
                 } else if (Objects.nonNull(message.photo())) { // если есть фото
 
@@ -94,27 +94,33 @@ public class TelegramBotListener implements UpdatesListener {
                 CallbackQuery callbackQuery = update.callbackQuery();
                 Message message = callbackQuery.message(); // получаем message callbackQuery
                 int messageId = callbackQuery.message().messageId();
+                long chatId = message.chat().id();
                 Button asEnum = Button.getAsEnum(callbackQuery.data()); // получаем enum на основе call back
                 Flashback flashback;
+                Photo photo;
                 switch (asEnum) {
                     case BACK:
                         flashback = previousFlashback(messageId);
-                        sendEditResponse(flashback, messageId);
+                        sendResponse(flashback, messageId);
                         break;
                     case DOG_SHELTER:
-                        flashback = new Flashback(message, Dialogue.MENU, Button.DOG_SHELTER, Shelter.DOG);
+                        flashback = new Flashback(message, Dialogue.MENU, Button.DOG_SHELTER, Shelter.DOG, Extension.MD);
                         remember(flashback);
-                        sendEditResponse(flashback, messageId);
+                        sendResponse(flashback, messageId);
                         break;
                     case CAT_SHELTER:
-                        flashback = new Flashback(message, Dialogue.MENU, Button.CAT_SHELTER, Shelter.CAT);
+                        flashback = new Flashback(message, Dialogue.MENU, Button.CAT_SHELTER, Shelter.CAT, Extension.MD);
                         remember(flashback);
-                        sendEditResponse(flashback, messageId);
+                        sendResponse(flashback, messageId);
                         break;
                     case SHELTER_INFO:
-                        flashback = new Flashback(message, Dialogue.INFO, Button.SHELTER_INFO, getCurrentShelter(messageId));
+                        flashback = new Flashback(message, Dialogue.INFO, Button.SHELTER_INFO, getCurrentShelter(messageId), Extension.MD);
                         remember(flashback);
-                        sendEditResponse(flashback, messageId);
+                        sendResponse(flashback, messageId);
+                        break;
+                    case LOOK_AT_THE_MAP:
+                        photo = new Photo(chatId, Dialogue.MAP, getCurrentShelter(messageId), Extension.PNG, Extension.MD);
+                        sendPhoto(photo);
                         break;
                     default:
                         LOGGER.error("Не существующая кнопка");
@@ -214,22 +220,21 @@ public class TelegramBotListener implements UpdatesListener {
 //    }
 //
 
-
     private Shelter getCurrentShelter(int messageId) { // получение текущего приюта
         return memory.get(messageId).peek().getShelter();
     }
 
     private void remember(Flashback flashback) { // добавление в ячейку памяти новой записи
         int messageId = flashback.getMessage().messageId();
-        LinkedList<Flashback> flashbacks = memory.get(messageId);
+        LinkedList<Flashback> flashbacks;
+        if (memory.containsKey(messageId)) {
+            flashbacks = memory.get(messageId);
+        } else {
+            messageId++;
+            flashbacks = new LinkedList<>();
+        }
         flashbacks.push(flashback);
         memory.put(messageId, flashbacks);
-    }
-
-    private void createMemoryCell(Flashback flashback, int messageId) { // создание новой ячейки памяти (по команде /start)
-        LinkedList<Flashback> stack = new LinkedList<>();
-        stack.push(flashback);
-        memory.put(messageId, stack);
     }
 
     private Flashback previousFlashback(int messageId) { // получение предыдущей записи в ячейке памяти (вызывается кнопкой BACK)
@@ -238,33 +243,42 @@ public class TelegramBotListener implements UpdatesListener {
         return flashbacks.peek();
     }
 
-    private void sendResponse(Flashback flashback) {
-        long chatId = flashback.getMessage().chat().id();
-        Dialogue dialogue = flashback.getDialogue();
-        boolean isOwner = userService.isOwner(chatId);
-        Shelter shelter = flashback.getShelter();
-        String text = dialogue.getText(shelter, isOwner); // получение заготовленного сообщения
-        SendMessage sendMessage = new SendMessage(chatId, text); // присвоение сообщения ответу
-        InlineKeyboardMarkup keyboard = addButtonUtil.getKeyboard(dialogue, isOwner, shelter); // получение заготовленных кнопок
-        sendMessage.replyMarkup(keyboard); // присвоение кнопок ответу
-        if (!telegramBot.execute(sendMessage).isOk()) {
-            LOGGER.error("Ответ не был отправлен", new RuntimeException());
-            //TODO своё исключение
-        }
-    }
-
-    private void sendEditResponse(Flashback flashback, int messageId) {
+    private void sendResponse(Flashback flashback, int messageId) {
         Message message = flashback.getMessage();
         long chatId = message.chat().id();
         Dialogue dialogue = flashback.getDialogue();
         boolean isOwner = userService.isOwner(chatId);
         Shelter shelter = flashback.getShelter();
-        String text = dialogue.getText(shelter, isOwner); // получение заготовленного сообщения
-        EditMessageText editMessage = new EditMessageText(chatId, messageId, text); // присвоение нового сообщения диалоговому окну
+        Extension extension = flashback.getExtension();
+        String text = dialogue.getText(shelter, isOwner, extension); // получение заготовленного сообщения
         InlineKeyboardMarkup keyboard = addButtonUtil.getKeyboard(dialogue, isOwner, shelter); // получение заготовленных кнопок
-        editMessage.replyMarkup(keyboard); // присвоение новых кнопок диалоговому окну
-        if (!telegramBot.execute(editMessage).isOk()) {
+        BaseResponse response;
+        if (messageId == -1) {
+            response = telegramBot.execute(new SendMessage(chatId, text).replyMarkup(keyboard));
+        } else {
+            response = telegramBot.execute(new EditMessageText(chatId, messageId, text).replyMarkup(keyboard));
+        }
+        if (!response.isOk()) {
             LOGGER.error("Ответ не был отправлен", new RuntimeException());
+            System.out.println(response.description());
+            //TODO своё исключение
+        }
+    }
+
+    private void sendPhoto(Photo photo) {
+        long chatId = photo.getChatId();
+        boolean isOwner = userService.isOwner(chatId);
+        Shelter shelter = photo.getShelter();
+        Extension photoExtension = photo.getPhotoExtension();
+        Extension textExtension = photo.getTextExtension();
+        Dialogue dialogue = photo.getDialogue();
+        File file = dialogue.getPhoto(shelter, isOwner, photoExtension);
+        String text = dialogue.getText(shelter, isOwner, textExtension);
+        SendPhoto sendPhoto = new SendPhoto(chatId, file);
+        sendPhoto.caption(text);
+        if (!telegramBot.execute(sendPhoto).isOk()) {
+            LOGGER.error("Ответ не был отправлен");
+            throw new RuntimeException();
             //TODO своё исключение
         }
     }
@@ -281,81 +295,6 @@ public class TelegramBotListener implements UpdatesListener {
         telegramBot.setUpdatesListener(this);
     }
 
-//    private void rememberCommand(Message message, Command command) {
-//        long chatId = message.chat().id();
-//        switch (command) {
-//            case START:
-//                LocalDateTime date = LocalDateTime.now();
-//                Dialogue dialogue = Dialogue.START;
-//                Shelter shelter = Shelter.NONE;
-//                CallbackQuery callbackQuery = new CallbackQuery();
-//                Flashback flashback = new Flashback(null, command, date, dialogue, shelter, callbackQuery);
-//                Stack<Flashback> flashbacks = new Stack<>();
-//                flashbacks.push(flashback);
-//                stacks.put(chatId, flashbacks);
-//                break;
-//            default:
-//                //TODO add my own exception
-//        }
-//    }
-
-//    private void rememberChosenShelter(CallbackQuery callbackQuery, Shelter shelter) {
-//        long chatId = callbackQuery.message().chat().id();
-//        Stack<Flashback> flashbacks = stacks.get(chatId);
-//        Button button = Button.WRONG;
-//        if (Objects.equals(shelter, Shelter.CAT)) {
-//            button = Button.CAT_SHELTER;
-//        } else if (Objects.equals(shelter, Shelter.DOG)) {
-//            button = Button.DOG_SHELTER;
-//        }
-//        LocalDateTime date = LocalDateTime.now();
-//        Dialogue dialogue = Dialogue.START;
-//        Flashback flashback = new Flashback(button, null, date, dialogue, shelter, callbackQuery);
-//        flashbacks.push(flashback);
-//        stacks.put(chatId, flashbacks);
-//    }
-//
-//
-//    private Flashback getLastButtonFlashback(long chatId) {
-//        Stack<Flashback> flashbacks = stacks.get(chatId);
-//        for (Flashback flashback : flashbacks) {
-//            if (Objects.nonNull(flashback.getButton())) {
-//                return flashback;
-//            }
-//        }
-//        return null;
-//    }
-//
-//    private Flashback getLastCommandFlashback(long chatId) {
-//        Stack<Flashback> flashbacks = stacks.get(chatId);
-//        for (Flashback flashback : flashbacks) {
-//            if (Objects.nonNull(flashback.getCommand())) {
-//                return flashback;
-//            }
-//        }
-//        return null;
-//    }
-//
-//
-//    private void rememberButton(CallbackQuery callbackQuery, Dialogue dialogue, Button button) {
-//        long chatId = callbackQuery.message().chat().id();
-//        Stack<Flashback> flashbacks = stacks.get(chatId);
-//        Shelter shelter = flashbacks.peek().getShelter();
-//        LocalDateTime date = LocalDateTime.now();
-//        Flashback flashback = new Flashback(button, null, date, dialogue, shelter, callbackQuery);
-//        flashbacks.push(flashback);
-//        stacks.put(chatId, flashbacks);
-//    }
-
-//    private Button getLastButton(CallbackQuery callbackQuery) {
-//        int messageId = callbackQuery.message().messageId();
-//        if (stacks.containsKey(messageId)) {
-//            return stacks.get(messageId).getStack().pop();
-//        }
-//        return Button.WRONG;
-//    }
-
-//
 //    @Nullable
 //    private LocalDateTime parse(String dateTime) {
 //        try {
@@ -365,6 +304,4 @@ public class TelegramBotListener implements UpdatesListener {
 //            return null;
 //        }
 //    }
-
-
 }

@@ -3,6 +3,7 @@ package re.st.animalshelter.utility;
 import com.pengrad.telegrambot.model.Message;
 import re.st.animalshelter.enumeration.Button;
 import re.st.animalshelter.enumeration.Dialogue;
+import re.st.animalshelter.enumeration.Extension;
 import re.st.animalshelter.enumeration.animal.Shelter;
 
 import java.time.LocalDateTime;
@@ -12,14 +13,16 @@ public class Flashback {
     private final Message message;
     private final Dialogue dialogue;
     private final Button button;
-    private Shelter shelter = Shelter.NONE;
     private final LocalDateTime creationTime;
+    private final Extension extension;
+    private Shelter shelter = Shelter.NONE;
 
-    public Flashback(Message message, Dialogue dialogue, Button button, Shelter shelter) {
+    public Flashback(Message message, Dialogue dialogue, Button button, Shelter shelter, Extension extension) {
         this.message = message;
         this.dialogue = dialogue;
         this.button = button;
         this.shelter = shelter;
+        this.extension = extension;
         this.creationTime = LocalDateTime.now();
     }
 
@@ -31,20 +34,24 @@ public class Flashback {
         return dialogue;
     }
 
-    public Shelter getShelter() {
-        return shelter;
-    }
-
     public Button getButton() {
         return button;
     }
 
-    public void setShelter(Shelter shelter) {
-        this.shelter = shelter;
-    }
-
     public LocalDateTime getCreationTime() {
         return creationTime;
+    }
+
+    public Extension getExtension() {
+        return extension;
+    }
+
+    public Shelter getShelter() {
+        return shelter;
+    }
+
+    public void setShelter(Shelter shelter) {
+        this.shelter = shelter;
     }
 
     @Override
@@ -52,22 +59,23 @@ public class Flashback {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Flashback flashback = (Flashback) o;
-        return Objects.equals(message, flashback.message) && dialogue == flashback.dialogue && button == flashback.button && shelter == flashback.shelter && Objects.equals(creationTime, flashback.creationTime);
+        return Objects.equals(message, flashback.message) && dialogue == flashback.dialogue && button == flashback.button && Objects.equals(creationTime, flashback.creationTime) && extension == flashback.extension && shelter == flashback.shelter;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(message, dialogue, button, shelter, creationTime);
+        return Objects.hash(message, dialogue, button, creationTime, extension, shelter);
     }
 
     @Override
     public String toString() {
         return "Flashback{" +
-//                "message=" + message +
+                "message=" + message +
                 ", dialogue=" + dialogue +
                 ", button=" + button +
+                ", creationTime=" + creationTime +
+                ", extension=" + extension +
                 ", shelter=" + shelter +
-//                ", creationTime=" + creationTime +
                 '}';
     }
 }

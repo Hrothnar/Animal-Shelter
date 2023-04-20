@@ -6,7 +6,7 @@ public enum Button {
     DOG_SHELTER("Приют для собак", "dog shelter"),
     CAT_SHELTER("Приют для кошек", "cat shelter"),
     SHELTER_INFO("Узнать информацию о приюте", "shelter info"),
-
+    LOOK_AT_THE_MAP("Схема проезда", "look at map" ),
 
     TAKE_AN_ANIMAL("Как приютить питомца?", "take an animal"),
     SEND_REPORT("Отправить отчёт о питомце", "send report"),

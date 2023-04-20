@@ -36,6 +36,8 @@ public class AddButtonUtil {
                         .callbackData(Button.BACK.getCallBackQuery()));
                 break;
             case INFO:
+                keyboardMarkup.addRow(new InlineKeyboardButton(Button.LOOK_AT_THE_MAP.getText())
+                        .callbackData(Button.LOOK_AT_THE_MAP.getCallBackQuery()));
                 keyboardMarkup.addRow(new InlineKeyboardButton(Button.BACK.getText())
                         .callbackData(Button.BACK.getCallBackQuery()));
                 break;
