@@ -2,30 +2,28 @@ package re.st.animalshelter.listener;
 
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
-import com.pengrad.telegrambot.model.CallbackQuery;
 import com.pengrad.telegrambot.model.Message;
+import com.pengrad.telegrambot.model.PhotoSize;
 import com.pengrad.telegrambot.model.Update;
-import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
-import com.pengrad.telegrambot.request.*;
 
-import com.pengrad.telegrambot.response.BaseResponse;
+import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
+import com.pengrad.telegrambot.request.EditMessageText;
+import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.request.SendPhoto;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import re.st.animalshelter.enumeration.Button;
-import re.st.animalshelter.enumeration.Command;
-import re.st.animalshelter.enumeration.Dialogue;
-import re.st.animalshelter.enumeration.Extension;
+import re.st.animalshelter.enumeration.*;
 import re.st.animalshelter.enumeration.animal.Shelter;
-import re.st.animalshelter.model.Photo;
 import re.st.animalshelter.service.CatService;
 import re.st.animalshelter.service.DogService;
+import re.st.animalshelter.service.FileService;
 import re.st.animalshelter.service.UserService;
 import re.st.animalshelter.utility.AddButtonUtil;
 import re.st.animalshelter.utility.AddCommand;
-import re.st.animalshelter.utility.Flashback;
+import re.st.animalshelter.model.Flashback;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
@@ -37,12 +35,12 @@ import java.util.*;
 public class TelegramBotListener implements UpdatesListener {
     private final TelegramBot telegramBot;
     private final UserService userService;
+    private final FileService fileService;
     private final CatService catService;
     private final DogService dogService;
     private final AddCommand addCommand;
     private final AddButtonUtil addButtonUtil;
     private final Map<Integer, LinkedList<Flashback>> memory = new LinkedHashMap<>(10);
-    private final static int START_DIALOGUE = -1;
     public final static Logger LOGGER = Logger.getLogger(TelegramBotListener.class);
 
 //    private final Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
@@ -55,32 +53,34 @@ public class TelegramBotListener implements UpdatesListener {
                                CatService catService,
                                DogService dogService,
                                AddButtonUtil addButtonUtil,
-                               AddCommand addCommand) {
+                               AddCommand addCommand,
+                               FileService fileService) {
         this.telegramBot = telegramBot;
         this.userService = userService;
         this.catService = catService;
         this.dogService = dogService;
         this.addButtonUtil = addButtonUtil;
         this.addCommand = addCommand;
+        this.fileService = fileService;
     }
 
     @Override // главный метод для обработки запросов
     public int process(List<Update> updateList) {
         for (Update update : updateList) {
+            Flashback flashback;
             if (Objects.nonNull(update.message())) { // если получили сообщение
-                Flashback flashback;
                 Message message = update.message();
-                long chatId = message.chat().id();
                 int messageId = message.messageId();
                 String text = message.text();
                 if (Objects.nonNull(text)) { // если у сообщения есть текст
                     if (Objects.equals(Command.START.getText(), text)) { // если равен /start
-                        if (!userService.isExist(chatId)) {
-                            userService.createUser(message); // заносим в БД пользователя, если его ещё там нет
-                        }
-                        flashback = new Flashback(message, Dialogue.START, Button.START, Shelter.NONE, Extension.MD);
-                        remember(flashback);
-                        sendResponse(flashback, START_DIALOGUE);
+                        userService.createUser(message); // заносим в БД пользователя
+                        System.out.println(messageId + "  start");
+                        remember(new Flashback(message, Dialogue.START, Shelter.NONE, Extension.MD));
+                        sendNewTextResponse(message, Dialogue.START, Shelter.NONE, Extension.MD);
+                    } else {
+//                        flashback = new Flashback(message, Dialogue.NONE, Shelter.NONE, Extension.MD);
+//                        checkStatus(flashback);
                     }
                 } else if (Objects.nonNull(message.photo())) { // если есть фото
 
@@ -91,36 +91,44 @@ public class TelegramBotListener implements UpdatesListener {
                     //TODO не забыть добавить ещё логики
                 }
             } else if (Objects.nonNull(update.callbackQuery())) { // если получили callbackQuery (пользователь нажал кнопку)
-                CallbackQuery callbackQuery = update.callbackQuery();
-                Message message = callbackQuery.message(); // получаем message callbackQuery
-                int messageId = callbackQuery.message().messageId();
-                long chatId = message.chat().id();
-                Button asEnum = Button.getAsEnum(callbackQuery.data()); // получаем enum на основе call back
-                Flashback flashback;
-                Photo photo;
-                switch (asEnum) {
+                Message message = update.callbackQuery().message(); // получаем message callbackQuery
+                int messageId = message.messageId();
+                Button button = Button.getAsEnum(update.callbackQuery().data()); // получаем enum на основе call back
+                Shelter shelter;
+                switch (button) {
                     case BACK:
                         flashback = previousFlashback(messageId);
-                        sendResponse(flashback, messageId);
+                        if (flashback.getMessage().messageId() == messageId - 1) {
+                            sendEditedFirstResponse(flashback.getMessage(), flashback.getDialogue(), flashback.getShelter(), flashback.getTextExtension());
+                        } else {
+                            sendEditedTextResponse(flashback.getMessage(), flashback.getDialogue(), flashback.getShelter(), flashback.getTextExtension());
+                        }
                         break;
                     case DOG_SHELTER:
-                        flashback = new Flashback(message, Dialogue.MENU, Button.DOG_SHELTER, Shelter.DOG, Extension.MD);
-                        remember(flashback);
-                        sendResponse(flashback, messageId);
+                        remember(new Flashback(message, Dialogue.MENU, Shelter.DOG, Extension.MD));
+                        sendEditedTextResponse(message, Dialogue.MENU, Shelter.DOG, Extension.MD);
                         break;
                     case CAT_SHELTER:
-                        flashback = new Flashback(message, Dialogue.MENU, Button.CAT_SHELTER, Shelter.CAT, Extension.MD);
-                        remember(flashback);
-                        sendResponse(flashback, messageId);
+                        remember(new Flashback(message, Dialogue.MENU, Shelter.CAT, Extension.MD));
+                        sendEditedTextResponse(message, Dialogue.MENU, Shelter.CAT, Extension.MD);
                         break;
                     case SHELTER_INFO:
-                        flashback = new Flashback(message, Dialogue.INFO, Button.SHELTER_INFO, getCurrentShelter(messageId), Extension.MD);
-                        remember(flashback);
-                        sendResponse(flashback, messageId);
+                        shelter = getCurrentShelter(messageId);
+                        remember(new Flashback(message, Dialogue.INFO, shelter, Extension.MD));
+                        sendEditedTextResponse(message, Dialogue.INFO, shelter, Extension.MD);
                         break;
                     case LOOK_AT_THE_MAP:
-                        photo = new Photo(chatId, Dialogue.MAP, getCurrentShelter(messageId), Extension.PNG, Extension.MD);
-                        sendPhoto(photo);
+                        shelter = getCurrentShelter(messageId);
+                        sendNewPhotoResponse(message, Dialogue.MAP, shelter, Extension.MD, Extension.PNG);
+                        break;
+                    case LEAVE_CONTACT_INFORMATION:
+//                        flashback = new Flashback(message, Dialogue.CONTACT_INFORMATION, Shelter.NONE, Extension.MD);
+                        break;
+                    case SEND_REPORT:
+//                        flashback = new Flashback(message, Dialogue.NONE, Shelter.NONE, Extension.MD);
+//                        checkStatus(flashback);
+
+
                         break;
                     default:
                         LOGGER.error("Не существующая кнопка");
@@ -133,6 +141,45 @@ public class TelegramBotListener implements UpdatesListener {
         }
         return UpdatesListener.CONFIRMED_UPDATES_ALL;  // возвращаем флаг полной обработки updates
     }
+
+    private void checkStatus(Flashback flashback) {
+        Message message = flashback.getMessage();
+        long chatId = message.chat().id();
+        String text = message.text();
+        PhotoSize[] photoSizes = message.photo();
+        Status status = userService.getStatus(chatId);
+        switch (status) {
+            case REPORT_WAS_NOT_SENT:
+                userService.updateStatus(chatId, Status.WAIT_FOR_REPORT_TEXT);
+                flashback.setDialogue(Dialogue.REPORT_TEXT);
+//                sendEditResponse(flashback);
+                break;
+            case WAIT_FOR_REPORT_TEXT:
+                if (Objects.nonNull(text)) {
+                    userService.updateStatus(chatId, Status.WAIT_FOR_REPORT_PHOTO);
+                    flashback.setDialogue(Dialogue.REPORT_PHOTO);
+//                    fileService.saveText(message);
+//                    sendEditResponse(flashback);
+                }
+                break;
+            case WAIT_FOR_REPORT_PHOTO:
+                if (Objects.nonNull(photoSizes)) {
+                    userService.updateStatus(chatId, Status.REPORT_WAS_SENT);
+                    flashback.setDialogue(Dialogue.REPORTED);
+//                    fileService.savePhoto(message);
+//                    sendEditResponse(flashback);
+                }
+                break;
+            case WAIT_FOR_CONTACT_INFORMATION:
+                if (Objects.nonNull(text)) {
+
+                }
+                break;
+            case NONE:
+                break;
+        }
+    }
+
 
 //    @Override // главный метод для обработки запросов
 //    public int process(List<Update> updates) {
@@ -243,45 +290,95 @@ public class TelegramBotListener implements UpdatesListener {
         return flashbacks.peek();
     }
 
-    private void sendResponse(Flashback flashback, int messageId) {
-        Message message = flashback.getMessage();
+    private void sendNewTextResponse(Message message, Dialogue dialogue, Shelter shelter, Extension extension) {
         long chatId = message.chat().id();
-        Dialogue dialogue = flashback.getDialogue();
         boolean isOwner = userService.isOwner(chatId);
-        Shelter shelter = flashback.getShelter();
-        Extension extension = flashback.getExtension();
-        String text = dialogue.getText(shelter, isOwner, extension); // получение заготовленного сообщения
-        InlineKeyboardMarkup keyboard = addButtonUtil.getKeyboard(dialogue, isOwner, shelter); // получение заготовленных кнопок
-        BaseResponse response;
-        if (messageId == -1) {
-            response = telegramBot.execute(new SendMessage(chatId, text).replyMarkup(keyboard));
-        } else {
-            response = telegramBot.execute(new EditMessageText(chatId, messageId, text).replyMarkup(keyboard));
-        }
-        if (!response.isOk()) {
+        String text = dialogue.getText(shelter, isOwner, extension);
+        InlineKeyboardMarkup keyboard = addButtonUtil.getKeyboard(shelter, isOwner, dialogue);
+        SendMessage response = new SendMessage(chatId, text).replyMarkup(keyboard);
+        if (!telegramBot.execute(response).isOk()) {
             LOGGER.error("Ответ не был отправлен", new RuntimeException());
-            System.out.println(response.description());
             //TODO своё исключение
         }
     }
 
-    private void sendPhoto(Photo photo) {
-        long chatId = photo.getChatId();
+    private void sendEditedFirstResponse(Message message, Dialogue dialogue, Shelter shelter, Extension extension) {
+        long chatId = message.chat().id();
         boolean isOwner = userService.isOwner(chatId);
-        Shelter shelter = photo.getShelter();
-        Extension photoExtension = photo.getPhotoExtension();
-        Extension textExtension = photo.getTextExtension();
-        Dialogue dialogue = photo.getDialogue();
-        File file = dialogue.getPhoto(shelter, isOwner, photoExtension);
-        String text = dialogue.getText(shelter, isOwner, textExtension);
-        SendPhoto sendPhoto = new SendPhoto(chatId, file);
-        sendPhoto.caption(text);
-        if (!telegramBot.execute(sendPhoto).isOk()) {
-            LOGGER.error("Ответ не был отправлен");
-            throw new RuntimeException();
+        int messageId = message.messageId();
+        String text = dialogue.getText(shelter, isOwner, extension);
+        InlineKeyboardMarkup keyboard = addButtonUtil.getKeyboard(shelter, isOwner, dialogue);
+        EditMessageText response = new EditMessageText(chatId, ++messageId, text).replyMarkup(keyboard);
+        if (!telegramBot.execute(response).isOk()) {
+            LOGGER.error("Ответ не был отправлен", new RuntimeException());
             //TODO своё исключение
         }
     }
+
+    private void sendEditedTextResponse(Message message, Dialogue dialogue, Shelter shelter, Extension extension) {
+        long chatId = message.chat().id();
+        boolean isOwner = userService.isOwner(chatId);
+        int messageId = message.messageId();
+        String text = dialogue.getText(shelter, isOwner, extension);
+        InlineKeyboardMarkup keyboard = addButtonUtil.getKeyboard(shelter, isOwner, dialogue);
+        EditMessageText response = new EditMessageText(chatId, messageId, text).replyMarkup(keyboard);
+        if (!telegramBot.execute(response).isOk()) {
+            LOGGER.error("Ответ не был отправлен", new RuntimeException());
+            //TODO своё исключение
+        }
+    }
+
+    private void sendNewPhotoResponse(Message message, Dialogue dialogue, Shelter shelter, Extension textExtension, Extension photoExtension) {
+        long chatId = message.chat().id();
+        boolean isOwner = userService.isOwner(chatId);
+        String text = dialogue.getText(shelter, isOwner, textExtension);
+        File photo = dialogue.getPhoto(shelter, isOwner, photoExtension);
+        InlineKeyboardMarkup keyboard = addButtonUtil.getKeyboard(shelter, isOwner, dialogue);
+        SendPhoto response = new SendPhoto(chatId, photo).caption(text).replyMarkup(keyboard);
+        if (!telegramBot.execute(response).isOk()) {
+            LOGGER.error("Ответ не был отправлен", new RuntimeException());
+            //TODO своё исключение
+        }
+    }
+
+
+//        Message message = flashback.getMessage();
+//        long chatId = message.chat().id();
+//        Dialogue dialogue = flashback.getDialogue();
+//        boolean isOwner = userService.isOwner(chatId);
+//        Shelter shelter = flashback.getShelter();
+//        Extension textExtension = flashback.getTextExtension();
+//        boolean initialMessage = flashback.isInitialMessage();
+//        String text = dialogue.getText(shelter, isOwner, textExtension); // получение заготовленного сообщения
+//        InlineKeyboardMarkup keyboard = addButtonUtil.getKeyboard(dialogue, isOwner, shelter); // получение заготовленных кнопок
+//        BaseResponse response;
+//        if (messageId == -1) {
+//            if (flashback instanceof Photo) {
+//                Extension photoExtension = ((Photo) flashback).getPhotoExtension();
+//                File photo = dialogue.getPhoto(shelter, isOwner, photoExtension);
+//                response = telegramBot.execute(new SendPhoto(chatId, photo).caption(text).replyMarkup(keyboard));
+//            } else {
+//                response = telegramBot.execute(new SendMessage(chatId, text).replyMarkup(keyboard));
+//            }
+//        } else {
+//            if (flashback instanceof Photo) {
+//                Extension photoExtension = ((Photo) flashback).getPhotoExtension();
+//                File photo = dialogue.getPhoto(shelter, isOwner, photoExtension);
+//                if (((Photo) flashback).isEditedMessageMedia()) {
+//                    response = telegramBot.execute(new EditMessageMedia(chatId, messageId, new InputMediaPhoto(photo)).replyMarkup(keyboard));
+//                } else {
+//                    response = telegramBot.execute(new SendPhoto(chatId, photo).caption(text).replyMarkup(keyboard));
+//                }
+//            } else {
+//                response = telegramBot.execute(new EditMessageText(chatId, messageId, text).replyMarkup(keyboard));
+//            }
+//        }
+//        if (!response.isOk()) {
+//            LOGGER.error("Ответ не был отправлен", new RuntimeException());
+//            System.out.println(response.description());
+//            //TODO своё исключение
+//        }
+
 
     @Scheduled(cron = "0 0 0 * * 0") // очистка memory пользователя, согласно условию
     private void cleanMemory() {

@@ -116,3 +116,133 @@ java.lang.RuntimeException
 	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
 	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
 	at java.base/java.lang.Thread.run(Thread.java:829)
+21-04-2023 11:10 ERROR TelegramBotListener:40 - Неподдерживаемая кнопка
+21-04-2023 11:10 ERROR TelegramBotListener:295 - Ответ не был отправлен
+java.lang.RuntimeException
+	at re.st.animalshelter.listener.TelegramBotListener.sendResponse(TelegramBotListener.java:295)
+	at re.st.animalshelter.listener.TelegramBotListener.process(TelegramBotListener.java:118)
+	at com.pengrad.telegrambot.impl.UpdatesHandler$1.onResponse(UpdatesHandler.java:73)
+	at com.pengrad.telegrambot.impl.UpdatesHandler$1.onResponse(UpdatesHandler.java:49)
+	at com.pengrad.telegrambot.impl.TelegramBotClient$1.onResponse(TelegramBotClient.java:53)
+	at okhttp3.internal.connection.RealCall$AsyncCall.run(RealCall.kt:519)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:829)
+21-04-2023 11:15 ERROR TelegramBotListener:40 - Неподдерживаемая кнопка
+21-04-2023 11:15 ERROR TelegramBotListener:295 - Ответ не был отправлен
+java.lang.RuntimeException
+	at re.st.animalshelter.listener.TelegramBotListener.sendResponse(TelegramBotListener.java:295)
+	at re.st.animalshelter.listener.TelegramBotListener.process(TelegramBotListener.java:118)
+	at com.pengrad.telegrambot.impl.UpdatesHandler$1.onResponse(UpdatesHandler.java:73)
+	at com.pengrad.telegrambot.impl.UpdatesHandler$1.onResponse(UpdatesHandler.java:49)
+	at com.pengrad.telegrambot.impl.TelegramBotClient$1.onResponse(TelegramBotClient.java:53)
+	at okhttp3.internal.connection.RealCall$AsyncCall.run(RealCall.kt:519)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:829)
+21-04-2023 11:18 ERROR TelegramBotListener:40 - Неподдерживаемая кнопка
+21-04-2023 11:19 ERROR TelegramBotListener:295 - Ответ не был отправлен
+java.lang.RuntimeException
+	at re.st.animalshelter.listener.TelegramBotListener.sendResponse(TelegramBotListener.java:295)
+	at re.st.animalshelter.listener.TelegramBotListener.process(TelegramBotListener.java:118)
+	at com.pengrad.telegrambot.impl.UpdatesHandler$1.onResponse(UpdatesHandler.java:73)
+	at com.pengrad.telegrambot.impl.UpdatesHandler$1.onResponse(UpdatesHandler.java:49)
+	at com.pengrad.telegrambot.impl.TelegramBotClient$1.onResponse(TelegramBotClient.java:53)
+	at okhttp3.internal.connection.RealCall$AsyncCall.run(RealCall.kt:519)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:829)
+21-04-2023 11:19 ERROR TelegramBotListener:40 - Неподдерживаемая кнопка
+21-04-2023 11:19 ERROR TelegramBotListener:295 - Ответ не был отправлен
+java.lang.RuntimeException
+	at re.st.animalshelter.listener.TelegramBotListener.sendResponse(TelegramBotListener.java:295)
+	at re.st.animalshelter.listener.TelegramBotListener.process(TelegramBotListener.java:118)
+	at com.pengrad.telegrambot.impl.UpdatesHandler$1.onResponse(UpdatesHandler.java:73)
+	at com.pengrad.telegrambot.impl.UpdatesHandler$1.onResponse(UpdatesHandler.java:49)
+	at com.pengrad.telegrambot.impl.TelegramBotClient$1.onResponse(TelegramBotClient.java:53)
+	at okhttp3.internal.connection.RealCall$AsyncCall.run(RealCall.kt:519)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:829)
+21-04-2023 11:20 ERROR TelegramBotListener:40 - Неподдерживаемая кнопка
+21-04-2023 11:20 ERROR TelegramBotListener:295 - Ответ не был отправлен
+java.lang.RuntimeException
+	at re.st.animalshelter.listener.TelegramBotListener.sendResponse(TelegramBotListener.java:295)
+	at re.st.animalshelter.listener.TelegramBotListener.process(TelegramBotListener.java:118)
+	at com.pengrad.telegrambot.impl.UpdatesHandler$1.onResponse(UpdatesHandler.java:73)
+	at com.pengrad.telegrambot.impl.UpdatesHandler$1.onResponse(UpdatesHandler.java:49)
+	at com.pengrad.telegrambot.impl.TelegramBotClient$1.onResponse(TelegramBotClient.java:53)
+	at okhttp3.internal.connection.RealCall$AsyncCall.run(RealCall.kt:519)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:829)
+21-04-2023 11:21 ERROR TelegramBotListener:40 - Неподдерживаемая кнопка
+21-04-2023 11:21 ERROR TelegramBotListener:294 - Ответ не был отправлен
+java.lang.RuntimeException
+	at re.st.animalshelter.listener.TelegramBotListener.sendResponse(TelegramBotListener.java:294)
+	at re.st.animalshelter.listener.TelegramBotListener.process(TelegramBotListener.java:118)
+	at com.pengrad.telegrambot.impl.UpdatesHandler$1.onResponse(UpdatesHandler.java:73)
+	at com.pengrad.telegrambot.impl.UpdatesHandler$1.onResponse(UpdatesHandler.java:49)
+	at com.pengrad.telegrambot.impl.TelegramBotClient$1.onResponse(TelegramBotClient.java:53)
+	at okhttp3.internal.connection.RealCall$AsyncCall.run(RealCall.kt:519)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:829)
+21-04-2023 11:23 ERROR TelegramBotListener:40 - Неподдерживаемая кнопка
+21-04-2023 11:23 ERROR TelegramBotListener:40 - Неподдерживаемая кнопка
+21-04-2023 18:30 ERROR TelegramBotListener:331 - Ответ не был отправлен
+java.lang.RuntimeException
+	at re.st.animalshelter.listener.TelegramBotListener.sendResponse(TelegramBotListener.java:331)
+	at re.st.animalshelter.listener.TelegramBotListener.process(TelegramBotListener.java:115)
+	at com.pengrad.telegrambot.impl.UpdatesHandler$1.onResponse(UpdatesHandler.java:73)
+	at com.pengrad.telegrambot.impl.UpdatesHandler$1.onResponse(UpdatesHandler.java:49)
+	at com.pengrad.telegrambot.impl.TelegramBotClient$1.onResponse(TelegramBotClient.java:53)
+	at okhttp3.internal.connection.RealCall$AsyncCall.run(RealCall.kt:519)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:829)
+21-04-2023 18:32 ERROR TelegramBotListener:331 - Ответ не был отправлен
+java.lang.RuntimeException
+	at re.st.animalshelter.listener.TelegramBotListener.sendResponse(TelegramBotListener.java:331)
+	at re.st.animalshelter.listener.TelegramBotListener.process(TelegramBotListener.java:110)
+	at com.pengrad.telegrambot.impl.UpdatesHandler$1.onResponse(UpdatesHandler.java:73)
+	at com.pengrad.telegrambot.impl.UpdatesHandler$1.onResponse(UpdatesHandler.java:49)
+	at com.pengrad.telegrambot.impl.TelegramBotClient$1.onResponse(TelegramBotClient.java:53)
+	at okhttp3.internal.connection.RealCall$AsyncCall.run(RealCall.kt:519)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:829)
+21-04-2023 18:38 ERROR TelegramBotListener:332 - Ответ не был отправлен
+java.lang.RuntimeException
+	at re.st.animalshelter.listener.TelegramBotListener.sendResponse(TelegramBotListener.java:332)
+	at re.st.animalshelter.listener.TelegramBotListener.process(TelegramBotListener.java:111)
+	at com.pengrad.telegrambot.impl.UpdatesHandler$1.onResponse(UpdatesHandler.java:73)
+	at com.pengrad.telegrambot.impl.UpdatesHandler$1.onResponse(UpdatesHandler.java:49)
+	at com.pengrad.telegrambot.impl.TelegramBotClient$1.onResponse(TelegramBotClient.java:53)
+	at okhttp3.internal.connection.RealCall$AsyncCall.run(RealCall.kt:519)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:829)
+21-04-2023 18:40 ERROR TelegramBotListener:331 - Ответ не был отправлен
+java.lang.RuntimeException
+	at re.st.animalshelter.listener.TelegramBotListener.sendResponse(TelegramBotListener.java:331)
+	at re.st.animalshelter.listener.TelegramBotListener.process(TelegramBotListener.java:116)
+	at com.pengrad.telegrambot.impl.UpdatesHandler$1.onResponse(UpdatesHandler.java:73)
+	at com.pengrad.telegrambot.impl.UpdatesHandler$1.onResponse(UpdatesHandler.java:49)
+	at com.pengrad.telegrambot.impl.TelegramBotClient$1.onResponse(TelegramBotClient.java:53)
+	at okhttp3.internal.connection.RealCall$AsyncCall.run(RealCall.kt:519)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:829)
+21-04-2023 19:50 ERROR TelegramBotListener:311 - Ответ не был отправлен
+java.lang.RuntimeException
+	at re.st.animalshelter.listener.TelegramBotListener.sendEditTextResponse(TelegramBotListener.java:311)
+	at re.st.animalshelter.listener.TelegramBotListener.process(TelegramBotListener.java:103)
+	at com.pengrad.telegrambot.impl.UpdatesHandler$1.onResponse(UpdatesHandler.java:73)
+	at com.pengrad.telegrambot.impl.UpdatesHandler$1.onResponse(UpdatesHandler.java:49)
+	at com.pengrad.telegrambot.impl.TelegramBotClient$1.onResponse(TelegramBotClient.java:53)
+	at okhttp3.internal.connection.RealCall$AsyncCall.run(RealCall.kt:519)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:829)
+21-04-2023 20:09 ERROR TelegramBotListener:136 - Не существующая кнопка

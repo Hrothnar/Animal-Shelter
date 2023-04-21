@@ -10,9 +10,14 @@ public enum Dialogue {
     START,
     MENU,
     INFO,
-    MAP;
+    MAP,
+    NONE,
+    DRIVER_PERMIT,
+    CONTACT_INFORMATION,
+    REPORT_TEXT,
+    REPORT_PHOTO,
+    REPORTED;
 
-//    DRIVER_PERMIT,
 //    COMMUNICATION_DATA,
 //    START_MENU,
 //    CHOOSE_AN_ANIMAL,
@@ -46,8 +51,8 @@ public enum Dialogue {
         String personPath = "user/";
         String personPrefix = "user_";
         if (isOwner) {
-            personPrefix = "owner_";
             personPath = "owner/";
+            personPrefix = "owner_";
         }
         try {
             switch (mediaType) {

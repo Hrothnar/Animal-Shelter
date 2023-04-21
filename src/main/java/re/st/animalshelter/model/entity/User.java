@@ -1,6 +1,6 @@
 package re.st.animalshelter.model.entity;
 
-import re.st.animalshelter.enumeration.Stage;
+import re.st.animalshelter.enumeration.Status;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -24,8 +24,32 @@ public class User {
     @Column(name = "last_report_date")
     private LocalDateTime lastReportDate;
     @Enumerated(EnumType.STRING)
-    private Stage stage;
-    private boolean active;
+    private Status status;
+    private boolean owner;
+
+    public User(long chatId,
+                String fullName,
+                String email,
+                String phoneNumber,
+                String data,
+                LocalDateTime expirationDate,
+                LocalDateTime lastReportDate,
+                Status status,
+                boolean isOwner) {
+        this.chatId = chatId;
+        this.fullName = fullName;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.data = data;
+        this.expirationDate = expirationDate;
+        this.lastReportDate = lastReportDate;
+        this.status = status;
+        this.owner = isOwner;
+    }
+
+    public User() {
+
+    }
 
     public long getId() {
         return id;
@@ -91,19 +115,19 @@ public class User {
         this.lastReportDate = lastReportDate;
     }
 
-    public Stage getStage() {
-        return stage;
+    public Status getStatus() {
+        return status;
     }
 
-    public void setStage(Stage stage) {
-        this.stage = stage;
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
-    public boolean isActive() {
-        return active;
+    public boolean isOwner() {
+        return owner;
     }
 
-    public void setActive(boolean status) {
-        this.active = status;
+    public void setOwner(boolean status) {
+        this.owner = status;
     }
 }
