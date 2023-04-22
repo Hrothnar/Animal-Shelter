@@ -2,7 +2,6 @@ package re.st.animalshelter.enumeration;
 
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.Optional;
 
 public enum Button {
     START("/start", "/start"),
@@ -18,7 +17,7 @@ public enum Button {
     TAKE_AN_ANIMAL("Как приютить питомца?", "take an animal"),
     SEND_REPORT("Отправить отчёт о питомце", "send report"),
     CALL_A_VOLUNTEER("Позвать волонтёра", "call a volunteer"),
-    WRONG("", "");
+    NONE("", "");
 
     private final String text;
     private final String calBackQuery;
@@ -40,6 +39,6 @@ public enum Button {
         return Arrays.stream(Button.values())
                 .filter(e -> Objects.equals(e.calBackQuery, string))
                 .findFirst()
-                .orElse(Button.WRONG);
+                .orElse(Button.NONE);
     }
 }

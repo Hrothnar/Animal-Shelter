@@ -17,6 +17,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import re.st.animalshelter.enumeration.*;
 import re.st.animalshelter.enumeration.animal.Shelter;
+import re.st.animalshelter.model.StageCollector;
+import re.st.animalshelter.model.entity.User;
 import re.st.animalshelter.service.CatService;
 import re.st.animalshelter.service.DogService;
 import re.st.animalshelter.service.FileService;
@@ -40,6 +42,7 @@ public class TelegramBotListener implements UpdatesListener {
     private final DogService dogService;
     private final AddCommand addCommand;
     private final AddButtonUtil addButtonUtil;
+    private StageCollector collector;
     private final Map<Integer, LinkedList<Flashback>> memory = new LinkedHashMap<>(10);
     public final static Logger LOGGER = Logger.getLogger(TelegramBotListener.class);
 
@@ -81,10 +84,10 @@ public class TelegramBotListener implements UpdatesListener {
                         remember(new Flashback(message, Dialogue.START, Shelter.NONE, Extension.MD));
                         sendNewTextResponse(message, Dialogue.START, Shelter.NONE, Extension.MD);
                     } else {
-                        checkStatus(message, Dialogue.NONE, Shelter.NONE, Extension.MD);
+                        checkStatus(message, Button.NONE, Shelter.NONE, Extension.MD);
                     }
                 } else if (Objects.nonNull(message.photo())) { // если есть фото
-                    checkStatus(message, Dialogue.NONE, Shelter.NONE, Extension.MD);
+                    checkStatus(message, Button.NONE, Shelter.NONE, Extension.MD);
                 } else if (Objects.nonNull(message.document())) { // если есть документ
 
                 } else { // если тип message не может быть обработан
@@ -94,6 +97,7 @@ public class TelegramBotListener implements UpdatesListener {
             } else if (Objects.nonNull(update.callbackQuery())) { // если получили callbackQuery (пользователь нажал кнопку)
                 Message message = update.callbackQuery().message(); // получаем message callbackQuery
                 int messageId = message.messageId();
+                long chatId = message.chat().id();
                 Button button = Button.getAsEnum(update.callbackQuery().data()); // получаем enum на основе call back
                 Shelter shelter;
                 switch (button) {
@@ -118,12 +122,12 @@ public class TelegramBotListener implements UpdatesListener {
                         sendNewPhotoResponse(message, Dialogue.MAP, shelter, Extension.MD, Extension.PNG);
                         break;
                     case LEAVE_CONTACT_INFORMATION:
-//                        flashback = new Flashback(message, Dialogue.CONTACT_INFORMATION, Shelter.NONE, Extension.MD);
+//                        User user = userService.getUser(chatId);
+//                        userService.updateStatus(chatId, Status.WAIT_FOR_CONTACT_INFORMATION);
+//                        checkStatus(message, Button.LEAVE_CONTACT_INFORMATION, Shelter.NONE, Extension.MD);
                         break;
                     case SEND_REPORT:
-                        checkStatus(message, Dialogue.NONE, Shelter.NONE, Extension.MD);
-
-
+                        checkStatus(message, Button.SEND_REPORT, Shelter.NONE, Extension.MD);
                         break;
                     default:
                         LOGGER.error("Не существующая кнопка");
@@ -137,51 +141,109 @@ public class TelegramBotListener implements UpdatesListener {
         return UpdatesListener.CONFIRMED_UPDATES_ALL;  // возвращаем флаг полной обработки updates
     }
 
-    private void checkStatus(Message message, Dialogue dialogue, Shelter shelter, Extension extension) {
+    private void checkButton(Message message, Button button, Shelter shelter, Extension extension) {
+        long chatId = message.chat().id();
+        User user = userService.getUser(chatId);
+        String text = message.text();
+        switch (button) {
+            case LEAVE_CONTACT_INFORMATION:
+                if (Objects.nonNull(text) && text.length() < 16) {
+                    userService.updatePhoneNumber(user, text);
+                }
+                break;
+        }
+    }
+
+
+    private void checkStatus(Message message, Button button, Shelter shelter, Extension extension) {
         long chatId = message.chat().id();
         String text = message.text();
         PhotoSize[] photoSizes = message.photo();
-        Status status = userService.getStatus(chatId);
+        User user = userService.getUser(chatId);
+        Status status = user.getStatus();
         switch (status) {
             case REPORT_WAS_NOT_SENT:
-                userService.updateStatus(chatId, Status.WAIT_FOR_REPORT_TEXT);
-                sendNewTextResponse(message, Dialogue.REPORT_TEXT, shelter, extension);
+                if (Objects.equals(button, Button.SEND_REPORT)) {
+                    userService.updateStatus(chatId, Status.WAIT_FOR_REPORT_TEXT);
+                    sendNewTextResponse(message, Dialogue.REPORT_TEXT, shelter, extension);
+                }
                 break;
             case WAIT_FOR_REPORT_TEXT:
                 if (Objects.nonNull(text)) {
-                    userService.updateStatus(chatId, Status.WAIT_FOR_REPORT_PHOTO);
-                    sendNewTextResponse(message, Dialogue.REPORT_PHOTO, shelter, extension);
-                    fileService.saveText(chatId, text);
+                    if (Objects.equals(button, Button.NONE)) {
+                        userService.updateStatus(chatId, Status.WAIT_FOR_REPORT_PHOTO);
+                        sendNewTextResponse(message, Dialogue.REPORT_PHOTO, shelter, extension);
+                        fileService.saveText(chatId, text);
+                    }
                 }
                 break;
             case WAIT_FOR_REPORT_PHOTO:
                 if (Objects.nonNull(photoSizes)) {
-                    userService.updateStatus(chatId, Status.REPORT_WAS_SENT);
-                    sendNewTextResponse(message, Dialogue.REPORTED, shelter, extension);
-                    fileService.savePhoto(chatId, photoSizes);
+                    if (Objects.equals(button, Button.NONE)) {
+                        userService.updateStatus(chatId, Status.REPORT_WAS_SENT);
+                        sendNewTextResponse(message, Dialogue.REPORTED, shelter, extension);
+                        fileService.savePhoto(chatId, photoSizes);
+                        userService.updateReportTime(user);
+                    }
                 }
             case REPORT_WAS_SENT:
-//                userService.updateStatus(chatId, Status.WAIT_FOR_REPORT_TEXT);
-//                sendNewTextResponse(message, Dialogue.REPORT_TEXT, shelter, extension);
+                if (Objects.equals(button, Button.SEND_REPORT)) {
+                    userService.updateStatus(chatId, Status.WAIT_FOR_REPORT_TEXT);
+                    sendNewTextResponse(message, Dialogue.REPORT_TEXT, shelter, extension);
+                }
                 break;
             case WAIT_FOR_CONTACT_INFORMATION:
-                if (Objects.nonNull(text)) {
-
-                }
                 break;
             case NONE:
                 break;
         }
     }
 
-    private void rightResponse(int messageId) {
-        Flashback flashback = previousFlashback(messageId);
-        if (flashback.getMessage().messageId() == messageId - 1) {
-            sendEditedFirstResponse(flashback.getMessage(), flashback.getDialogue(), flashback.getShelter(), flashback.getTextExtension());
-        } else {
-            sendEditedTextResponse(flashback.getMessage(), flashback.getDialogue(), flashback.getShelter(), flashback.getTextExtension());
-        }
-    }
+
+//    private void checkStatus(Message message, Button button, Shelter shelter, Extension extension) {
+//        long chatId = message.chat().id();
+//        String text = message.text();
+//        PhotoSize[] photoSizes = message.photo();
+//        User user = userService.getUser(chatId);
+//        Status status = user.getStatus();
+//        switch (status) {
+//            case REPORT_WAS_NOT_SENT:
+//                if (Objects.equals(button, Button.SEND_REPORT)) {
+//                    userService.updateStatus(chatId, Status.WAIT_FOR_REPORT_TEXT);
+//                    sendNewTextResponse(message, Dialogue.REPORT_TEXT, shelter, extension);
+//                }
+//                break;
+//            case WAIT_FOR_REPORT_TEXT:
+//                if (Objects.nonNull(text)) {
+//                    if (Objects.equals(button, Button.NONE)) {
+//                        userService.updateStatus(chatId, Status.WAIT_FOR_REPORT_PHOTO);
+//                        sendNewTextResponse(message, Dialogue.REPORT_PHOTO, shelter, extension);
+//                        fileService.saveText(chatId, text);
+//                    }
+//                }
+//                break;
+//            case WAIT_FOR_REPORT_PHOTO:
+//                if (Objects.nonNull(photoSizes)) {
+//                    if (Objects.equals(button, Button.NONE)) {
+//                        userService.updateStatus(chatId, Status.REPORT_WAS_SENT);
+//                        sendNewTextResponse(message, Dialogue.REPORTED, shelter, extension);
+//                        fileService.savePhoto(chatId, photoSizes);
+//                        userService.updateReportTime(user);
+//                    }
+//                }
+//            case REPORT_WAS_SENT:
+//                if (Objects.equals(button, Button.SEND_REPORT)) {
+//                    userService.updateStatus(chatId, Status.WAIT_FOR_REPORT_TEXT);
+//                    sendNewTextResponse(message, Dialogue.REPORT_TEXT, shelter, extension);
+//                }
+//                break;
+//            case WAIT_FOR_CONTACT_INFORMATION:
+//                checkButton();
+//                break;
+//            case NONE:
+//                break;
+//        }
+//    }
 
 
 //    @Override // главный метод для обработки запросов
@@ -270,6 +332,15 @@ public class TelegramBotListener implements UpdatesListener {
 //    }
 //
 
+    private void rightResponse(int messageId) {
+        Flashback flashback = previousFlashback(messageId);
+        if (flashback.getMessage().messageId() == messageId - 1) {
+            sendEditedFirstResponse(flashback.getMessage(), flashback.getDialogue(), flashback.getShelter(), flashback.getTextExtension());
+        } else {
+            sendEditedTextResponse(flashback.getMessage(), flashback.getDialogue(), flashback.getShelter(), flashback.getTextExtension());
+        }
+    }
+
     private Shelter getCurrentShelter(int messageId) { // получение текущего приюта
         return memory.get(messageId).peek().getShelter();
     }
@@ -344,45 +415,6 @@ public class TelegramBotListener implements UpdatesListener {
         }
     }
 
-
-//        Message message = flashback.getMessage();
-//        long chatId = message.chat().id();
-//        Dialogue dialogue = flashback.getDialogue();
-//        boolean isOwner = userService.isOwner(chatId);
-//        Shelter shelter = flashback.getShelter();
-//        Extension textExtension = flashback.getTextExtension();
-//        boolean initialMessage = flashback.isInitialMessage();
-//        String text = dialogue.getText(shelter, isOwner, textExtension); // получение заготовленного сообщения
-//        InlineKeyboardMarkup keyboard = addButtonUtil.getKeyboard(dialogue, isOwner, shelter); // получение заготовленных кнопок
-//        BaseResponse response;
-//        if (messageId == -1) {
-//            if (flashback instanceof Photo) {
-//                Extension photoExtension = ((Photo) flashback).getPhotoExtension();
-//                File photo = dialogue.getPhoto(shelter, isOwner, photoExtension);
-//                response = telegramBot.execute(new SendPhoto(chatId, photo).caption(text).replyMarkup(keyboard));
-//            } else {
-//                response = telegramBot.execute(new SendMessage(chatId, text).replyMarkup(keyboard));
-//            }
-//        } else {
-//            if (flashback instanceof Photo) {
-//                Extension photoExtension = ((Photo) flashback).getPhotoExtension();
-//                File photo = dialogue.getPhoto(shelter, isOwner, photoExtension);
-//                if (((Photo) flashback).isEditedMessageMedia()) {
-//                    response = telegramBot.execute(new EditMessageMedia(chatId, messageId, new InputMediaPhoto(photo)).replyMarkup(keyboard));
-//                } else {
-//                    response = telegramBot.execute(new SendPhoto(chatId, photo).caption(text).replyMarkup(keyboard));
-//                }
-//            } else {
-//                response = telegramBot.execute(new EditMessageText(chatId, messageId, text).replyMarkup(keyboard));
-//            }
-//        }
-//        if (!response.isOk()) {
-//            LOGGER.error("Ответ не был отправлен", new RuntimeException());
-//            System.out.println(response.description());
-//            //TODO своё исключение
-//        }
-
-
     @Scheduled(cron = "0 0 0 * * 0") // очистка memory пользователя, согласно условию
     private void cleanMemory() {
         if (memory.size() > 1) {
@@ -390,8 +422,13 @@ public class TelegramBotListener implements UpdatesListener {
         }
     }
 
+    @Scheduled(cron = "0 0 0 * * *")
+    private void discardOwnerStatus() {
+        userService.getAllActiveOwners().forEach(userService::discardStatus);
+    }
+
     @PostConstruct // связывание объекта TelegramBotUpdatesListener и бота
-    public void init() {
+    private void init() {
         telegramBot.setUpdatesListener(this);
     }
 

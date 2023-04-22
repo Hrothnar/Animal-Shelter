@@ -7,6 +7,8 @@ import re.st.animalshelter.enumeration.Status;
 import re.st.animalshelter.model.entity.User;
 import re.st.animalshelter.repository.UserRepository;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -47,13 +49,33 @@ public class UserService {
         }
     }
 
-    public Status getStatus(long chatId) {
-        return userRepository.getByChatId(chatId).getStatus();
+    public void updatePhoneNumber(User user, String phoneNumber) {
+        user.setPhoneNumber(phoneNumber);
+        userRepository.save(user);
+    }
+
+    public void discardStatus(User user) {
+        user.setStatus(Status.REPORT_WAS_NOT_SENT);
+        userRepository.save(user);
+    }
+
+    public List<User> getAllActiveOwners() {
+        return userRepository.findAllByOwnerTrueAndStatusNotLike(Status.NONE);
     }
 
     public void updateStatus(long chatId, Status status) {
         User user = userRepository.getByChatId(chatId);
         user.setStatus(status);
+        userRepository.save(user);
+    }
+
+    public void updateReportPath(User user, String path) {
+        user.setData(path);
+        userRepository.save(user);
+    }
+
+    public void updateReportTime(User user) {
+        user.setLastReportDate(LocalDateTime.now());
         userRepository.save(user);
     }
 }

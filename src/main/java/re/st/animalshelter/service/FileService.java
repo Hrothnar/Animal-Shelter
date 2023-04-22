@@ -2,7 +2,6 @@ package re.st.animalshelter.service;
 
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.File;
-import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.PhotoSize;
 import com.pengrad.telegrambot.request.GetFile;
 import com.pengrad.telegrambot.response.GetFileResponse;
@@ -11,11 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import re.st.animalshelter.model.entity.User;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.net.URL;
-import java.nio.file.*;
-import java.nio.file.attribute.FileAttribute;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.Month;
 
@@ -65,19 +62,7 @@ public class FileService {
         }
     }
 
-//    PhotoSize photoSize = message.photo()[message.photo().length - 1];
-//                    GetFileResponse getFileResponse = telegramBot.execute(new GetFile(photoSize.fileId()));
-//                    if (getFileResponse.isOk()) {
-//                        try {
-//                            byte[] fileContent = telegramBot.getFileContent(getFileResponse.file());
-//                            String extension = StringUtils.getFilenameExtension(getFileResponse.file().filePath());
-//                            Files.write(Paths.get(UUID.randomUUID().toString() + "." + extension), fileContent);
-//                        } catch (IOException e) {
-//                            throw new RuntimeException(e);
-//                        }
-//                    }
-
-    private String getReportsPath(long chatId) {
+    public String getReportsPath(long chatId) {
         User user = userService.getUser(chatId);
         long id = user.getId();
         int day = LocalDateTime.now().getDayOfMonth();
@@ -86,8 +71,7 @@ public class FileService {
         int hour = LocalDateTime.now().getHour();
         int minute = LocalDateTime.now().getMinute();
         String fullName = user.getFullName().replace(" ", "_");
+        userService.updateReportPath(user, "reports/" + fullName + "_" + id);
         return "reports/" + fullName + "_" + id + "#" + day + "." + month + "." + year + "_" + hour + "." + minute;
     }
-
-
 }
