@@ -40,7 +40,7 @@ public class UserService {
             user.setEmail(null);
             user.setFullName(message.chat().firstName() + " " + message.chat().lastName());
             user.setExpirationDate(null);
-            user.setStatus(null);
+            user.setStatus(Status.NONE);
             user.setLastReportDate(null);
             user.setPhoneNumber(null);
             userRepository.save(user);

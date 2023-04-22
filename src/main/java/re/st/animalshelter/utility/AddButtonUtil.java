@@ -37,6 +37,12 @@ public class AddButtonUtil {
                 keyboardMarkup.addRow(new InlineKeyboardButton(Button.BACK.getText()).callbackData(Button.BACK.getCallBackQuery()));
             case MAP:
                 break;
+            case REPORT_PHOTO:
+                break;
+            case REPORT_TEXT:
+                break;
+            case REPORTED:
+                break;
             default:
                 LOGGER.error("Неподдерживаемая кнопка");
                 //TODO доработать

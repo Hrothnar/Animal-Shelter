@@ -75,15 +75,16 @@ public class TelegramBotListener implements UpdatesListener {
                 if (Objects.nonNull(text)) { // если у сообщения есть текст
                     if (Objects.equals(Command.START.getText(), text)) { // если равен /start
                         userService.createUser(message); // заносим в БД пользователя
-                        System.out.println(messageId + "  start");
+
+                        userService.updateStatus(message.chat().id(), Status.REPORT_WAS_NOT_SENT);
+
                         remember(new Flashback(message, Dialogue.START, Shelter.NONE, Extension.MD));
                         sendNewTextResponse(message, Dialogue.START, Shelter.NONE, Extension.MD);
                     } else {
-//                        flashback = new Flashback(message, Dialogue.NONE, Shelter.NONE, Extension.MD);
-//                        checkStatus(flashback);
+                        checkStatus(message, Dialogue.NONE, Shelter.NONE, Extension.MD);
                     }
                 } else if (Objects.nonNull(message.photo())) { // если есть фото
-
+                    checkStatus(message, Dialogue.NONE, Shelter.NONE, Extension.MD);
                 } else if (Objects.nonNull(message.document())) { // если есть документ
 
                 } else { // если тип message не может быть обработан
@@ -97,12 +98,7 @@ public class TelegramBotListener implements UpdatesListener {
                 Shelter shelter;
                 switch (button) {
                     case BACK:
-                        flashback = previousFlashback(messageId);
-                        if (flashback.getMessage().messageId() == messageId - 1) {
-                            sendEditedFirstResponse(flashback.getMessage(), flashback.getDialogue(), flashback.getShelter(), flashback.getTextExtension());
-                        } else {
-                            sendEditedTextResponse(flashback.getMessage(), flashback.getDialogue(), flashback.getShelter(), flashback.getTextExtension());
-                        }
+                        rightResponse(messageId);
                         break;
                     case DOG_SHELTER:
                         remember(new Flashback(message, Dialogue.MENU, Shelter.DOG, Extension.MD));
@@ -125,8 +121,7 @@ public class TelegramBotListener implements UpdatesListener {
 //                        flashback = new Flashback(message, Dialogue.CONTACT_INFORMATION, Shelter.NONE, Extension.MD);
                         break;
                     case SEND_REPORT:
-//                        flashback = new Flashback(message, Dialogue.NONE, Shelter.NONE, Extension.MD);
-//                        checkStatus(flashback);
+                        checkStatus(message, Dialogue.NONE, Shelter.NONE, Extension.MD);
 
 
                         break;
@@ -142,8 +137,7 @@ public class TelegramBotListener implements UpdatesListener {
         return UpdatesListener.CONFIRMED_UPDATES_ALL;  // возвращаем флаг полной обработки updates
     }
 
-    private void checkStatus(Flashback flashback) {
-        Message message = flashback.getMessage();
+    private void checkStatus(Message message, Dialogue dialogue, Shelter shelter, Extension extension) {
         long chatId = message.chat().id();
         String text = message.text();
         PhotoSize[] photoSizes = message.photo();
@@ -151,24 +145,24 @@ public class TelegramBotListener implements UpdatesListener {
         switch (status) {
             case REPORT_WAS_NOT_SENT:
                 userService.updateStatus(chatId, Status.WAIT_FOR_REPORT_TEXT);
-                flashback.setDialogue(Dialogue.REPORT_TEXT);
-//                sendEditResponse(flashback);
+                sendNewTextResponse(message, Dialogue.REPORT_TEXT, shelter, extension);
                 break;
             case WAIT_FOR_REPORT_TEXT:
                 if (Objects.nonNull(text)) {
                     userService.updateStatus(chatId, Status.WAIT_FOR_REPORT_PHOTO);
-                    flashback.setDialogue(Dialogue.REPORT_PHOTO);
-//                    fileService.saveText(message);
-//                    sendEditResponse(flashback);
+                    sendNewTextResponse(message, Dialogue.REPORT_PHOTO, shelter, extension);
+                    fileService.saveText(chatId, text);
                 }
                 break;
             case WAIT_FOR_REPORT_PHOTO:
                 if (Objects.nonNull(photoSizes)) {
                     userService.updateStatus(chatId, Status.REPORT_WAS_SENT);
-                    flashback.setDialogue(Dialogue.REPORTED);
-//                    fileService.savePhoto(message);
-//                    sendEditResponse(flashback);
+                    sendNewTextResponse(message, Dialogue.REPORTED, shelter, extension);
+                    fileService.savePhoto(chatId, photoSizes);
                 }
+            case REPORT_WAS_SENT:
+//                userService.updateStatus(chatId, Status.WAIT_FOR_REPORT_TEXT);
+//                sendNewTextResponse(message, Dialogue.REPORT_TEXT, shelter, extension);
                 break;
             case WAIT_FOR_CONTACT_INFORMATION:
                 if (Objects.nonNull(text)) {
@@ -177,6 +171,15 @@ public class TelegramBotListener implements UpdatesListener {
                 break;
             case NONE:
                 break;
+        }
+    }
+
+    private void rightResponse(int messageId) {
+        Flashback flashback = previousFlashback(messageId);
+        if (flashback.getMessage().messageId() == messageId - 1) {
+            sendEditedFirstResponse(flashback.getMessage(), flashback.getDialogue(), flashback.getShelter(), flashback.getTextExtension());
+        } else {
+            sendEditedTextResponse(flashback.getMessage(), flashback.getDialogue(), flashback.getShelter(), flashback.getTextExtension());
         }
     }
 
