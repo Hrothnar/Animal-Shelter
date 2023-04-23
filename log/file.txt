@@ -1,0 +1,181 @@
+
+//    @Override // главный метод для обработки запросов
+//    public int process(List<Update> updates) {
+//        try {
+//            updates.stream().filter(update -> Objects.nonNull(update.message())).forEach(update -> {
+//                logger.info("Handles update: {}", update);
+//
+//                Message message = update.message();
+//                Long chatId = message.chat().id();
+//                String text = message.text();
+//
+//                if ("/start".equals(text)) {
+//                    SendMessage sendMessage = new SendMessage(chatId, "Привет! Я помогу тебе запланировать задачу, отправь её в формате 12.03.2022");
+
+//                    InlineKeyboardButton button1 = new InlineKeyboardButton("Кнопка 1");
+//                    button1.callbackData("Кнопка 1");
+//                    InlineKeyboardButton button2 = new InlineKeyboardButton("Кнопка 2");
+//                    button2.callbackData("Кнопка 2");
+
+//                    Keyboard keyboard = new InlineKeyboardMarkup(button1, button2);
+
+//                    sendMessage.replyMarkup(keyboard);
+//                    telegramBot.execute(sendMessage);
+
+//                    if (update.callbackQuery() != null) {
+//                        CallbackQuery callbackQuery = update.callbackQuery();
+//                        String data = callbackQuery.data();
+//                        switch (data) {
+//                            case "Кнопка 1":
+//                                sendMessage(chatId, "Нажата кнопка 1");
+//                                break;
+//                            case "Кнопка 2":
+//                                sendMessage(chatId, "Нажата кнопка 2");
+//                                break;
+//                        }
+//                    }
+//
+//
+//                    sendMessage(chatId, "Привет! Я помогу тебе запланировать задачу, отправь её в формате 12.03.2022");
+//                    try {
+//                        byte[] photo = Files.readAllBytes(Paths.get(TelegramBotUpdatesListener.class.getResource("/photo/Dragon.jpeg").toURI()));
+//                        SendPhoto sendPhoto = new SendPhoto(chatId, photo);
+//                        sendPhoto.caption("Привет! Я помогу тебе запланировать задачу, отправь её в формате 12.03.2022");
+//                        telegramBot.execute(sendPhoto);
+//                    } catch (IOException | URISyntaxException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//
+//                } else if (text != null) {
+//                    Matcher matcher = pattern.matcher(text);
+//                    if (matcher.find()) {
+//                        LocalDateTime dateTime = parse(matcher.group(1));
+//                        if (Objects.isNull(dateTime)) {
+//                            sendMessage(chatId, "Некорректный формат даты или времени");
+//                        } else { //если использовать цикл можно применить continue
+//                            String text1 = matcher.group(2);
+//                            NotificationTask notificationTask = new NotificationTask();
+//                            notificationTask.setChatId(chatId);
+//                            notificationTask.setMessage(text1);
+//                            notificationTask.setNotificationDateTime(dateTime);
+//                            notificationTaskService.save(notificationTask);
+//                            sendMessage(chatId, "Задача занесена в таблицу");
+//                        }
+//                    } else {
+//                        sendMessage(chatId, "Некорректный формат");
+//                    }
+//                } else if (message.photo() != null) {
+//                    PhotoSize photoSize = message.photo()[message.photo().length - 1];
+//                    GetFileResponse getFileResponse = telegramBot.execute(new GetFile(photoSize.fileId()));
+//                    if (getFileResponse.isOk()) {
+//                        try {
+//                            byte[] fileContent = telegramBot.getFileContent(getFileResponse.file());
+//                            String extension = StringUtils.getFilenameExtension(getFileResponse.file().filePath());
+//                            Files.write(Paths.get(UUID.randomUUID().toString() + "." + extension), fileContent);
+//                        } catch (IOException e) {
+//                            throw new RuntimeException(e);
+//                        }
+//                    }
+//                }
+//            });
+//        } catch (Exception e) {
+//            logger.error(e.getMessage());
+//        }
+//        return UpdatesListener.CONFIRMED_UPDATES_ALL;
+//    }
+//
+
+//    private void rightResponse(int messageId) {
+//        Dialog dialog = previousFlashback(messageId);
+//        if (dialog.getMessage().messageId() == messageId - 1) {
+//            sendEditedFirstResponse(dialog.getMessage(), dialog.getDialogue(), dialog.getShelter(), dialog.getTextExtension());
+//        } else {
+//            sendEditedTextResponse(dialog.getMessage(), dialog.getDialogue(), dialog.getShelter(), dialog.getTextExtension());
+//        }
+//    }
+
+//    private Shelter getCurrentShelter(int messageId) { // получение текущего приюта
+//        return memory.get(messageId).peek().getShelter();
+//    }
+//
+//    private void remember(Dialog dialog) { // добавление в ячейку памяти новой записи
+//        int messageId = dialog.getMessage().messageId();
+//        LinkedList<Dialog> dialogs;
+//        if (memory.containsKey(messageId)) {
+//            dialogs = memory.get(messageId);
+//        } else {
+//            messageId++;
+//            dialogs = new LinkedList<>();
+//        }
+//        dialogs.push(dialog);
+//        memory.put(messageId, dialogs);
+//    }
+
+//
+//    @Scheduled(cron = "0 0 0 * * 0") // очистка memory пользователя, согласно условию
+//    private void cleanMemory() {
+//        if (memory.size() > 1) {
+//            memory.values().removeIf(e -> e.getLast().getCreationTime().isBefore(LocalDateTime.now().minusWeeks(2)));
+//        }
+//    }
+//
+//    @Scheduled(cron = "0 0 0 * * *")
+//    private void discardOwnerStatus() {
+//        userService.getAllActiveOwners().forEach(userService::discardStatus);
+//    }
+
+//    @Nullable
+//    private LocalDateTime parse(String dateTime) {
+//        try {
+//            return LocalDateTime.parse(dateTime, dateTimeFormatter);
+//        } catch (DateTimeParseException e) {
+//            logger.error(e.getMessage());
+//            return null;
+//        }
+//    }
+
+
+//    private void checkStatus(Message message, Button button, Shelter shelter, Extension extension) {
+//        long chatId = message.chat().id();
+//        String text = message.text();
+//        PhotoSize[] photoSizes = message.photo();
+//        User user = userService.getUser(chatId);
+//        Status status = user.getStatus();
+//        switch (status) {
+//            case REPORT_WAS_NOT_SENT:
+//                if (Objects.equals(button, Button.SEND_REPORT)) {
+//                    userService.updateStatus(chatId, Status.WAIT_FOR_REPORT_TEXT);
+//                    sendNewTextResponse(message, Dialogue.REPORT_TEXT, shelter, extension);
+//                }
+//                break;
+//            case WAIT_FOR_REPORT_TEXT:
+//                if (Objects.nonNull(text)) {
+//                    if (Objects.equals(button, Button.NONE)) {
+//                        userService.updateStatus(chatId, Status.WAIT_FOR_REPORT_PHOTO);
+//                        sendNewTextResponse(message, Dialogue.REPORT_PHOTO, shelter, extension);
+//                        fileService.saveText(chatId, text);
+//                    }
+//                }
+//                break;
+//            case WAIT_FOR_REPORT_PHOTO:
+//                if (Objects.nonNull(photoSizes)) {
+//                    if (Objects.equals(button, Button.NONE)) {
+//                        userService.updateStatus(chatId, Status.REPORT_WAS_SENT);
+//                        sendNewTextResponse(message, Dialogue.REPORTED, shelter, extension);
+//                        fileService.savePhoto(chatId, photoSizes);
+//                        userService.updateReportTime(user);
+//                    }
+//                }
+//            case REPORT_WAS_SENT:
+//                if (Objects.equals(button, Button.SEND_REPORT)) {
+//                    userService.updateStatus(chatId, Status.WAIT_FOR_REPORT_TEXT);
+//                    sendNewTextResponse(message, Dialogue.REPORT_TEXT, shelter, extension);
+//                }
+//                break;
+//            case WAIT_FOR_CONTACT_INFORMATION:
+//                checkButton();
+//                break;
+//            case NONE:
+//                break;
+//        }
+//    }

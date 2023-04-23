@@ -5,6 +5,7 @@ import java.util.Objects;
 
 public enum Button {
     START("/start", "/start"),
+
     BACK("Вернуться", "back"),
     DOG_SHELTER("Приют для собак", "dog shelter"),
     CAT_SHELTER("Приют для кошек", "cat shelter"),
@@ -12,10 +13,12 @@ public enum Button {
     LOOK_AT_THE_MAP("Схема проезда", "look at map"),
     DRIVER_PERMIT("Оформить разрешение на проезд", "driver permit"),
     LEAVE_CONTACT_INFORMATION("Оставить данные для связи", "leave contact information"),
-
-
-    TAKE_AN_ANIMAL("Как приютить питомца?", "take an animal"),
     SEND_REPORT("Отправить отчёт о питомце", "send report"),
+    TAKE_AN_ANIMAL("Как приютить питомца?", "take an animal"),
+    RULES("Правила знакомства", "rules"),
+    DOCUMENTS_FOR_ANIMAL("Документы для оформления животного", "documents for animal"),
+    DISABLED_ANIMAL("Животное с ограниченными возможностями", "disabled animal"),
+    CYNOLOGIST("Рекомендации кинологов и контакты","cynologist"),
     CALL_A_VOLUNTEER("Позвать волонтёра", "call a volunteer"),
     NONE("", "");
 

@@ -1,9 +1,10 @@
 package re.st.animalshelter.model.entity;
 
-import re.st.animalshelter.enumeration.Status;
+import re.st.animalshelter.enumeration.Stage;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity(name = "users")
 public class User {
@@ -24,32 +25,11 @@ public class User {
     @Column(name = "last_report_date")
     private LocalDateTime lastReportDate;
     @Enumerated(EnumType.STRING)
-    private Status status;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private Set<Dialog> dialogs;
+    @Enumerated(EnumType.STRING)
+    private Stage stage;
     private boolean owner;
-
-    public User(long chatId,
-                String fullName,
-                String email,
-                String phoneNumber,
-                String data,
-                LocalDateTime expirationDate,
-                LocalDateTime lastReportDate,
-                Status status,
-                boolean isOwner) {
-        this.chatId = chatId;
-        this.fullName = fullName;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.data = data;
-        this.expirationDate = expirationDate;
-        this.lastReportDate = lastReportDate;
-        this.status = status;
-        this.owner = isOwner;
-    }
-
-    public User() {
-
-    }
 
     public long getId() {
         return id;
@@ -115,19 +95,28 @@ public class User {
         this.lastReportDate = lastReportDate;
     }
 
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
     public boolean isOwner() {
         return owner;
     }
 
-    public void setOwner(boolean status) {
-        this.owner = status;
+    public void setOwner(boolean owner) {
+        this.owner = owner;
     }
+
+    public Set<Dialog> getDialogs() {
+        return dialogs;
+    }
+
+    public void setDialogs(Set<Dialog> dialogs) {
+        this.dialogs = dialogs;
+    }
+
+    public Stage getStage() {
+        return stage;
+    }
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
+
 }
