@@ -28,7 +28,8 @@ public class User {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<Dialog> dialogs;
     @Enumerated(EnumType.STRING)
-    private Stage stage;
+    @Column(name = "report_phase", nullable = false)
+    private Stage reportPhase;
     private boolean owner;
 
     public long getId() {
@@ -111,12 +112,12 @@ public class User {
         this.dialogs = dialogs;
     }
 
-    public Stage getStage() {
-        return stage;
+    public Stage getReportPhase() {
+        return reportPhase;
     }
 
-    public void setStage(Stage stage) {
-        this.stage = stage;
+    public void setReportPhase(Stage stage) {
+        this.reportPhase = stage;
     }
 
 }

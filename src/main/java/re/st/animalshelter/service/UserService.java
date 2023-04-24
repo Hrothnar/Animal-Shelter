@@ -51,7 +51,7 @@ public class UserService {
         user.setLastReportDate(null);
         user.setPhoneNumber(null);
         user.setDialogs(dialogs);
-        user.setStage(Stage.NONE);
+        user.setReportPhase(Stage.NONE);
         userRepository.save(user);
     }
 
@@ -66,9 +66,9 @@ public class UserService {
 //        user.getDialogs().forEach(e -> System.out.println(e.getMessageId()));
     }
 
-    public void updateStage(long chatId, Stage stage) {
+    public void updatePhase(long chatId, Stage stage) {
         User user = userRepository.getUserByChatId(chatId);
-        user.setStage(stage);
+        user.setReportPhase(stage);
         userRepository.save(user);
     }
 

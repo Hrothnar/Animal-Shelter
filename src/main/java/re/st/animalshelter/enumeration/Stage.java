@@ -19,7 +19,6 @@ public enum Stage {
     DISABLED_ANIMAL(".md"),
     CYNOLOGIST(".md"),
 
-
     //состояния отправки информации,
     MAP(".png"),
 

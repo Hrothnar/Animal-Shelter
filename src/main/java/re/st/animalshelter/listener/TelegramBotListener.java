@@ -94,10 +94,10 @@ public class TelegramBotListener implements UpdatesListener {
         long chatId = message.chat().id();
         PhotoSize[] photos = message.photo();
         User user = userService.getUser(chatId);
-        Stage stage = user.getStage();
+        Stage stage = user.getReportPhase();
         switch (stage) {
             case REPORT_PHOTO:
-                userService.updateStage(chatId, Stage.REPORTED);
+                userService.updatePhase(chatId, Stage.REPORTED);
                 userService.updateReportTime(user);
                 fileService.savePhoto(chatId, photos);
                 sendNewTextResponse(chatId, Stage.REPORTED, Shelter.NONE);
@@ -121,41 +121,44 @@ public class TelegramBotListener implements UpdatesListener {
                 dialogService.attachShelter(messageId, Shelter.CAT, Stage.MENU);
                 sendEditedTextResponse(chatId, messageId);
                 break;
-            case SHELTER_INFO:
-                dialogService.forwardDialog(messageId, Stage.INFO);
-                sendEditedTextResponse(chatId, messageId);
+            case LEAVE_CONTACT_INFORMATION:
+                userService.updatePhase(chatId, Stage.CONTACT_INFO);
+                sendNewTextResponse(chatId, Stage.CONTACT_INFO, Shelter.NONE);
+                break;
+            case SEND_REPORT:
+                userService.updatePhase(chatId, Stage.REPORT_TEXT);
+                sendNewTextResponse(chatId, Stage.REPORT_TEXT, Shelter.NONE);
                 break;
             case LOOK_AT_THE_MAP:
                 sendNewPhotoResponse(chatId, messageId, Stage.MAP);
                 break;
-            case LEAVE_CONTACT_INFORMATION:
-                userService.updateStage(chatId, Stage.CONTACT_INFO);
-                sendNewTextResponse(chatId, Stage.CONTACT_INFO, Shelter.NONE);
-                break;
-            case SEND_REPORT:
-                userService.updateStage(chatId, Stage.REPORT_TEXT);
-                sendNewTextResponse(chatId, Stage.REPORT_TEXT, Shelter.NONE);
+            case SHELTER_INFO:
+                dialogService.forwardDialog(messageId, Stage.INFO);
+                sendEditedTextResponse(chatId, messageId);
                 break;
             case DRIVER_PERMIT:
-//                Shelter shelter = dialogService.getDialog(messageId).getShelter();
-//                sendNewTextResponse(chatId, Stage.DRIVER_PERMIT, shelter);
                 dialogService.forwardDialog(messageId, Stage.DRIVER_PERMIT);
                 sendEditedTextResponse(chatId, messageId);
                 break;
             case RULES:
+                dialogService.forwardDialog(messageId, Stage.RULES);
+                sendEditedTextResponse(chatId, messageId);
                 break;
             case DOCUMENTS_FOR_ANIMAL:
                 dialogService.forwardDialog(messageId, Stage.DOCUMENTS);
-                sendEditedTextResponse(chatId, messageId);
+                sendEditedTextResponse(chatId, messageId, Shelter.NONE);
                 break;
             case DISABLED_ANIMAL:
-
+                dialogService.forwardDialog(messageId, Stage.DISABLED_ANIMAL);
+                sendEditedTextResponse(chatId, messageId, Shelter.NONE);
                 break;
             case TAKE_AN_ANIMAL:
                 dialogService.forwardDialog(messageId, Stage.ANIMAL);
                 sendEditedTextResponse(chatId, messageId);
                 break;
             case CYNOLOGIST:
+                dialogService.forwardDialog(messageId, Stage.CYNOLOGIST);
+                sendEditedTextResponse(chatId, messageId);
                 break;
             default:
                 LOGGER.error("Не существующая кнопка");
@@ -165,19 +168,35 @@ public class TelegramBotListener implements UpdatesListener {
 
     private void processBack(long chatId, int messageId) {
         Dialog dialog = dialogService.getDialog(messageId);
+        Stage currentStage = dialog.getCurrentStage();
         Stage previousStage = dialog.getPreviousStage();
-        switch (previousStage) {
-            case START:
+        switch (currentStage) {
+            case MENU:
                 dialogService.rebootDialog(messageId);
                 sendEditedTextResponse(chatId, messageId);
                 break;
-            case MENU:
+            case INFO:
+            case ANIMAL:
                 dialogService.backwardDialog(messageId, Stage.START);
                 sendEditedTextResponse(chatId, messageId);
                 break;
-            case INFO:
+            case CYNOLOGIST:
+            case DISABLED_ANIMAL:
+            case DOCUMENTS:
+            case RULES:
                 dialogService.backwardDialog(messageId, Stage.MENU);
                 sendEditedTextResponse(chatId, messageId);
+            case DRIVER_PERMIT:
+                switch (previousStage) {
+                    case INFO:
+                        dialogService.backwardDialog(messageId, Stage.START);
+                        sendEditedTextResponse(chatId, messageId);
+                        break;
+                    case DOCUMENTS:
+                        dialogService.backwardDialog(messageId, Stage.MENU);
+                        sendEditedTextResponse(chatId, messageId);
+                        break;
+                }
                 break;
         }
     }
@@ -196,16 +215,16 @@ public class TelegramBotListener implements UpdatesListener {
             }
             sendStartResponse(chatId);
         } else {
-            Stage stage = userService.getUser(chatId).getStage();
+            Stage stage = userService.getUser(chatId).getReportPhase();
             switch (stage) {
                 case REPORT_TEXT:
-                    userService.updateStage(chatId, Stage.REPORT_PHOTO);
+                    userService.updatePhase(chatId, Stage.REPORT_PHOTO);
                     fileService.saveText(chatId, text);
                     sendNewTextResponse(chatId, Stage.REPORT_PHOTO, Shelter.NONE);
                     break;
                 case CONTACT_INFO:
                     if (text.length() < 15 && text.length() > 6) {
-                        userService.updateStage(chatId, Stage.CONTACT_INFO_RECEIVED);
+                        userService.updatePhase(chatId, Stage.CONTACT_INFO_RECEIVED);
                         userService.updatePhoneNumber(chatId, text);
                         sendNewTextResponse(chatId, Stage.CONTACT_INFO_RECEIVED, Shelter.NONE);
                     }
@@ -244,6 +263,17 @@ public class TelegramBotListener implements UpdatesListener {
         Dialog dialog = dialogService.getDialog(messageId);
         boolean isOwner = user.isOwner();
         Shelter shelter = dialog.getShelter();
+        send(chatId, messageId, dialog, isOwner, shelter);
+    }
+
+    private void sendEditedTextResponse(long chatId, int messageId, Shelter shelter) {
+        User user = userService.getUser(chatId);
+        Dialog dialog = dialogService.getDialog(messageId);
+        boolean isOwner = user.isOwner();
+        send(chatId, messageId, dialog, isOwner, shelter);
+    }
+
+    private void send(long chatId, int messageId, Dialog dialog, boolean isOwner, Shelter shelter) {
         Stage stage = dialog.getCurrentStage();
         String text = stage.getText(shelter, isOwner);
         InlineKeyboardMarkup keyboard = addButtonUtil.getKeyboard(shelter, isOwner, stage);
@@ -255,6 +285,7 @@ public class TelegramBotListener implements UpdatesListener {
             //TODO своё исключение
         }
     }
+
 
     private void sendNewPhotoResponse(long chatId, int messageId, Stage stage) {
         User user = userService.getUser(chatId);
