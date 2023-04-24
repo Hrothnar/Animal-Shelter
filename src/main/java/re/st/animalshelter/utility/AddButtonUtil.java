@@ -50,6 +50,9 @@ public class AddButtonUtil {
                 keyboardMarkup.addRow(new InlineKeyboardButton(Button.DRIVER_PERMIT.getText()).callbackData(Button.DRIVER_PERMIT.getCallBackQuery()));
                 keyboardMarkup.addRow(new InlineKeyboardButton(Button.BACK.getText()).callbackData(Button.BACK.getCallBackQuery()));
                 break;
+            case CYNOLOGIST:
+            case DISABLED_ANIMAL:
+            case RULES:
             case DRIVER_PERMIT:
                 keyboardMarkup.addRow(new InlineKeyboardButton(Button.BACK.getText()).callbackData(Button.BACK.getCallBackQuery()));
                 break;

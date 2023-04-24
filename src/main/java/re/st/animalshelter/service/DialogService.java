@@ -16,18 +16,18 @@ public class DialogService {
         this.dialogRepository = dialogRepository;
     }
 
+    public void attachShelter(int messageId, Shelter shelter, Stage stage) {
+        Dialog dialog = dialogRepository.getDialogByMessageId(messageId);
+        dialog.setShelter(shelter);
+        dialog.setCurrentStage(stage);
+        dialogRepository.save(dialog);
+    }
+
     public void rebootDialog(int messageId) {
         Dialog dialog = dialogRepository.getDialogByMessageId(messageId);
         dialog.setShelter(Shelter.NONE);
         dialog.setCurrentStage(Stage.START);
         dialog.setPreviousStage(Stage.START);
-        dialogRepository.save(dialog);
-    }
-
-    public void attachShelter(int messageId, Shelter shelter, Stage currentStage) {
-        Dialog dialog = dialogRepository.getDialogByMessageId(messageId);
-        dialog.setShelter(shelter);
-        dialog.setCurrentStage(currentStage);
         dialogRepository.save(dialog);
     }
 

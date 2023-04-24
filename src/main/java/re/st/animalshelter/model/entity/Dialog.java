@@ -19,7 +19,7 @@ public class Dialog {
     @Column(name = "current_stage", nullable = false)
     @Enumerated(value = EnumType.STRING)
     private Stage currentStage;
-    @Column(name = "previous_stage", nullable = false)
+    @Column(name =  "previous_stage",nullable = false)
     @Enumerated(value = EnumType.STRING)
     private Stage previousStage;
     @Column(name = "lats_update", nullable = false)
