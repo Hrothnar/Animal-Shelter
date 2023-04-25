@@ -2,18 +2,27 @@ package re.st.animalshelter.controller;
 
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
-@RequestMapping("petowner")
+@Controller
+@RequestMapping("/")
 public class VolunteerController {
+
+
+    @GetMapping()
+    public String menu() {
+//        model.addAttribute("name", "value");
+        return "greeting";
+    }
 
     @GetMapping("/chat")
     public ResponseEntity<?> chat() {
         return null;
     }
 
-    @GetMapping("/")
+    @GetMapping("/all")
     public ResponseEntity<?> showAllReports() {
         return null;
     }
