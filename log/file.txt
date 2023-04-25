@@ -179,3 +179,28 @@
 //                break;
 //        }
 //    }
+
+//public interface NotificationTaskRepository extends JpaRepository<> {
+//    List<NotificationTask> findAllByNotificationDateTime(LocalDateTime localDateTime);
+//
+//    SQL запросы через Spring JPA с указанием классов и полей, в таком случае название метода значение не имеет
+//    @Query("SELECT nt FROM NotificationTask nt WHERE nt.message like %:messageLike%")
+//    @Query(value = "SELECT nt FROM NotificatonTask nt WHERE nt.message like %:messageLike%", nativeQuery = true)
+//    List<NotificationTask> findAllByMessageLike (@Param("messageLike") String message);
+//
+//    List<NotificationTask> findAllByNotificationDateTimeAndChatId(LocalDateTime localDateTime, Long chatId);
+//
+//    @Modifying // без этой аннотации Spring думает что запросы выполнены в нативном SQL
+//    @Query("DELETE FROM NotificationTask WHERE message like %:messageLike%")
+//    void removeAllLike(@Param("messageLike") String message);
+//}
+
+//    @Scheduled(fixedDelay = 1, timeUnit = TimeUnit.MINUTES)
+//    public void task() {
+//        notificationTaskRepository.findAllByNotificationDateTime(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES))
+//                .forEach(notificationTask -> {
+//                    telegramBot.execute(new SendMessage(notificationTask.getChatId(), notificationTask.getMessage()));
+//                    notificationTaskRepository.delete(notificationTask);
+//                });
+//
+//    }

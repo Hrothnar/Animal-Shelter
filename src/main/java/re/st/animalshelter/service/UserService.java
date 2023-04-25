@@ -16,12 +16,10 @@ import java.util.*;
 @Service
 public class UserService {
     private final UserRepository userRepository;
-    private final DialogRepository dialogRepository;
 
     @Autowired
-    public UserService(UserRepository userRepository, DialogRepository dialogRepository) {
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.dialogRepository = dialogRepository;
     }
 
     public boolean isOwner(long chatId) {
@@ -51,50 +49,23 @@ public class UserService {
         user.setLastReportDate(null);
         user.setPhoneNumber(null);
         user.setDialogs(dialogs);
-        user.setReportPhase(Stage.NONE);
+        user.setPhase(Stage.NONE);
         userRepository.save(user);
     }
 
     public void createDialog(long chatId, int messageId) {
         User user = userRepository.getUserByChatId(chatId);
-//        System.out.println("Before");
-//        user.getDialogs().forEach(e -> System.out.println(e.getMessageId()));
         Dialog dialog = new Dialog(messageId, Shelter.NONE, Stage.START, Stage.START);
         user.getDialogs().add(dialog);
         userRepository.save(user);
-//        System.out.println("After");
-//        user.getDialogs().forEach(e -> System.out.println(e.getMessageId()));
     }
 
     public void updatePhase(long chatId, Stage stage) {
         User user = userRepository.getUserByChatId(chatId);
-        user.setReportPhase(stage);
+        user.setPhase(stage);
         userRepository.save(user);
     }
 
-
-
-    //
-//    public void updatePhoneNumber(User user, String phoneNumber) {
-//        user.setPhoneNumber(phoneNumber);
-//        userRepository.save(user);
-//    }
-//
-//    public void discardStatus(User user) {
-//        user.setStatus(Stage.REPORT_WAS_NOT_SENT);
-//        userRepository.save(user);
-//    }
-//
-//    public List<User> getAllActiveOwners() {
-//        return userRepository.findAllByOwnerTrueAndStatusNotLike(Stage.NONE);
-//    }
-//
-//    public void updateStatus(long chatId, Stage stage) {
-//        User user = userRepository.getByChatId(chatId);
-//        user.setStatus(stage);
-//        userRepository.save(user);
-//    }
-//
     public void updateReportPath(User user, String path) {
         user.setData(path);
         userRepository.save(user);

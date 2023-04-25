@@ -24,7 +24,7 @@ import re.st.animalshelter.model.entity.Dialog;
 import re.st.animalshelter.model.entity.User;
 import re.st.animalshelter.service.*;
 import re.st.animalshelter.utility.AddButtonUtil;
-import re.st.animalshelter.utility.AddCommand;
+import re.st.animalshelter.utility.AddCommandUtil;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
@@ -40,7 +40,7 @@ public class TelegramBotListener implements UpdatesListener {
     private final DialogService dialogService;
     private final CatService catService;
     private final DogService dogService;
-    private final AddCommand addCommand;
+    private final AddCommandUtil addCommandUtil;
     private final AddButtonUtil addButtonUtil;
     public final static Logger LOGGER = Logger.getLogger(TelegramBotListener.class);
 
@@ -54,7 +54,7 @@ public class TelegramBotListener implements UpdatesListener {
                                CatService catService,
                                DogService dogService,
                                AddButtonUtil addButtonUtil,
-                               AddCommand addCommand,
+                               AddCommandUtil addCommandUtil,
                                FileService fileService,
                                DialogService dialogService) {
         this.telegramBot = telegramBot;
@@ -62,7 +62,7 @@ public class TelegramBotListener implements UpdatesListener {
         this.catService = catService;
         this.dogService = dogService;
         this.addButtonUtil = addButtonUtil;
-        this.addCommand = addCommand;
+        this.addCommandUtil = addCommandUtil;
         this.fileService = fileService;
         this.dialogService = dialogService;
     }
@@ -94,7 +94,7 @@ public class TelegramBotListener implements UpdatesListener {
         long chatId = message.chat().id();
         PhotoSize[] photos = message.photo();
         User user = userService.getUser(chatId);
-        Stage stage = user.getReportPhase();
+        Stage stage = user.getPhase();
         switch (stage) {
             case REPORT_PHOTO:
                 userService.updatePhase(chatId, Stage.REPORTED);
@@ -172,7 +172,7 @@ public class TelegramBotListener implements UpdatesListener {
         Stage previousStage = dialog.getPreviousStage();
         switch (currentStage) {
             case MENU:
-                dialogService.rebootDialog(messageId);
+                dialogService.resetDialog(messageId);
                 sendEditedTextResponse(chatId, messageId);
                 break;
             case INFO:
@@ -186,6 +186,7 @@ public class TelegramBotListener implements UpdatesListener {
             case RULES:
                 dialogService.backwardDialog(messageId, Stage.MENU);
                 sendEditedTextResponse(chatId, messageId);
+                break;
             case DRIVER_PERMIT:
                 switch (previousStage) {
                     case INFO:
@@ -193,7 +194,7 @@ public class TelegramBotListener implements UpdatesListener {
                         sendEditedTextResponse(chatId, messageId);
                         break;
                     case DOCUMENTS:
-                        dialogService.backwardDialog(messageId, Stage.MENU);
+                        dialogService.backwardDialog(messageId, Stage.ANIMAL);
                         sendEditedTextResponse(chatId, messageId);
                         break;
                 }
@@ -215,7 +216,7 @@ public class TelegramBotListener implements UpdatesListener {
             }
             sendStartResponse(chatId);
         } else {
-            Stage stage = userService.getUser(chatId).getReportPhase();
+            Stage stage = userService.getUser(chatId).getPhase();
             switch (stage) {
                 case REPORT_TEXT:
                     userService.updatePhase(chatId, Stage.REPORT_PHOTO);
@@ -228,6 +229,7 @@ public class TelegramBotListener implements UpdatesListener {
                         userService.updatePhoneNumber(chatId, text);
                         sendNewTextResponse(chatId, Stage.CONTACT_INFO_RECEIVED, Shelter.NONE);
                     }
+                    break;
             }
         }
     }
@@ -305,5 +307,6 @@ public class TelegramBotListener implements UpdatesListener {
     @PostConstruct // связывание объекта TelegramBotUpdatesListener и бота
     private void init() {
         telegramBot.setUpdatesListener(this);
+        new AddCommandUtil().addCommands(telegramBot);
     }
 }

@@ -23,7 +23,7 @@ public class DialogService {
         dialogRepository.save(dialog);
     }
 
-    public void rebootDialog(int messageId) {
+    public void resetDialog(int messageId) {
         Dialog dialog = dialogRepository.getDialogByMessageId(messageId);
         dialog.setShelter(Shelter.NONE);
         dialog.setCurrentStage(Stage.START);
