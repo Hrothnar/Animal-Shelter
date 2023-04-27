@@ -38,9 +38,6 @@ public class TelegramBotListener implements UpdatesListener {
     private final UserService userService;
     private final FileService fileService;
     private final DialogService dialogService;
-    private final CatService catService;
-    private final DogService dogService;
-    private final AddCommandUtil addCommandUtil;
     private final AddButtonUtil addButtonUtil;
     public final static Logger LOGGER = Logger.getLogger(TelegramBotListener.class);
 
@@ -51,18 +48,12 @@ public class TelegramBotListener implements UpdatesListener {
     @Autowired
     public TelegramBotListener(TelegramBot telegramBot,
                                UserService userService,
-                               CatService catService,
-                               DogService dogService,
                                AddButtonUtil addButtonUtil,
-                               AddCommandUtil addCommandUtil,
                                FileService fileService,
                                DialogService dialogService) {
         this.telegramBot = telegramBot;
         this.userService = userService;
-        this.catService = catService;
-        this.dogService = dogService;
         this.addButtonUtil = addButtonUtil;
-        this.addCommandUtil = addCommandUtil;
         this.fileService = fileService;
         this.dialogService = dialogService;
     }
@@ -114,50 +105,29 @@ public class TelegramBotListener implements UpdatesListener {
                 processBack(chatId, messageId);
                 break;
             case DOG_SHELTER:
-                dialogService.attachShelter(messageId, Shelter.DOG, Stage.MENU);
-                sendEditedTextResponse(chatId, messageId);
-                break;
             case CAT_SHELTER:
-                dialogService.attachShelter(messageId, Shelter.CAT, Stage.MENU);
+                dialogService.attachShelter(messageId, button, Stage.MENU);
                 sendEditedTextResponse(chatId, messageId);
                 break;
             case LEAVE_CONTACT_INFORMATION:
-                userService.updatePhase(chatId, Stage.CONTACT_INFO);
-                sendNewTextResponse(chatId, Stage.CONTACT_INFO, Shelter.NONE);
-                break;
             case SEND_REPORT:
-                userService.updatePhase(chatId, Stage.REPORT_TEXT);
-                sendNewTextResponse(chatId, Stage.REPORT_TEXT, Shelter.NONE);
+                userService.updatePhase(chatId, button.getStage());
+                sendNewTextResponse(chatId, button.getStage(), Shelter.NONE);
                 break;
             case LOOK_AT_THE_MAP:
                 sendNewPhotoResponse(chatId, messageId, Stage.MAP);
                 break;
-            case SHELTER_INFO:
-                dialogService.forwardDialog(messageId, Stage.INFO);
-                sendEditedTextResponse(chatId, messageId);
-                break;
-            case DRIVER_PERMIT:
-                dialogService.forwardDialog(messageId, Stage.DRIVER_PERMIT);
-                sendEditedTextResponse(chatId, messageId);
-                break;
-            case RULES:
-                dialogService.forwardDialog(messageId, Stage.RULES);
-                sendEditedTextResponse(chatId, messageId);
-                break;
             case DOCUMENTS_FOR_ANIMAL:
-                dialogService.forwardDialog(messageId, Stage.DOCUMENTS);
-                sendEditedTextResponse(chatId, messageId, Shelter.NONE);
-                break;
             case DISABLED_ANIMAL:
-                dialogService.forwardDialog(messageId, Stage.DISABLED_ANIMAL);
+                dialogService.forwardDialog(messageId, button.getStage());
                 sendEditedTextResponse(chatId, messageId, Shelter.NONE);
                 break;
+            case SHELTER_INFO:
+            case DRIVER_PERMIT:
+            case RULES:
             case TAKE_AN_ANIMAL:
-                dialogService.forwardDialog(messageId, Stage.ANIMAL);
-                sendEditedTextResponse(chatId, messageId);
-                break;
             case CYNOLOGIST:
-                dialogService.forwardDialog(messageId, Stage.CYNOLOGIST);
+                dialogService.forwardDialog(messageId, button.getStage());
                 sendEditedTextResponse(chatId, messageId);
                 break;
             default:
@@ -190,7 +160,7 @@ public class TelegramBotListener implements UpdatesListener {
             case DRIVER_PERMIT:
                 switch (previousStage) {
                     case INFO:
-                        dialogService.backwardDialog(messageId, Stage.START);
+                        dialogService.backwardDialog(messageId, Stage.MENU);
                         sendEditedTextResponse(chatId, messageId);
                         break;
                     case DOCUMENTS:

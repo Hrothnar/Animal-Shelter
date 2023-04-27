@@ -34,6 +34,9 @@ public class UserService {
         return userRepository.getUserByChatId(chatId);
     }
 
+    public User getUser(String userName, String email, String passport) {
+        return userRepository.getUserByUserNameOrEmailOrPassport(userName, email, passport);
+    }
 
     public void createUserAndStartDialog(long chatId, int messageId, Message message) {
         Set<Dialog> dialogs = new HashSet<>();
@@ -48,6 +51,8 @@ public class UserService {
         user.setExpirationDate(null);
         user.setLastReportDate(null);
         user.setPhoneNumber(null);
+        user.setPassport(null);
+        user.setUserName(message.chat().username());
         user.setDialogs(dialogs);
         user.setPhase(Stage.NONE);
         userRepository.save(user);
@@ -80,7 +85,23 @@ public class UserService {
         User user = userRepository.getUserByChatId(chatId);
         user.setPhoneNumber(text);
         userRepository.save(user);
-
     }
+
+
+    public void updateData(long id, String fullName, String phoneNumber, String email, String passport) {
+        User user = userRepository.getUserById(id);
+        if (Objects.isNull(user)) {
+            user = new User();
+        }
+        user.setFullName(fullName);
+        user.setPhoneNumber(phoneNumber);
+        user.setEmail(email);
+        user.setPassport(passport);
+        user.setExpirationDate(LocalDateTime.now().plusDays(30));
+        user.setOwner(true);
+        user.setPhase(Stage.NONE);
+        userRepository.save(user);
+    }
+
 }
 

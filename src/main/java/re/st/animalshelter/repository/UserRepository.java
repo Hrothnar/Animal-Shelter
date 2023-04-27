@@ -7,4 +7,6 @@ import re.st.animalshelter.model.entity.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     User getUserByChatId(long chatId);
+    User getUserById(long id);
+    User getUserByUserNameOrEmailOrPassport(String userName, String email, String passport);
 }

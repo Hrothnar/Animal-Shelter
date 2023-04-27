@@ -2,6 +2,7 @@ package re.st.animalshelter.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import re.st.animalshelter.enumeration.Button;
 import re.st.animalshelter.enumeration.Stage;
 import re.st.animalshelter.enumeration.animal.Shelter;
 import re.st.animalshelter.model.entity.Dialog;
@@ -16,7 +17,8 @@ public class DialogService {
         this.dialogRepository = dialogRepository;
     }
 
-    public void attachShelter(int messageId, Shelter shelter, Stage stage) {
+    public void attachShelter(int messageId, Button button, Stage stage) {
+        Shelter shelter = Button.getShelter(button);
         Dialog dialog = dialogRepository.getDialogByMessageId(messageId);
         dialog.setShelter(shelter);
         dialog.setCurrentStage(stage);

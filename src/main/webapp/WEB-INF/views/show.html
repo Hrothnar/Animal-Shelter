@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Пользователь</title>
+</head>
+
+<body>
+
+<form th:method="POST" th:action="@{/user/edit}" th:object="${user}">
+    <label for="id">Id пользователя:</label>
+    <input type="text" th:field="*{id}" id="id"/>
+    <br/>
+    <label for="fullName">Введите ФИО:</label>
+    <input type="text" th:field="*{fullName}" id="fullName"/>
+    <br/>
+    <label for="email">Введите Email:</label>
+    <input type="text" th:field="*{email}" id="email"/>
+    <br/>
+    <label for="phoneNumber">Введите номер телефона:</label>
+    <input type="text" th:field="*{phoneNumber}" id="phoneNumber"/>
+    <br/>
+    <label for="passport">Введите номер и серию паспорта:</label>
+    <input type="text" th:field="*{passport}" id="passport"/>
+    <br/>
+    <input type="submit" value="Сохранить">
+    <p ></p>
+</form>
+
+</body>
+</html>

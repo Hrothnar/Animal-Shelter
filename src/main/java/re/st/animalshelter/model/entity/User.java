@@ -11,10 +11,11 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column(name = "chat_id", unique = true, nullable = false)
+    @Column(name = "chat_id", unique = true)
     private long chatId;
     @Column(name = "full_name")
     private String fullName;
+    private String userName;
     @Column(unique = true)
     private String email;
     @Column(name = "phone_number")
@@ -31,6 +32,7 @@ public class User {
     @Column(name = "phase", nullable = false)
     private Stage phase;
     private boolean owner;
+    private String passport;
 
     public long getId() {
         return id;
@@ -120,4 +122,38 @@ public class User {
         this.phase = stage;
     }
 
+    public String getPassport() {
+        return passport;
+    }
+
+    public void setPassport(String passport) {
+        this.passport = passport;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", chatId=" + chatId +
+                ", fullName='" + fullName + '\'' +
+                ", userName='" + userName + '\'' +
+                ", email='" + email + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", data='" + data + '\'' +
+                ", expirationDate=" + expirationDate +
+                ", lastReportDate=" + lastReportDate +
+//                ", dialogs=" + dialogs +
+                ", phase=" + phase +
+                ", owner=" + owner +
+                ", passport='" + passport + '\'' +
+                '}';
+    }
 }
