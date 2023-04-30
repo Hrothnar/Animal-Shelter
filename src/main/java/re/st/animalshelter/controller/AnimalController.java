@@ -2,8 +2,8 @@ package re.st.animalshelter.controller;
 
 import org.springframework.web.bind.annotation.*;
 
-@RestController
-@RequestMapping("/animal")
+//@RestController
+//@RequestMapping("/animal")
 public class AnimalController {
 
 //

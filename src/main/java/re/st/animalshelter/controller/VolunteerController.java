@@ -3,7 +3,7 @@ package re.st.animalshelter.controller;
 
 import org.springframework.stereotype.Controller;
 
-@Controller
+//@Controller
 public class VolunteerController {
 
 

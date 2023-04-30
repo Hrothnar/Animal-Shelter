@@ -3,6 +3,7 @@ package re.st.animalshelter.entity;
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 @Entity(name = "users")
 public class User {
@@ -31,47 +32,47 @@ public class User {
 
     private boolean owner;
 
-    @OneToOne(cascade = {CascadeType.ALL}, fetch = FetchType.LAZY, orphanRemoval = true, mappedBy = "user")
-    private Stage stage;
+//    @OneToOne(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "user")
+//    private Stage stage;
+//
+//    @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER, mappedBy = "users")
+//    private Set<Volunteer> volunteers = new HashSet<>();
+//
+//    @OneToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER, mappedBy = "user")
+//    private Set<Animal> animals = new HashSet<>();
+//
+//    @OneToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER, mappedBy = "user")
+//    private Set<Action> actions = new HashSet<>();
 
-    @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY, mappedBy = "users")
-    private Collection<Volunteer> volunteers = new HashSet<>();
-
-    @OneToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY, mappedBy = "user")
-    private Collection<Animal> animals = new HashSet<>();
-
-    @OneToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY, mappedBy = "user")
-    private Collection<Action> actions = new HashSet<>();
-
-    public void addVolunteer(Volunteer volunteer) {
-        this.volunteers.add(volunteer);
-        volunteer.getUsers().add(this);
-    }
-
-    private void removeVolunteer(Volunteer volunteer) {
-        this.volunteers.remove(volunteer);
-        volunteer.getUsers().remove(this);
-    }
-
-    public void addAnimal(Animal animal) {
-        this.animals.add(animal);
-        animal.setUser(this);
-    }
-
-    public void removeAnimal(Animal animal) {
-        this.animals.remove(animal);
-        animal.setUser(null);
-    }
-
-    public void addAction(Action action) {
-        this.actions.add(action);
-        action.setUser(this);
-    }
-
-    public void removeAction(Action action) {
-        this.actions.remove(action);
-        action.setUser(null);
-    }
+//    public void addVolunteer(Volunteer volunteer) {
+//        this.volunteers.add(volunteer);
+//        volunteer.getUsers().add(this);
+//    }
+//
+//    private void removeVolunteer(Volunteer volunteer) {
+//        this.volunteers.remove(volunteer);
+//        volunteer.getUsers().remove(this);
+//    }
+//
+//    public void addAnimal(Animal animal) {
+//        this.animals.add(animal);
+//        animal.setUser(this);
+//    }
+//
+//    public void removeAnimal(Animal animal) {
+//        this.animals.remove(animal);
+//        animal.setUser(null);
+//    }
+//
+//    public void addAction(Action action) {
+//        this.actions.add(action);
+//        action.setUser(this);
+//    }
+//
+//    public void removeAction(Action action) {
+//        this.actions.remove(action);
+//        action.setUser(null);
+//    }
 
     public long getId() {
         return id;
@@ -133,28 +134,28 @@ public class User {
         this.owner = owner;
     }
 
-    public Stage getStage() {
-        return stage;
-    }
-
-    public void setStage(Stage stage) {
-        this.stage = stage;
-    }
-
-    public Collection<Volunteer> getVolunteers() {
-//        return Collections.unmodifiableCollection(volunteers);
-        return volunteers;
-    }
-
-    public Collection<Animal> getAnimals() {
-//        return Collections.unmodifiableCollection(animals);
-        return animals;
-    }
-
-    public Collection<Action> getActions() {
-//        return Collections.unmodifiableCollection(actions);
-        return actions;
-    }
+//    public Stage getStage() {
+//        return stage;
+//    }
+//
+//    public void setStage(Stage stage) {
+//        this.stage = stage;
+//    }
+//
+//    public Set<Volunteer> getVolunteers() {
+////        return Collections.unmodifiableCollection(volunteers);
+//        return volunteers;
+//    }
+//
+//    public Set<Animal> getAnimals() {
+////        return Collections.unmodifiableCollection(animals);
+//        return animals;
+//    }
+//
+//    public Set<Action> getActions() {
+////        return Collections.unmodifiableCollection(actions);
+//        return actions;
+//    }
 
     @Override
     public String toString() {

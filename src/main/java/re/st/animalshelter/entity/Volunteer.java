@@ -3,6 +3,7 @@ package re.st.animalshelter.entity;
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 @Entity(name = "volunteers")
 public class Volunteer {
@@ -17,31 +18,31 @@ public class Volunteer {
     @Column(length = 56)
     private String fullName;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    private Collection<User> users = new HashSet<>();
+//    @ManyToMany(fetch = FetchType.LAZY)
+//    private Set<User> users = new HashSet<>();
+//
+//    @OneToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER, mappedBy = "volunteer")
+//    private Set<Animal> animals = new HashSet<>();
 
-    @OneToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY, mappedBy = "volunteer")
-    private Collection<Animal> animals = new HashSet<>();
-
-    public void addAnimal(Animal animal) {
-        this.animals.add(animal);
-        animal.setVolunteer(this);
-    }
-
-    public void removeAnimal(Animal animal) {
-        this.animals.remove(animal);
-        animal.setVolunteer(null);
-    }
-
-    public Collection<Animal> getAnimals() {
-//        return Collections.unmodifiableCollection(animals);
-        return animals;
-    }
-
-    public Collection<User> getUsers() {
-//        return Collections.unmodifiableCollection(users);
-        return users;
-    }
+//    public void addAnimal(Animal animal) {
+//        this.animals.add(animal);
+//        animal.setVolunteer(this);
+//    }
+//
+//    public void removeAnimal(Animal animal) {
+//        this.animals.remove(animal);
+//        animal.setVolunteer(null);
+//    }
+//
+//    public Set<Animal> getAnimals() {
+////        return Collections.unmodifiableCollection(animals);
+//        return animals;
+//    }
+//
+//    public Set<User> getUsers() {
+////        return Collections.unmodifiableCollection(users);
+//        return users;
+//    }
 
     public long getId() {
         return id;

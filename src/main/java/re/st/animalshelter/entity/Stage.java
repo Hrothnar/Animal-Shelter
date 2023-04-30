@@ -13,9 +13,9 @@ public class Stage {
     @Enumerated(value = EnumType.STRING)
     private Status contactInfoStatus;
 
-    @OneToOne(fetch = FetchType.LAZY, orphanRemoval = true)
-    @MapsId
-    private User user;
+//    @OneToOne(fetch = FetchType.EAGER, orphanRemoval = true)
+//    @MapsId
+//    private User user;
 
     public long getId() {
         return id;
@@ -28,12 +28,12 @@ public class Stage {
     public void setContactInfoStatus(Status contactInfoStatus) {
         this.contactInfoStatus = contactInfoStatus;
     }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
+//
+//    public User getUser() {
+//        return user;
+//    }
+//
+//    public void setUser(User user) {
+//        this.user = user;
+//    }
 }

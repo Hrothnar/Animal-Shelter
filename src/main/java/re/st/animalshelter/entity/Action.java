@@ -27,9 +27,9 @@ public class Action {
     @Column(nullable = false)
     private LocalDateTime lastUpdate;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+//    @ManyToOne(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
+//    @JoinColumn(name = "user_id")
+//    private User user;
 
     public Action(int messageId, Button button, Shelter shelter) {
         this.messageId = messageId;
@@ -70,16 +70,16 @@ public class Action {
     public void setShelter(Shelter shelter) {
         this.shelter = shelter;
     }
-
-    public User getUser() {
-        return user;
-    }
-
-    public LocalDateTime getLastUpdate() {
-        return lastUpdate;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
+//
+//    public User getUser() {
+//        return user;
+//    }
+//
+//    public LocalDateTime getLastUpdate() {
+//        return lastUpdate;
+//    }
+//
+//    public void setUser(User user) {
+//        this.user = user;
+//    }
 }

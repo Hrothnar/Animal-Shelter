@@ -32,13 +32,13 @@ public class Animal {
 
     private LocalDateTime lastReportDate;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    @ManyToOne(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY)
-    @JoinColumn(name = "volunteer_id")
-    private Volunteer volunteer;
+//    @ManyToOne(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
+//    @JoinColumn(name = "user_id")
+//    private User user;
+//
+//    @ManyToOne(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
+//    @JoinColumn(name = "volunteer_id")
+//    private Volunteer volunteer;
 
     public long getId() {
         return id;
@@ -51,14 +51,14 @@ public class Animal {
     public void setAge(int age) {
         this.age = age;
     }
-//
-//    public Shelter getAnimal() {
-//        return animal;
-//    }
-//
-//    public void setAnimal(Shelter animal) {
-//        this.animal = animal;
-//    }
+
+    public Shelter getAnimal() {
+        return animal;
+    }
+
+    public void setAnimal(Shelter animal) {
+        this.animal = animal;
+    }
 
     public Breed getBreed() {
         return breed;
@@ -91,22 +91,22 @@ public class Animal {
     public void setLastReportDate(LocalDateTime lastReportDate) {
         this.lastReportDate = lastReportDate;
     }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Volunteer getVolunteer() {
-        return volunteer;
-    }
-
-    public void setVolunteer(Volunteer volunteer) {
-        this.volunteer = volunteer;
-    }
+//
+//    public User getUser() {
+//        return user;
+//    }
+//
+//    public void setUser(User user) {
+//        this.user = user;
+//    }
+//
+//    public Volunteer getVolunteer() {
+//        return volunteer;
+//    }
+//
+//    public void setVolunteer(Volunteer volunteer) {
+//        this.volunteer = volunteer;
+//    }
 
     public void setId(long id) {
         this.id = id;

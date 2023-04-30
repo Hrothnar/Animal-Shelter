@@ -12,8 +12,8 @@ import re.st.animalshelter.service.UserService;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Objects;
 
-@Controller
-@RequestMapping("/user")
+//@Controller
+//@RequestMapping("/user")
 public class UserController {
     private final UserService userService;
 

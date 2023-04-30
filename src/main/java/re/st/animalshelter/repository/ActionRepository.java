@@ -1,8 +1,10 @@
 package re.st.animalshelter.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 import re.st.animalshelter.entity.Action;
 
+@Repository
 public interface ActionRepository extends JpaRepository<Action, Long> {
 //    List<Dialog> getDialogByMessageId(int messageId);
     Action getTopByMessageId(int messageId);
