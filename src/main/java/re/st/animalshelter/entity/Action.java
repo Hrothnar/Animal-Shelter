@@ -5,30 +5,45 @@ import re.st.animalshelter.enumeration.animal.Shelter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Set;
 
-@Entity(name = "dialogs")
-public class Dialog {
+@Entity(name = "actions")
+public class Action {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long id;
-    @Column(name = "chat_id", nullable = false)
-    private long chatId;
-    @Column(name = "message_id", nullable = false)
+
+    @Column(nullable = false)
     private int messageId;
+
+    @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
     private Button button;
+
+    @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
     private Shelter shelter;
-    @Column(name = "lats_update", nullable = false)
+
+    @Column(nullable = false)
     private LocalDateTime lastUpdate;
+
+    @ManyToOne(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    public Action(int messageId, Button button, Shelter shelter) {
+        this.messageId = messageId;
+        this.button = button;
+        this.shelter = shelter;
+        this.lastUpdate = LocalDateTime.now();
+    }
+
+    public Action() {
+
+    }
 
     public long getId() {
         return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public int getMessageId() {
@@ -44,6 +59,7 @@ public class Dialog {
     }
 
     public void setButton(Button button) {
+        this.lastUpdate = LocalDateTime.now();
         this.button = button;
     }
 
@@ -55,19 +71,15 @@ public class Dialog {
         this.shelter = shelter;
     }
 
+    public User getUser() {
+        return user;
+    }
+
     public LocalDateTime getLastUpdate() {
         return lastUpdate;
     }
 
-    public void setLastUpdate(LocalDateTime lastUpdate) {
-        this.lastUpdate = lastUpdate;
-    }
-
-    public long getChatId() {
-        return chatId;
-    }
-
-    public void setChatId(long chatId) {
-        this.chatId = chatId;
+    public void setUser(User user) {
+        this.user = user;
     }
 }

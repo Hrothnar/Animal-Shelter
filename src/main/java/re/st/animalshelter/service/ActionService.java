@@ -3,20 +3,15 @@ package re.st.animalshelter.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import re.st.animalshelter.entity.Action;
-import re.st.animalshelter.enumeration.Button;
-import re.st.animalshelter.repository.DialogRepository;
-
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import re.st.animalshelter.repository.ActionRepository;
 
 @Service
-public class DialogService {
-    private final DialogRepository dialogRepository;
+public class ActionService {
+    private final ActionRepository actionRepository;
 
     @Autowired
-    public DialogService(DialogRepository dialogRepository) {
-        this.dialogRepository = dialogRepository;
+    public ActionService(ActionRepository actionRepository) {
+        this.actionRepository = actionRepository;
     }
 //
 //    public long getDialogId(int messageId) {
@@ -86,7 +81,7 @@ public class DialogService {
 //    }
 
     public Action getLastDialog(int messageId) {
-        return dialogRepository.getTopByMessageId(messageId);
+        return actionRepository.getTopByMessageId(messageId);
     }
 
 }

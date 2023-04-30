@@ -86,11 +86,11 @@
 //
 
 //    private void rightResponse(int messageId) {
-//        Dialog dialog = previousFlashback(messageId);
-//        if (dialog.getMessage().messageId() == messageId - 1) {
-//            sendEditedFirstResponse(dialog.getMessage(), dialog.getDialogue(), dialog.getShelter(), dialog.getTextExtension());
+//        Dialog action = previousHistory(messageId);
+//        if (action.getMessage().messageId() == messageId - 1) {
+//            sendEditedFirstResponse(action.getMessage(), action.getDialogue(), action.getShelter(), action.getTextExtension());
 //        } else {
-//            sendEditedTextResponse(dialog.getMessage(), dialog.getDialogue(), dialog.getShelter(), dialog.getTextExtension());
+//            sendEditedTextResponse(action.getMessage(), action.getDialogue(), action.getShelter(), action.getTextExtension());
 //        }
 //    }
 
@@ -98,17 +98,17 @@
 //        return memory.get(messageId).peek().getShelter();
 //    }
 //
-//    private void remember(Dialog dialog) { // добавление в ячейку памяти новой записи
-//        int messageId = dialog.getMessage().messageId();
-//        LinkedList<Dialog> dialogs;
+//    private void remember(Dialog action) { // добавление в ячейку памяти новой записи
+//        int messageId = action.getMessage().messageId();
+//        LinkedList<Dialog> actions;
 //        if (memory.containsKey(messageId)) {
-//            dialogs = memory.get(messageId);
+//            actions = memory.get(messageId);
 //        } else {
 //            messageId++;
-//            dialogs = new LinkedList<>();
+//            actions = new LinkedList<>();
 //        }
-//        dialogs.push(dialog);
-//        memory.put(messageId, dialogs);
+//        actions.push(action);
+//        memory.put(messageId, actions);
 //    }
 
 //

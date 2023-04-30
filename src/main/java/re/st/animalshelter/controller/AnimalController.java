@@ -1,10 +1,6 @@
 package re.st.animalshelter.controller;
 
-import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import re.st.animalshelter.enumeration.animal.Shelter;
-import re.st.animalshelter.model.Animal;
 
 @RestController
 @RequestMapping("/animal")
