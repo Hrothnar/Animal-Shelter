@@ -1,12 +1,29 @@
 package re.st.animalshelter.controller;
 
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-//@RestController
-//@RequestMapping("/animal")
+@Controller
+@RequestMapping("/animal")
 public class AnimalController {
 
-//
+
+    @GetMapping("/add")
+    public String getForm() {
+        return "animal_form";
+    }
+
+    @PostMapping("/receive")
+    public String receive(@RequestParam) {
+
+    }
+
+
+
+
+
+
+
 //    @PostMapping("/add")
 //    public ResponseEntity<?> addAnimal(@RequestBody Animal animal, Shelter shelter) {
 //        return null;
@@ -21,7 +38,6 @@ public class AnimalController {
 //    public ResponseEntity<?> removeAnimal(@PathVariable("id") String id) {
 //        return null;
 //    }
-//
 
 
 }

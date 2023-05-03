@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class Action {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(nullable = false)
@@ -27,9 +27,9 @@ public class Action {
     @Column(nullable = false)
     private LocalDateTime lastUpdate;
 
-//    @ManyToOne(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
-//    @JoinColumn(name = "user_id")
-//    private User user;
+    @ManyToOne(cascade = {}, fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     public Action(int messageId, Button button, Shelter shelter) {
         this.messageId = messageId;
@@ -59,8 +59,8 @@ public class Action {
     }
 
     public void setButton(Button button) {
-        this.lastUpdate = LocalDateTime.now();
         this.button = button;
+        this.lastUpdate = LocalDateTime.now();
     }
 
     public Shelter getShelter() {
@@ -70,16 +70,25 @@ public class Action {
     public void setShelter(Shelter shelter) {
         this.shelter = shelter;
     }
-//
-//    public User getUser() {
-//        return user;
-//    }
-//
-//    public LocalDateTime getLastUpdate() {
-//        return lastUpdate;
-//    }
-//
-//    public void setUser(User user) {
-//        this.user = user;
-//    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public LocalDateTime getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    @Override
+    public String toString() {
+        return "Action{" +
+                "messageId=" + messageId +
+                ", button=" + button +
+                ", shelter=" + shelter +
+                '}';
+    }
 }

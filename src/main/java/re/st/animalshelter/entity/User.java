@@ -1,7 +1,12 @@
 package re.st.animalshelter.entity;
 
+import org.hibernate.Hibernate;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+import org.springframework.transaction.annotation.Transactional;
+
 import javax.persistence.*;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -9,7 +14,7 @@ import java.util.Set;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(unique = true)
@@ -32,47 +37,56 @@ public class User {
 
     private boolean owner;
 
-//    @OneToOne(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "user")
-//    private Stage stage;
-//
-//    @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER, mappedBy = "users")
-//    private Set<Volunteer> volunteers = new HashSet<>();
-//
-//    @OneToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER, mappedBy = "user")
-//    private Set<Animal> animals = new HashSet<>();
-//
-//    @OneToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER, mappedBy = "user")
-//    private Set<Action> actions = new HashSet<>();
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REFRESH, CascadeType.DETACH, CascadeType.REMOVE}, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true)
+    private Stage stage;
 
-//    public void addVolunteer(Volunteer volunteer) {
-//        this.volunteers.add(volunteer);
-//        volunteer.getUsers().add(this);
-//    }
-//
-//    private void removeVolunteer(Volunteer volunteer) {
-//        this.volunteers.remove(volunteer);
-//        volunteer.getUsers().remove(this);
-//    }
-//
-//    public void addAnimal(Animal animal) {
-//        this.animals.add(animal);
-//        animal.setUser(this);
-//    }
-//
-//    public void removeAnimal(Animal animal) {
-//        this.animals.remove(animal);
-//        animal.setUser(null);
-//    }
-//
-//    public void addAction(Action action) {
-//        this.actions.add(action);
-//        action.setUser(this);
-//    }
-//
-//    public void removeAction(Action action) {
-//        this.actions.remove(action);
-//        action.setUser(null);
-//    }
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REFRESH, CascadeType.DETACH, CascadeType.REMOVE}, fetch = FetchType.LAZY, mappedBy = "users")
+    @LazyCollection(value = LazyCollectionOption.TRUE)
+    private Set<Volunteer> volunteers = new HashSet<>();
+
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REFRESH, CascadeType.DETACH, CascadeType.REMOVE}, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true)
+    @LazyCollection(value = LazyCollectionOption.TRUE)
+    private Set<Animal> animals = new HashSet<>();
+
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REFRESH, CascadeType.DETACH, CascadeType.REMOVE}, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true)
+    @LazyCollection(value = LazyCollectionOption.TRUE)
+    private Set<Action> actions = new HashSet<>();
+
+    public void addVolunteer(Volunteer volunteer) {
+        this.volunteers.add(volunteer);
+        volunteer.getUsers().add(this);
+    }
+
+    private void removeVolunteer(Volunteer volunteer) {
+        this.volunteers.remove(volunteer);
+        volunteer.getUsers().remove(this);
+    }
+
+    public void addAnimal(Animal animal) {
+        this.animals.add(animal);
+        animal.setUser(this);
+    }
+
+    public void removeAnimal(Animal animal) {
+        this.animals.remove(animal);
+        animal.setUser(null);
+    }
+
+    public void addAction(Action action) {
+        this.actions.add(action);
+        action.setUser(this);
+    }
+
+    public void removeAction(Action action) {
+        this.actions.remove(action);
+        action.setUser(null);
+        System.out.println(action.getUser());
+    }
+
+    public void addStage(Stage stage) {
+        this.setStage(stage);
+        stage.setUser(this);
+    }
 
     public long getId() {
         return id;
@@ -134,28 +148,31 @@ public class User {
         this.owner = owner;
     }
 
-//    public Stage getStage() {
-//        return stage;
-//    }
-//
-//    public void setStage(Stage stage) {
-//        this.stage = stage;
-//    }
-//
-//    public Set<Volunteer> getVolunteers() {
-////        return Collections.unmodifiableCollection(volunteers);
-//        return volunteers;
-//    }
-//
-//    public Set<Animal> getAnimals() {
-////        return Collections.unmodifiableCollection(animals);
-//        return animals;
-//    }
-//
-//    public Set<Action> getActions() {
-////        return Collections.unmodifiableCollection(actions);
-//        return actions;
-//    }
+    public Stage getStage() {
+        return stage;
+    }
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
+
+    public Set<Volunteer> getVolunteers() {
+        Hibernate.initialize(this.volunteers);
+//        return Collections.unmodifiableCollection(volunteers);
+        return volunteers;
+    }
+
+    public Set<Animal> getAnimals() {
+        Hibernate.initialize(this.animals);
+//        return Collections.unmodifiableCollection(animals);
+        return animals;
+    }
+
+    public Set<Action> getActions() {
+//        Hibernate.initialize(this.actions);
+//        return Collections.unmodifiableCollection(actions);
+        return actions;
+    }
 
     @Override
     public String toString() {

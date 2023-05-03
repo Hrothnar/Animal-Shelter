@@ -1,36 +1,33 @@
 package re.st.animalshelter.model.handler;
 
+import com.pengrad.telegrambot.model.Message;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import re.st.animalshelter.dto.ActionDTO;
+import re.st.animalshelter.enumeration.Command;
+import re.st.animalshelter.model.response.TextResponse;
+import re.st.animalshelter.service.UserService;
 
 @Component
 public class TextHandler {
 
+    private final UserService userService;
+    private final TextResponse textResponse;
 
-    //    public void sendStartResponse(long chatId) {
-//        User user = userService.getUser(chatId);
-//        boolean isOwner = user.isOwner();
-//        String text = Stage.START.getText(Shelter.NONE, isOwner);
-//        InlineKeyboardMarkup keyboard = addButtonUtil.getKeyboard(Shelter.NONE, isOwner, Stage.START);
-//        SendMessage response = new SendMessage(chatId, text).replyMarkup(keyboard);
-//        if (!telegramBot.execute(response).isOk()) {
-//            LOGGER.error("Ответ не был отправлен", new RuntimeException());
-//            //TODO своё исключение
-//        }
-//    }
-//
-//    public void sendNewTextResponse(long chatId, Stage stage, Shelter shelter) {
-//        User user = userService.getUser(chatId);
-//        boolean isOwner = user.isOwner();
-//        String text = stage.getText(shelter, isOwner);
-//        InlineKeyboardMarkup keyboard = addButtonUtil.getKeyboard(shelter, isOwner, stage);
-//        SendMessage response = new SendMessage(chatId, text).replyMarkup(keyboard);
-//        SendResponse execute = telegramBot.execute(response);
-//        if (!execute.isOk()) {
-//            System.out.println(execute.description());
-//            LOGGER.error("Ответ не был отправлен", new RuntimeException());
-//            //TODO своё исключение
-//        }
-//    }
+    @Autowired
+    public TextHandler(UserService userService, TextResponse textResponse) {
+        this.userService = userService;
+        this.textResponse = textResponse;
+    }
+
+    public void processTextMessage(Message message) {
+        Long chatId = message.chat().id();
+        if (message.text().equals(Command.START.getText())) {
+            ActionDTO actionDTO = userService.createUserOrAction(message);
+            textResponse.sendNewTextResponse(actionDTO);
+        } else {
+
+        }
+    }
 
 }
-

@@ -1,40 +1,88 @@
 package re.st.animalshelter.service;
 
 import com.pengrad.telegrambot.model.Message;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import re.st.animalshelter.dto.ActionDTO;
 import re.st.animalshelter.entity.Action;
+import re.st.animalshelter.entity.Stage;
 import re.st.animalshelter.entity.User;
+import re.st.animalshelter.enumeration.Button;
+import re.st.animalshelter.enumeration.Status;
+import re.st.animalshelter.enumeration.animal.Shelter;
 import re.st.animalshelter.repository.UserRepository;
-
-import java.util.*;
 
 @Service
 public class UserService {
     private final UserRepository userRepository;
-    private final ActionService actionService;
 
     @Autowired
-    public UserService(UserRepository userRepository, ActionService actionService) {
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.actionService = actionService;
-    }
-
-    public boolean isOwner(long chatId) {
-        return userRepository.getUserByChatId(chatId).isOwner();
-    }
-
-    public boolean isExist(long chatId) {
-        return !Objects.isNull(userRepository.getUserByChatId(chatId));
     }
 
     public User getUser(long chatId) {
-        return userRepository.getUserByChatId(chatId);
+        return userRepository.findByChatId(chatId).orElseThrow(RuntimeException::new); //TODO
     }
 
-    public User getUser(String userName, String email, String passport) {
-        return userRepository.getUserByUserNameOrEmailOrPassport(userName, email, passport);
+    public void saveUser(User user) {
+        userRepository.save(user);
     }
+
+    public boolean isExist(long chatId) {
+        return userRepository.findByChatId(chatId).isPresent();
+    }
+
+    @Transactional
+    public ActionDTO createUserOrAction(Message message) {
+        long chatId = message.chat().id();
+        int messageId = message.messageId();
+        boolean owner = false;
+        User user;
+        if (!isExist(chatId)) {
+            user = new User();
+            user.addStage(new Stage(Status.NONE));
+            user.setOwner(false);
+            user.setUserName(message.chat().username());
+            user.setChatId(chatId);
+            user.setEmail(null);
+            user.setFullName(message.chat().firstName() + " " + message.chat().lastName());
+            user.setPhoneNumber(null);
+        } else {
+            user = getUser(chatId);
+            owner = user.isOwner();
+        }
+        user.addAction(new Action(++messageId, Button.START, Shelter.NONE));
+        userRepository.save(user);
+        return new ActionDTO(chatId, messageId, owner, Button.START, Shelter.NONE);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//    public User getUser(String userName, String email, String passport) {
+//        return userRepository.findUserByUserNameOrEmailOrPassport(userName, email, passport);
+//    }
+
 
 //    public void createUserAndStartDialog(long chatId, int messageId, Message message) {
 //        Set<Dialog> dialogs = new HashSet<>();
@@ -66,11 +114,6 @@ public class UserService {
 //        }
 //    }
 
-    private void createUser(long chatId, int messageId, Action action, Message message) {
-        User user = new User();
-        user.setChatId(chatId);
-//        user.setDialogs(action);
-    }
 //
 //    public void createDialog(long chatId, int messageId) {
 //        User user = userRepository.getUserByChatId(chatId);

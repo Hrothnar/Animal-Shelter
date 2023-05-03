@@ -1,14 +1,16 @@
 package re.st.animalshelter.entity;
 
 import re.st.animalshelter.enumeration.Button;
+import re.st.animalshelter.enumeration.Status;
 import re.st.animalshelter.enumeration.animal.Shelter;
 
 import javax.persistence.*;
 
 @Entity(name = "storage")
 public class Cell {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(nullable = false)
@@ -19,11 +21,47 @@ public class Cell {
     @Enumerated(EnumType.STRING)
     private Shelter shelter;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
+    @Column(nullable = false)
     private boolean owner;
 
+    @Column(length = 4048)
     private String text;
 
-    private String photo;
+    @Column(length = 4048)
+    private byte[] photo;
+
+    public Cell(Button button, Shelter shelter, Status status, boolean owner, String text) {
+        this.button = button;
+        this.shelter = shelter;
+        this.status = status;
+        this.owner = owner;
+        this.text = text;
+    }
+
+    public Cell(Button button, Shelter shelter, Status status, boolean owner, String text, byte[] photo) {
+        this.button = button;
+        this.shelter = shelter;
+        this.status = status;
+        this.owner = owner;
+        this.text = text;
+        this.photo = photo;
+    }
+
+    public Cell(Button button, Shelter shelter, Status status, boolean owner, byte[] photo) {
+        this.button = button;
+        this.shelter = shelter;
+        this.status = status;
+        this.owner = owner;
+        this.photo = photo;
+    }
+
+    public Cell() {
+
+    }
 
     public long getId() {
         return id;
@@ -61,11 +99,19 @@ public class Cell {
         this.text = text;
     }
 
-    public String getPhoto() {
+    public byte[] getPhoto() {
         return photo;
     }
 
-    public void setPhoto(String photo) {
+    public void setPhoto(byte[] photo) {
         this.photo = photo;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 }

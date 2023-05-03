@@ -6,7 +6,7 @@ import com.pengrad.telegrambot.request.SetMyCommands;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AddCommandUtil {
+public class CommandUtil {
 
     public void addCommands(TelegramBot bot) {
         BotCommand start = new BotCommand("/start", "начать общение");

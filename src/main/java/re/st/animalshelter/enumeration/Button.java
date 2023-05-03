@@ -7,16 +7,12 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public enum Button {
-    START("/start", "/start", Distributor.BACK_RESPONSE, false, false),
+    START("/start", "/start", null, false, true),
+
     BACK("Вернуться", "back", Distributor.BACK_RESPONSE, false, false),
 
-    LOOK_AT_THE_MAP("Схема проезда", "look at map",  Distributor.PHOTO_RESPONSE,true, false),
-
-    DOG_SHELTER("Приют для собак", "dog shelter", Distributor.TEXT_RESPONSE, true, true),
-    CAT_SHELTER("Приют для кошек", "cat shelter", Distributor.TEXT_RESPONSE, true, true),
-    SEND_REPORT("Отправить отчёт о питомце", "send report", Distributor.TEXT_RESPONSE, false, true),
-    LEAVE_CONTACT_INFORMATION("Оставить данные для связи", "leave contact information", Distributor.TEXT_RESPONSE, false, true),
-    CALL_A_VOLUNTEER("Позвать волонтёра", "call a volunteer", Distributor.TEXT_RESPONSE, false, false),
+    DOG_SHELTER("Приют для собак", "dog shelter", Distributor.EDIT_TEXT_RESPONSE, false, false),
+    CAT_SHELTER("Приют для кошек", "cat shelter", Distributor.EDIT_TEXT_RESPONSE, false, false),
 
     SHELTER_INFO("Узнать информацию о приюте", "shelter info", Distributor.EDIT_TEXT_RESPONSE, true, false),
     DRIVER_PERMIT("Оформить разрешение на проезд", "driver permit", Distributor.EDIT_TEXT_RESPONSE, false, false),
@@ -24,7 +20,13 @@ public enum Button {
     RULES("Правила знакомства", "rules", Distributor.EDIT_TEXT_RESPONSE, true, false),
     DOCUMENTS_FOR_ANIMAL("Документы для оформления животного", "documents for animal", Distributor.EDIT_TEXT_RESPONSE, false, false),
     DISABLED_ANIMAL("Животное с ограниченными возможностями", "disabled animal", Distributor.EDIT_TEXT_RESPONSE, false, false),
-    CYNOLOGIST("Рекомендации кинологов и контакты", "cynologist", Distributor.EDIT_TEXT_RESPONSE, true, false);
+    CYNOLOGIST("Рекомендации кинологов и контакты", "cynologist", Distributor.EDIT_TEXT_RESPONSE, true, false),
+
+    LOOK_AT_THE_MAP("Схема проезда", "look at map", Distributor.PHOTO_RESPONSE, true, false),
+
+    SEND_REPORT("Отправить отчёт о питомце", "send report", Distributor.TEXT_RESPONSE, false, false),
+    LEAVE_CONTACT_INFORMATION("Оставить данные для связи", "leave contact information", Distributor.TEXT_RESPONSE, false, false),
+    CALL_A_VOLUNTEER("Позвать волонтёра", "call a volunteer", Distributor.TEXT_RESPONSE, false, false);
 
     private final String text;
     private final String callBackQuery;
@@ -62,7 +64,7 @@ public enum Button {
 
     public static Button getButton(String string) {
         return Arrays.stream(Button.values())
-                .filter(e -> Objects.equals(e.callBackQuery, string))
+                .filter(e -> Objects.equals(e.callBackQuery, string) || Objects.equals(e.toString(), string))
                 .findFirst()
                 .orElseThrow(RuntimeException::new);
     }

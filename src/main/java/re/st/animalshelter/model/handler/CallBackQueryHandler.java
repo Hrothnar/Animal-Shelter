@@ -1,108 +1,59 @@
 package re.st.animalshelter.model.handler;
 
-import com.pengrad.telegrambot.TelegramBot;
-import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
-import com.pengrad.telegrambot.request.EditMessageText;
-import com.pengrad.telegrambot.response.BaseResponse;
+import com.pengrad.telegrambot.model.CallbackQuery;
+import com.pengrad.telegrambot.model.Message;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import re.st.animalshelter.entity.Action;
-import re.st.animalshelter.service.InformationService;
-import re.st.animalshelter.service.UserService;
-import re.st.animalshelter.utility.AddButtonUtil;
+import re.st.animalshelter.dto.ActionDTO;
+import re.st.animalshelter.enumeration.Button;
+import re.st.animalshelter.model.response.EditTextResponse;
+import re.st.animalshelter.model.response.PhotoResponse;
+import re.st.animalshelter.service.ActionService;
+
+import static re.st.animalshelter.model.Distributor.*;
 
 @Component
 public class CallBackQueryHandler {
-    private final InformationService informationService;
-    private final AddButtonUtil addButtonUtil;
-    private final UserService userService;
-    private final TelegramBot telegramBot;
+    private final EditTextResponse editTextResponse;
+    private final ActionService actionService;
+    private final PhotoResponse photoResponse;
 
-    public CallBackQueryHandler(InformationService informationService, AddButtonUtil addButtonUtil, UserService userService, TelegramBot telegramBot) {
-        this.informationService = informationService;
-        this.addButtonUtil = addButtonUtil;
-        this.userService = userService;
-        this.telegramBot = telegramBot;
+    @Autowired
+    public CallBackQueryHandler(EditTextResponse editTextResponse, ActionService actionService, PhotoResponse photoResponse) {
+        this.editTextResponse = editTextResponse;
+        this.actionService = actionService;
+        this.photoResponse = photoResponse;
     }
 
-//    public void sendEditedTextResponse(Action action) {
-//        long chatId = action.getChatId();
-//        int messageId = action.getMessageId();
-//        boolean owner = userService.isOwner(chatId);
-//        String text = informationService.getText(action, owner);
-//        InlineKeyboardMarkup keyboard = addButtonUtil.getKeyboard(action, owner);
-//        EditMessageText response = new EditMessageText(chatId, messageId, text).replyMarkup(keyboard);
-//        BaseResponse execute = telegramBot.execute(response);
-//        if (!execute.isOk()) {
-//            System.out.println(execute.description());
-//        }
-//    }
+    public void processCallBackQuery(CallbackQuery callbackQuery) {
+        Message message = callbackQuery.message();
+        Button button = Button.getButton(callbackQuery.data());
+        ActionDTO actionDTO;
+        System.out.println("--------------------------------------------------------------------------");
+        switch (button.getResponseType()) {
+            case BACK_RESPONSE:
+                actionDTO = actionService.returnLastAction(message);
+                editTextResponse.sendEditedTextResponse(actionDTO);
+                break;
+            case EDIT_MULTIMEDIA_RESPONSE:
 
-//    public void sendEditedTextResponse(long chatId, int messageId, Shelter shelter) {
-//        User user = userService.getUser(chatId);
-//        Dialog dialog = dialogService.getDialog(messageId);
-//        boolean isOwner = user.isOwner();
-//        send(chatId, messageId, dialog, isOwner, shelter);
-//    }
-//
-//    private void send(Dialog dialog) {
-//        String text1 = informationService.getText(dialog);
-//
-//
-//        Stage stage = dialog.getCurrentStage();
-//        String text = stage.getText(shelter, isOwner);
-//        InlineKeyboardMarkup keyboard = addButtonUtil.getKeyboard(shelter, isOwner, stage);
-//        EditMessageText response = new EditMessageText(chatId, messageId, text).replyMarkup(keyboard);
-//        BaseResponse execute = telegramBot.execute(response);
-//        if (!execute.isOk()) {
-//            System.out.println(execute.description());
-//            LOGGER.error("Ответ не был отправлен", new RuntimeException());
-//            //TODO своё исключение
-//        }
-//
-//        public void sendEditedTextResponse(long chatId, int messageId) {
-//            User user = userService.getUser(chatId);
-//            Dialog dialog = dialogService.getDialog(messageId);
-//            boolean isOwner = user.isOwner();
-//            Shelter shelter = dialog.getShelter();
-//            send(chatId, messageId, dialog, isOwner, shelter);
-//        }
-//
-//        public void sendEditedTextResponse(long chatId, int messageId, Shelter shelter) {
-//            User user = userService.getUser(chatId);
-//            Dialog dialog = dialogService.getDialog(messageId);
-//            boolean isOwner = user.isOwner();
-//            send(chatId, messageId, dialog, isOwner, shelter);
-//        }
-//
-//        private void send(long chatId, int messageId, Dialog dialog, boolean isOwner, Shelter shelter) {
-//            Stage stage = dialog.getCurrentStage();
-//            String text = stage.getText(shelter, isOwner);
-//            InlineKeyboardMarkup keyboard = addButtonUtil.getKeyboard(shelter, isOwner, stage);
-//            EditMessageText response = new EditMessageText(chatId, messageId, text).replyMarkup(keyboard);
-//            BaseResponse execute = telegramBot.execute(response);
-//            if (!execute.isOk()) {
-//                System.out.println(execute.description());
-//                LOGGER.error("Ответ не был отправлен", new RuntimeException());
-//                //TODO своё исключение
-//            }
-//        }
-//
-//    }
-//
-//
-//    public void sendNewPhotoResponse(long chatId, int messageId, Stage stage) {
-//        User user = userService.getUser(chatId);
-//        Dialog dialog = dialogService.getDialog(messageId);
-//        boolean isOwner = user.isOwner();
-//        Shelter shelter = dialog.getShelter();
-//        String text = stage.getText(shelter, isOwner);
-//        File photo = stage.getPhoto(shelter, isOwner);
-//        InlineKeyboardMarkup keyboard = addButtonUtil.getKeyboard(shelter, isOwner, stage);
-//        SendPhoto response = new SendPhoto(chatId, photo).caption(text).replyMarkup(keyboard);
-//        if (!telegramBot.execute(response).isOk()) {
-//            LOGGER.error("Ответ не был отправлен", new RuntimeException());
-//            //TODO своё исключение
-//        }
-//    }
+                break;
+            case EDIT_TEXT_RESPONSE:
+                actionDTO = actionService.saveAction(message, button);
+                editTextResponse.sendEditedTextResponse(actionDTO);
+                break;
+            case PHOTO_RESPONSE:
+                actionDTO = actionService.getCurrentAction(message, button);
+                photoResponse.sendNewPhotoResponse(actionDTO);
+                break;
+            case TEXT_RESPONSE:
 
+
+
+
+                break;
+            default:
+                throw new RuntimeException("Нет подходящего обработчика"); //TODO
+        }
+    }
 }

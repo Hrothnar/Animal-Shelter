@@ -11,14 +11,14 @@ import java.time.LocalDateTime;
 public class Animal {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(nullable = false)
     private int age;
 
     @Column(nullable = false)
-    @Enumerated(value = EnumType.STRING)
+    @Enumerated(value = EnumType.STRING)w
     private Shelter animal;
 
     @Column(nullable = false)
@@ -32,13 +32,13 @@ public class Animal {
 
     private LocalDateTime lastReportDate;
 
-//    @ManyToOne(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
-//    @JoinColumn(name = "user_id")
-//    private User user;
-//
-//    @ManyToOne(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
-//    @JoinColumn(name = "volunteer_id")
-//    private Volunteer volunteer;
+    @ManyToOne(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY)
+    @JoinColumn(name = "volunteer_id")
+    private Volunteer volunteer;
 
     public long getId() {
         return id;
@@ -91,39 +91,39 @@ public class Animal {
     public void setLastReportDate(LocalDateTime lastReportDate) {
         this.lastReportDate = lastReportDate;
     }
-//
-//    public User getUser() {
-//        return user;
-//    }
-//
-//    public void setUser(User user) {
-//        this.user = user;
-//    }
-//
-//    public Volunteer getVolunteer() {
-//        return volunteer;
-//    }
-//
-//    public void setVolunteer(Volunteer volunteer) {
-//        this.volunteer = volunteer;
-//    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Volunteer getVolunteer() {
+        return volunteer;
+    }
+
+    public void setVolunteer(Volunteer volunteer) {
+        this.volunteer = volunteer;
+    }
 
     public void setId(long id) {
         this.id = id;
     }
 
-//    @Override
-//    public String toString() {
-//        return "Animal{" +
-//                "id=" + id +
-//                ", age=" + age +
-//                ", animal=" + animal +
-//                ", breed=" + breed +
-////                ", reportStatus=" + reportStatus +
-////                ", expirationDate=" + expirationDate +
-////                ", lastReportDate=" + lastReportDate +
-////                ", user=" + user +
-////                ", volunteer=" + volunteer +
-//                '}';
-//    }
+    @Override
+    public String toString() {
+        return "Animal{" +
+                "id=" + id +
+                ", age=" + age +
+                ", animal=" + animal +
+                ", breed=" + breed +
+//                ", reportStatus=" + reportStatus +
+//                ", expirationDate=" + expirationDate +
+//                ", lastReportDate=" + lastReportDate +
+//                ", user=" + user +
+//                ", volunteer=" + volunteer +
+                '}';
+    }
 }

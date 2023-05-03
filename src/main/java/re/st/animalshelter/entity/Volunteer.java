@@ -9,40 +9,40 @@ import java.util.Set;
 public class Volunteer {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(unique = true)
+//    @Column(unique = true)
     private long userChatId;
 
     @Column(length = 56)
     private String fullName;
 
-//    @ManyToMany(fetch = FetchType.LAZY)
-//    private Set<User> users = new HashSet<>();
-//
-//    @OneToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER, mappedBy = "volunteer")
-//    private Set<Animal> animals = new HashSet<>();
+    @ManyToMany(fetch = FetchType.LAZY)
+    private Set<User> users = new HashSet<>();
 
-//    public void addAnimal(Animal animal) {
-//        this.animals.add(animal);
-//        animal.setVolunteer(this);
-//    }
-//
-//    public void removeAnimal(Animal animal) {
-//        this.animals.remove(animal);
-//        animal.setVolunteer(null);
-//    }
-//
-//    public Set<Animal> getAnimals() {
-////        return Collections.unmodifiableCollection(animals);
-//        return animals;
-//    }
-//
-//    public Set<User> getUsers() {
-////        return Collections.unmodifiableCollection(users);
-//        return users;
-//    }
+    @OneToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY, mappedBy = "volunteer")
+    private Set<Animal> animals = new HashSet<>();
+
+    public void addAnimal(Animal animal) {
+        this.animals.add(animal);
+        animal.setVolunteer(this);
+    }
+
+    public void removeAnimal(Animal animal) {
+        this.animals.remove(animal);
+        animal.setVolunteer(null);
+    }
+
+    public Set<Animal> getAnimals() {
+//        return Collections.unmodifiableCollection(animals);
+        return animals;
+    }
+
+    public Set<User> getUsers() {
+//        return Collections.unmodifiableCollection(users);
+        return users;
+    }
 
     public long getId() {
         return id;

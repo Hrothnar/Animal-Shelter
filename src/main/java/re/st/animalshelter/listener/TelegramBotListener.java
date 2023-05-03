@@ -9,8 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Component;
 import re.st.animalshelter.model.Distributor;
-import re.st.animalshelter.service.UserService;
-import re.st.animalshelter.utility.AddCommandUtil;
+import re.st.animalshelter.utility.CommandUtil;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -21,7 +20,6 @@ import java.util.Objects;
 public class TelegramBotListener implements UpdatesListener {
     private final TelegramBot telegramBot;
     private final Distributor distributor;
-    public final static Logger LOGGER = Logger.getLogger(TelegramBotListener.class);
 
 //    private final Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
 //    private final Pattern pattern = Pattern.compile("(\\d{1,2}\\.\\d{1,2}\\.\\d{4} \\d{1,2}:\\d{1,2})\\s+([А-я\\d\\s,.?!:]+)");
@@ -36,25 +34,18 @@ public class TelegramBotListener implements UpdatesListener {
     @Override
     public int process(List<Update> updateList) {
         for (Update update : updateList) {
-            if (Objects.nonNull(update.message())) {
-                Message message = update.message();
-                if (Objects.nonNull(message.text())) {
-
-                    distributor.processTextMessage(message);
-                } else if (Objects.nonNull(message.photo())) {
-                    distributor.processPhotoMessage(message);
-                } else if (Objects.nonNull(message.document())) {
-                    distributor.processDocumentMessage(message);
-                } else {
-                    LOGGER.error("Необрабатываемый запрос"); //TODO не забыть добавить ещё логики
-                }
-            } else if (Objects.nonNull(update.callbackQuery())) {
-                distributor.processCallBackQuery(update.callbackQuery());
-            }
+            distributor.catchUpdate(update);
         }
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
-//
+
+    @PostConstruct
+    private void init() {
+        telegramBot.setUpdatesListener(this);
+        new CommandUtil().addCommands(telegramBot);
+    }
+
+
 //    private void processPhoto(Message message) {
 //        long chatId = message.chat().id();
 //        PhotoSize[] photos = message.photo();
@@ -248,9 +239,4 @@ public class TelegramBotListener implements UpdatesListener {
 //        }
 //    }
 
-    @PostConstruct // связывание объекта TelegramBotUpdatesListener и бота
-    private void init() {
-        telegramBot.setUpdatesListener(this);
-        new AddCommandUtil().addCommands(telegramBot);
-    }
 }
