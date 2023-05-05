@@ -1,14 +1,16 @@
 package re.st.animalshelter.entity;
 
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.springframework.transaction.annotation.Transactional;
+import re.st.animalshelter.entity.animal.Animal;
+import re.st.animalshelter.enumeration.Status;
 
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity(name = "users")
 public class User {
@@ -35,7 +37,12 @@ public class User {
     @Column(unique = true, length = 16)
     private String passport;
 
+    @Column(nullable = false)
     private boolean owner;
+
+    @Column(nullable = false)
+    @Enumerated(value = EnumType.STRING)
+    private Status currentStatus;
 
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REFRESH, CascadeType.DETACH, CascadeType.REMOVE}, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true)
     private Stage stage;
@@ -44,13 +51,18 @@ public class User {
     @LazyCollection(value = LazyCollectionOption.TRUE)
     private Set<Volunteer> volunteers = new HashSet<>();
 
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REFRESH, CascadeType.DETACH, CascadeType.REMOVE}, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true)
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REFRESH, CascadeType.DETACH, CascadeType.REMOVE}, fetch = FetchType.LAZY, mappedBy = "user")
     @LazyCollection(value = LazyCollectionOption.TRUE)
     private Set<Animal> animals = new HashSet<>();
 
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REFRESH, CascadeType.DETACH, CascadeType.REMOVE}, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true)
     @LazyCollection(value = LazyCollectionOption.TRUE)
     private Set<Action> actions = new HashSet<>();
+
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REFRESH, CascadeType.DETACH, CascadeType.REMOVE}, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true)
+    @LazyCollection(value = LazyCollectionOption.TRUE)
+    private Set<Report> reports = new HashSet<>();
+
 
     public void addVolunteer(Volunteer volunteer) {
         this.volunteers.add(volunteer);
@@ -86,6 +98,13 @@ public class User {
     public void addStage(Stage stage) {
         this.setStage(stage);
         stage.setUser(this);
+    }
+
+    public void addReport(Report report, Animal animal) {
+        this.reports.add(report);
+        animal.getReports().add(report);
+        report.setUser(this);
+        report.setAnimal(animal);
     }
 
     public long getId() {
@@ -163,32 +182,24 @@ public class User {
     }
 
     public Set<Animal> getAnimals() {
-        Hibernate.initialize(this.animals);
 //        return Collections.unmodifiableCollection(animals);
         return animals;
     }
 
+    public Set<Animal> getActiveAnimals() {
+        return animals.stream().filter(Animal::isActive).collect(Collectors.toSet());
+    }
+
     public Set<Action> getActions() {
-//        Hibernate.initialize(this.actions);
 //        return Collections.unmodifiableCollection(actions);
         return actions;
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", chatId=" + chatId +
-//                ", fullName='" + fullName + '\'' +
-//                ", userName='" + userName + '\'' +
-//                ", email='" + email + '\'' +
-//                ", phoneNumber='" + phoneNumber + '\'' +
-//                ", passport='" + passport + '\'' +
-//                ", owner=" + owner +
-//                ", stage=" + stage +
-//                ", volunteers=" + volunteers +
-//                ", animals=" + animals +
-//                ", actions=" + actions +
-                '}';
+    public Status getCurrentStatus() {
+        return currentStatus;
+    }
+
+    public void setCurrentStatus(Status currentStatus) {
+        this.currentStatus = currentStatus;
     }
 }

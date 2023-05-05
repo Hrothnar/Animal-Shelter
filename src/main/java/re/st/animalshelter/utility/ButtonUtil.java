@@ -4,10 +4,12 @@ import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import re.st.animalshelter.dto.ActionDTO;
-import re.st.animalshelter.entity.Animal;
+import re.st.animalshelter.entity.User;
+import re.st.animalshelter.entity.animal.Animal;
 import re.st.animalshelter.enumeration.Button;
-import re.st.animalshelter.enumeration.animal.Shelter;
+import re.st.animalshelter.enumeration.shelter.Shelter;
 import re.st.animalshelter.service.UserService;
 
 import java.util.Set;
@@ -21,6 +23,7 @@ public class ButtonUtil {
         this.userService = userService;
     }
 
+    @Transactional
     public InlineKeyboardMarkup getKeyboard(ActionDTO actionDTO) {
         Shelter shelter = actionDTO.getShelter();
         Button button = actionDTO.getButton();
@@ -56,7 +59,6 @@ public class ButtonUtil {
                 if (shelter.equals(Shelter.DOG)) {
                     keyboardMarkup.addRow(new InlineKeyboardButton(Button.CYNOLOGIST.getText()).callbackData(Button.CYNOLOGIST.getCallBackQuery()));
                 }
-                keyboardMarkup.addRow(new InlineKeyboardButton(Button.CALL_A_VOLUNTEER.getText()).callbackData(Button.CALL_A_VOLUNTEER.getCallBackQuery()));
                 keyboardMarkup.addRow(new InlineKeyboardButton(Button.BACK.getText()).callbackData(Button.BACK.getCallBackQuery()));
                 break;
             case DOCUMENTS_FOR_ANIMAL:
@@ -68,23 +70,23 @@ public class ButtonUtil {
             case RULES:
             case DRIVER_PERMIT:
                 keyboardMarkup.addRow(new InlineKeyboardButton(Button.BACK.getText()).callbackData(Button.BACK.getCallBackQuery()));
+                break;
             case SEND_REPORT:
-                keyboardMarkup = dynamicGenerator(actionDTO.getChatId());
+                keyboardMarkup = showPets(actionDTO.getChatId());
                 break;
             default:
-                if ()
         }
         return keyboardMarkup;
     }
 
-    private InlineKeyboardMarkup dynamicGenerator(long chatId) {
+    public InlineKeyboardMarkup showPets(long chatId) {
         InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
-        Set<Animal> animals = userService.getUser(chatId).getAnimals();
-        if (animals.size() > 1) {
-            for (Animal animal : animals) {
-                keyboardMarkup.addRow(new InlineKeyboardButton(animal.getBreed() + " " + animal.getAge()).callbackData(String.valueOf(animal.getId())));
-            }
+        User user = userService.getUser(chatId);
+        Set<Animal> animals = user.getActiveAnimals();
+        for (Animal animal : animals) {
+            keyboardMarkup.addRow(new InlineKeyboardButton("Порода: " + animal.getBreedAsString() + "  Возраст: " + animal.getAge()).callbackData(String.valueOf(animal.getId())));
         }
+        keyboardMarkup.addRow(new InlineKeyboardButton(Button.BACK.getText()).callbackData(Button.BACK.getCallBackQuery()));
         return keyboardMarkup;
     }
 

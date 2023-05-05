@@ -1,7 +1,8 @@
 package re.st.animalshelter.entity;
 
+import re.st.animalshelter.entity.animal.Animal;
+
 import javax.persistence.*;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,10 +13,16 @@ public class Volunteer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-//    @Column(unique = true)
+    @Column(unique = true)
     private long userChatId;
 
-    @Column(length = 56)
+    @Column(unique = true)
+    private long chatId;
+
+    @Column(name = "user_name")
+    private String userName;
+
+    @Column(name = "full_name", length = 56)
     private String fullName;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -23,6 +30,9 @@ public class Volunteer {
 
     @OneToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY, mappedBy = "volunteer")
     private Set<Animal> animals = new HashSet<>();
+
+
+
 
     public void addAnimal(Animal animal) {
         this.animals.add(animal);
@@ -62,5 +72,21 @@ public class Volunteer {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
+    }
+
+    public long getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(long chatId) {
+        this.chatId = chatId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }

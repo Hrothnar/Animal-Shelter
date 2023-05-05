@@ -5,10 +5,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import re.st.animalshelter.dto.ActionDTO;
 import re.st.animalshelter.entity.Cell;
-import re.st.animalshelter.entity.User;
 import re.st.animalshelter.enumeration.Button;
 import re.st.animalshelter.enumeration.Status;
-import re.st.animalshelter.enumeration.animal.Shelter;
+import re.st.animalshelter.enumeration.shelter.Shelter;
 import re.st.animalshelter.repository.InformationRepository;
 
 import java.io.IOException;
@@ -43,13 +42,9 @@ public class InformationService {
         return text;
     }
 
-    public String getStatusText(ActionDTO actionDTO) {
-        long chatId = actionDTO.getChatId();
-        User user = userService.getUser(chatId);
-        user.getAnimals().stream().findAny();
-
+    public String getText(Status status) {
+        return informationRepository.findByStatus(status).getText();
     }
-
 
     public byte[] getPhoto(ActionDTO actionDTO) {
         Shelter shelter = actionDTO.getShelter();

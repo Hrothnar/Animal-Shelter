@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Animal expiration date</title>
+</head>
+<body>
+<h2>Вы можете увеличить срок тестового периода для пользователя </h2>
+<br/>
+<form th:method="POST" th:action="@{/user/{id}/save_time(id=${id})}" th:object="${animal}">
+    <label for="animal">Выберите питомца:</label>
+    <select th:name="animal_id" id="animal">
+        <option th:each="animal : ${animals}" th:value="${animal.getId()}" th:text="${animal.getBreed().getText() + ' --  Возраст: ' + animal.getAge() + ' y.o.  Дата окончания срока: ' + animal.getExpirationDate()}"></option>
+    </select>
+    <br/>
+    <br/>
+    <input type="radio" name="time" th:value="7">Добавить неделю к сроку</input>
+    <input type="radio" name="time" th:value="14">Добавить две недели к сроку</input>
+    <br/>
+    <br/>
+    <input type="submit" value="Сохранить">
+</form>
+
+</body>
+</html>

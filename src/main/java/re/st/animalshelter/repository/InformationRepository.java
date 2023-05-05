@@ -4,7 +4,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import re.st.animalshelter.entity.Cell;
 import re.st.animalshelter.enumeration.Button;
-import re.st.animalshelter.enumeration.animal.Shelter;
+import re.st.animalshelter.enumeration.Status;
+import re.st.animalshelter.enumeration.shelter.Shelter;
 
 @Repository
 public interface InformationRepository extends JpaRepository<Cell, Long> {
@@ -12,4 +13,5 @@ public interface InformationRepository extends JpaRepository<Cell, Long> {
     Cell findByButtonAndOwner(Button button, boolean owner);
     Cell findByButtonAndShelter(Button button, Shelter shelter);
     Cell findByButton(Button button);
+    Cell findByStatus(Status status);
 }

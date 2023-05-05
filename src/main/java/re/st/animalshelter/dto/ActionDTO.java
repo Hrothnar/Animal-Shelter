@@ -1,7 +1,8 @@
 package re.st.animalshelter.dto;
 
 import re.st.animalshelter.enumeration.Button;
-import re.st.animalshelter.enumeration.animal.Shelter;
+import re.st.animalshelter.enumeration.Status;
+import re.st.animalshelter.enumeration.shelter.Shelter;
 
 public class ActionDTO {
     private long chatId;

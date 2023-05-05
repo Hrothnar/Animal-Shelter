@@ -1,7 +1,7 @@
 package re.st.animalshelter.entity;
 
 import re.st.animalshelter.enumeration.Button;
-import re.st.animalshelter.enumeration.animal.Shelter;
+import re.st.animalshelter.enumeration.shelter.Shelter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
