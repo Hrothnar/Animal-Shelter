@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Find user</title>
+</head>
+<body>
+<h2>Укажите данные, если пользователь уже находиться в базе, то вы сможете работать с ним</h2>
+<br/>
+<form method="post" action="/user/receive">
+    <label for="userName">User Name:</label>
+    <input id="userName" type="text" name="userName"/>
+    <br/>
+    <label for="email">Email:</label>
+    <input id="email" type="text" name="email"/>
+    <br/>
+    <label for="passport">Паспортные данные:</label>
+    <input id="passport" type="text" name="passport"/>
+    <br/>
+    <input type="submit" value="Найти"/>
+</form>
+
+</body>
+</html>

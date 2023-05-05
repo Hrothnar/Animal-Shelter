@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Add cat</title>
+</head>
+
+<body>
+<h2>Здесь вы можете добавить кошек на баланс</h2>
+<br/>
+<form method="POST" action="/cat/receive">
+    <label for="age">Укажите возраст:</label>
+    <input type="text" name="age" id="age"/>
+    <br/>
+    <label for="breed">Выберите породу:</label>
+    <select th:name="breed" id="breed">
+        <option th:each="breed : ${breeds}" th:value="${breed}" th:text="${breed.getText()}"></option>
+    </select>
+    <br/>
+    <label for="amount">Укажите, сколько кошек данной комплекции вы хотите добавить:</label>
+    <input type="text" name="amount" id="amount" value="1"/>
+    <br/>
+    <br/>
+    <input type="submit" value="Добавить">
+</form>
+
+</body>
+</html>

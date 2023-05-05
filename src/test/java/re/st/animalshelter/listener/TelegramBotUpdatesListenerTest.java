@@ -24,7 +24,6 @@ public class TelegramBotUpdatesListenerTest {
     @Mock
     private com.pengrad.telegrambot.TelegramBot telegramBot;
     @Mock
-    private NotificationTaskService notificationTaskService;
     @InjectMocks
     private TelegramBotListener telegramBotUpdatesListener;
 

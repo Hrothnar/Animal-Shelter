@@ -10,7 +10,6 @@ public enum Command {
     }
 
     public String getText() {
-        return this.text;
+        return text;
     }
-
 }

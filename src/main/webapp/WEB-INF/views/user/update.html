@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>User</title>
+</head>
+
+<body>
+<h2>Укажите данные:</h2>
+<br/>
+<form th:method="POST" th:action="@{/user/{id}/save_update(id=${user.getId()})}" th:object="${user}">
+    <label for="fullName">Введите ФИО:</label>
+    <input type="text" th:field="*{fullName}" id="fullName"/>
+    <br/>
+    <label for="email">Введите Email:</label>
+    <input type="text" th:field="*{email}" id="email"/>
+    <br/>
+    <label for="userName">Введите Telegram userName:</label>
+    <input type="text" th:field="*{userName}" id="userName"/>
+    <br/>
+    <label for="phoneNumber">Введите номер телефона:</label>
+    <input type="text" th:field="*{phoneNumber}" id="phoneNumber"/>
+    <br/>
+    <label for="passport">Введите номер и серию паспорта:</label>
+    <input type="text" th:field="*{passport}" id="passport"/>
+    <br/>
+<!--    <input type="hidden" th:field="*{id}"/>-->
+    <input type="submit" value="Сохранить">
+</form>
+
+</body>
+</html>
