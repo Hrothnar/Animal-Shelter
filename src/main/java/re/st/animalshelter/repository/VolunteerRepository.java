@@ -10,7 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface VolunteerRepository extends JpaRepository<Volunteer, Long> {
-    Optional<Volunteer> findByUserChatId(long userChatId);
     Optional<Volunteer> findById(long id);
     List<Volunteer> findAll();
 }

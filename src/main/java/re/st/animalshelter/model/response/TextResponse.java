@@ -9,26 +9,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import re.st.animalshelter.dto.ActionDTO;
 import re.st.animalshelter.entity.User;
-import re.st.animalshelter.entity.Volunteer;
 import re.st.animalshelter.enumeration.Status;
 import re.st.animalshelter.service.StorageService;
 import re.st.animalshelter.service.VolunteerService;
 import re.st.animalshelter.utility.ButtonUtil;
 
-import java.util.LinkedList;
-import java.util.Optional;
-
 @Component
 public class TextResponse {
     private final StorageService storageService;
-    private final VolunteerService volunteerService;
     private final ButtonUtil buttonUtil;
     private final TelegramBot telegramBot;
 
     @Autowired
-    public TextResponse(StorageService storageService, VolunteerService volunteerService, ButtonUtil buttonUtil, TelegramBot telegramBot) {
+    public TextResponse(StorageService storageService, ButtonUtil buttonUtil, TelegramBot telegramBot) {
         this.storageService = storageService;
-        this.volunteerService = volunteerService;
         this.buttonUtil = buttonUtil;
         this.telegramBot = telegramBot;
     }
@@ -55,21 +49,22 @@ public class TextResponse {
         }
     }
 
-    public Status connectVolunteerAndUser(User user, String text) {
-        long userChatId = user.getChatId();
-        LinkedList<Volunteer> volunteers = volunteerService.getAllVolunteers();
-        Optional<Volunteer> optional = volunteers.stream()
-                .filter(volunteer -> volunteer.getUserChatId() == userChatId )
-                .findFirst();
-        if (optional.isPresent()) {
-            Volunteer volunteer = optional.get();
-            long volunteerChatId = volunteer.getChatId();
-            SendMessage response = new SendMessage(volunteerChatId, text);
+    public void sendNewTextResponseByStatus(User user, String textForCompanion, Status status) {
+        String text;
+        long chatId;
+        if (status != Status.NONE) {
+            if (status != Status.DIALOG) {
+                chatId = user.getChatId();
+                text = storageService.getText(status);
+            } else {
+                chatId = user.getCompanionChatId();
+                text = textForCompanion;
+            }
+            SendMessage response = new SendMessage(chatId, text);
             SendResponse execute = telegramBot.execute(response);
             if (!execute.isOk()) {
                 System.out.println(execute.description());
             }
         }
-        return Status.NONE;
     }
 }

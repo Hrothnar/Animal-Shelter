@@ -5,10 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import re.st.animalshelter.dto.ActionDTO;
+import re.st.animalshelter.entity.User;
 import re.st.animalshelter.enumeration.Command;
 import re.st.animalshelter.enumeration.Status;
 import re.st.animalshelter.model.response.TextResponse;
 import re.st.animalshelter.service.UserService;
+import re.st.animalshelter.service.VolunteerService;
 
 @Component
 public class TextHandler {
@@ -24,16 +26,18 @@ public class TextHandler {
     @Transactional
     public void processTextMessage(Message message) {
         Long chatId = message.chat().id();
-        if (message.text().equals(Command.START.getText())) {
+        String text = message.text();
+        if (text.equals(Command.START.getText())) {
             ActionDTO actionDTO = userService.createUserOrAction(message);
             textResponse.sendNewTextResponse(actionDTO);
-        } else if (message.text().equals(Command.FINISH.getText())) {
-
+        } else if (text.equals(Command.FINISH.getText())) {
+            userService.discardDialog(chatId);
         } else {
+            User user = userService.getUser(chatId);
             Status status = userService.checkStatusForText(message);
-            textResponse.sendNewTextResponseByStatus(chatId, status);
-
+            textResponse.sendNewTextResponseByStatus(user, text, status);
         }
     }
+
 
 }

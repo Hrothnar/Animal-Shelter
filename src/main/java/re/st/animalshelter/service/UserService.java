@@ -2,7 +2,6 @@ package re.st.animalshelter.service;
 
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.PhotoSize;
-import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +12,6 @@ import re.st.animalshelter.entity.animal.Animal;
 import re.st.animalshelter.enumeration.Button;
 import re.st.animalshelter.enumeration.Status;
 import re.st.animalshelter.enumeration.shelter.Shelter;
-import re.st.animalshelter.model.response.TextResponse;
 import re.st.animalshelter.repository.UserRepository;
 
 import java.time.LocalDateTime;
@@ -27,17 +25,18 @@ public class UserService {
     private final UserRepository userRepository;
     private final AnimalService animalService;
     private final VolunteerService volunteerService;
-    private final TextResponse textResponse;
     private final FileService fileService;
 
     private final static int TEST_PERIOD_TIME = 30;
 
     @Autowired
-    public UserService(UserRepository userRepository, AnimalService animalService, VolunteerService volunteerService, TextResponse textResponse, FileService fileService) {
+    public UserService(UserRepository userRepository,
+                       AnimalService animalService,
+                       VolunteerService volunteerService,
+                       FileService fileService) {
         this.userRepository = userRepository;
         this.animalService = animalService;
         this.volunteerService = volunteerService;
-        this.textResponse = textResponse;
         this.fileService = fileService;
     }
 
@@ -65,12 +64,13 @@ public class UserService {
         User user;
         if (!isExist(chatId)) {
             user = new User();
-            user.addStage(new Stage(Status.NONE));
+            user.addStage(new Stage(Status.NONE, Status.NONE));
             user.setChatId(chatId);
             user.setEmail(null);
             user.setFullName(message.chat().firstName() + " " + message.chat().lastName());
             user.setPhoneNumber(null);
             user.setOwner(false);
+            user.setCompanionChatId(0);
             user.setCurrentStatus(Status.NONE);
         } else {
             user = getUser(chatId);
@@ -142,15 +142,19 @@ public class UserService {
     }
 
     private Status setVolunteer(User user) {
-        long chatId = user.getChatId();
+        long userChatId = user.getChatId();
         LinkedList<Volunteer> volunteers = volunteerService.getAllVolunteers();
-        int i = new Random().nextInt(volunteers.size()) + 1;
-        Volunteer volunteer = volunteers.get(i);
-        volunteer.setUserChatId(chatId);
-        user.setCurrentStatus(Status.DIALOG);
+//        int i = new Random().nextInt(volunteers.size()) + 1;
+        Volunteer volunteer = volunteers.get(0);
+        long volunteerChatId = volunteer.getChatId();
+        User volunteerAsUser = getUser(volunteerChatId);
+        volunteerAsUser.setCompanionChatId(userChatId);
+        user.setCompanionChatId(volunteerChatId);
+        volunteerAsUser.getStage().setDialogStatus(Status.DIALOG);
+        user.getStage().setDialogStatus(Status.DIALOG);
+        saveUser(volunteerAsUser);
         saveUser(user);
-        volunteerService.saveVolunteer(volunteer);
-        return Status.DIALOG;
+        return Status.PREPARE_FOR_DIALOG;
     }
 
     private Status setContactStatus(User user, Status nextStatus, boolean correct) {
@@ -235,8 +239,11 @@ public class UserService {
                 correct = fileService.validateTextData(text, currentStatus);
                 fileService.saveText(user, text, correct);
                 return setReportStatus(reportDTO, Status.REPORT_PHOTO, correct);
-            case DIALOG:
-                return textResponse.connectVolunteerAndUser(user, text);
+            default:
+                Status stageStatus = user.getStage().getDialogStatus();
+                if (stageStatus == Status.DIALOG) {
+                    return stageStatus;
+                }
         }
         return Status.NONE;
     }
@@ -269,6 +276,22 @@ public class UserService {
             return true;
         }
         return false;
+    }
+
+    public void discardDialog(Long chatId) {
+        User finisher = getUser(chatId);
+        Optional<User> optional = userRepository.findByCompanionChatId(chatId);
+        if (optional.isPresent()) {
+            User companion = optional.get();
+            companion.setCompanionChatId(0);
+            companion.setCurrentStatus(Status.NONE);
+            companion.getStage().setDialogStatus(Status.NONE);
+            saveUser(companion);
+        }
+        finisher.setCurrentStatus(Status.NONE);
+        finisher.setCompanionChatId(0);
+        finisher.getStage().setDialogStatus(Status.NONE);
+        saveUser(finisher);
     }
 }
 

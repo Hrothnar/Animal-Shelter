@@ -25,8 +25,8 @@ public class PhotoResponse {
 
     public void sendNewPhotoResponse(ActionDTO actionDTO) {
         long chatId = actionDTO.getChatId();
-        String text = storageService.getText(actionDTO);
         byte[] photo = storageService.getPhoto(actionDTO);
+        String text = storageService.getText(actionDTO);
         InlineKeyboardMarkup keyboard = buttonUtil.getKeyboard(actionDTO);
         SendPhoto response = new SendPhoto(chatId, photo).caption(text).replyMarkup(keyboard);
         BaseResponse execute = telegramBot.execute(response);
