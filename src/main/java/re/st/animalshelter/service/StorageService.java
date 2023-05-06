@@ -13,14 +13,12 @@ import re.st.animalshelter.repository.InformationRepository;
 import java.io.IOException;
 
 @Service
-public class InformationService {
+public class StorageService {
     private final InformationRepository informationRepository;
-    private final UserService userService;
 
     @Autowired
-    public InformationService(InformationRepository informationRepository, UserService userService) {
+    public StorageService(InformationRepository informationRepository) {
         this.informationRepository = informationRepository;
-        this.userService = userService;
     }
 
     public String getText(ActionDTO actionDTO) {

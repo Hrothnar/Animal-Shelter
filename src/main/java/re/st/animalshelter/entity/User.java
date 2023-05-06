@@ -100,7 +100,8 @@ public class User {
         stage.setUser(this);
     }
 
-    public void addReport(Report report, Animal animal) {
+    public void addReport(Report report) {
+        Animal animal = report.getAnimal();
         this.reports.add(report);
         animal.getReports().add(report);
         report.setUser(this);

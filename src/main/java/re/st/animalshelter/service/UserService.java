@@ -1,36 +1,44 @@
 package re.st.animalshelter.service;
 
 import com.pengrad.telegrambot.model.Message;
+import com.pengrad.telegrambot.model.PhotoSize;
+import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import re.st.animalshelter.dto.ActionDTO;
-import re.st.animalshelter.entity.Action;
-import re.st.animalshelter.entity.Stage;
-import re.st.animalshelter.entity.User;
-import re.st.animalshelter.entity.Volunteer;
+import re.st.animalshelter.dto.ReportDTO;
+import re.st.animalshelter.entity.*;
 import re.st.animalshelter.entity.animal.Animal;
 import re.st.animalshelter.enumeration.Button;
 import re.st.animalshelter.enumeration.Status;
 import re.st.animalshelter.enumeration.shelter.Shelter;
+import re.st.animalshelter.model.response.TextResponse;
 import re.st.animalshelter.repository.UserRepository;
 
 import java.time.LocalDateTime;
+import java.util.LinkedList;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class UserService {
     private final UserRepository userRepository;
     private final AnimalService animalService;
     private final VolunteerService volunteerService;
+    private final TextResponse textResponse;
+    private final FileService fileService;
 
     private final static int TEST_PERIOD_TIME = 30;
 
     @Autowired
-    public UserService(UserRepository userRepository, AnimalService animalService, VolunteerService volunteerService) {
+    public UserService(UserRepository userRepository, AnimalService animalService, VolunteerService volunteerService, TextResponse textResponse, FileService fileService) {
         this.userRepository = userRepository;
         this.animalService = animalService;
         this.volunteerService = volunteerService;
+        this.textResponse = textResponse;
+        this.fileService = fileService;
     }
 
     public User getUser(long chatId) {
@@ -101,7 +109,7 @@ public class UserService {
         user.addAnimal(animal);
         user.addVolunteer(volunteer);
         user.setOwner(true);
-        volunteerService.save(volunteer);
+        volunteerService.saveVolunteer(volunteer);
         userRepository.save(user);
     }
 
@@ -113,7 +121,7 @@ public class UserService {
             volunteer.setChatId(user.getChatId());
             volunteer.setFullName(user.getFullName());
             volunteer.setUserName(user.getUserName());
-            volunteerService.save(volunteer);
+            volunteerService.saveVolunteer(volunteer);
             return true;
         }
         return false;
@@ -124,26 +132,49 @@ public class UserService {
         User user = getUser(chatId);
         switch (button) {
             case LEAVE_CONTACT_INFORMATION:
-                return setContactStatus(user, Status.CONTACT_INFO);
+                return setContactStatus(user, Status.CONTACT_INFO, true);
+            case CALL_A_VOLUNTEER:
+                return setVolunteer(user);
             case UNKNOWN:
-                return setAnimalStatus(user, button);
+                return setInitialAnimalStatus(user, button);
         }
         return Status.NONE;
     }
 
-    public Status setContactStatus(User user, Status nextStatus) {
-        user.setCurrentStatus(nextStatus);
-        user.getStage().setContactInfoStatus(nextStatus);
+    private Status setVolunteer(User user) {
+        long chatId = user.getChatId();
+        LinkedList<Volunteer> volunteers = volunteerService.getAllVolunteers();
+        int i = new Random().nextInt(volunteers.size()) + 1;
+        Volunteer volunteer = volunteers.get(i);
+        volunteer.setUserChatId(chatId);
+        user.setCurrentStatus(Status.DIALOG);
         saveUser(user);
-        return nextStatus;
+        volunteerService.saveVolunteer(volunteer);
+        return Status.DIALOG;
     }
 
-    public Status setReportStatus(User user, Status currentStatus, Status nextStatus) {
-        Optional<Animal> optional = user.getActiveAnimals().stream()
-                .filter(animal -> animal.getReportStatus() == currentStatus)
-                .findFirst();
-        if (optional.isPresent()) {
-            Animal animal = optional.get();
+    private Status setContactStatus(User user, Status nextStatus, boolean correct) {
+        if (correct) {
+            user.setCurrentStatus(nextStatus);
+            user.getStage().setContactInfoStatus(nextStatus);
+            saveUser(user);
+            return nextStatus;
+        }
+        return Status.NONE;
+    }
+
+    private boolean savePhoneNumber(User user, String text, boolean correct) {
+        if (correct) {
+            user.setPhoneNumber(text);
+            return true;
+        }
+        return false;
+    }
+
+    private Status setReportStatus(ReportDTO reportDTO, Status nextStatus, boolean correct) {
+        if (correct) {
+            User user = reportDTO.getUser();
+            Animal animal = reportDTO.getAnimal();
             animal.setReportStatus(nextStatus);
             user.setCurrentStatus(nextStatus);
             animalService.saveAnimal(animal);
@@ -153,7 +184,8 @@ public class UserService {
         return Status.NONE;
     }
 
-    private Status setAnimalStatus(User user, Button button) {
+
+    private Status setInitialAnimalStatus(User user, Button button) {
         String callBackQuery = button.getCallBackQuery();
         long animalId;
         try {
@@ -175,105 +207,68 @@ public class UserService {
         return Status.NONE;
     }
 
+    private ReportDTO getReportDTO(User user, Status currentStatus) {
+        Optional<Animal> optional = user.getActiveAnimals().stream()
+                .filter(animal -> animal.getReportStatus() == currentStatus)
+                .findFirst();
+        if (optional.isPresent()) {
+            Animal animal = optional.get();
+            return new ReportDTO(user, animal);
+        }
+        return null;
+    }
+
     @Transactional
-    public Status checkTextStatus(long chatId) {
+    public Status checkStatusForText(Message message) {
+        long chatId = message.chat().id();
+        String text = message.text();
         User user = getUser(chatId);
         Status currentStatus = user.getCurrentStatus();
+        boolean correct;
         switch (currentStatus) {
             case CONTACT_INFO:
-                return setContactStatus(user, Status.CONTACT_INFO_RECEIVED);
+                correct = fileService.validateTextData(text, currentStatus);
+                correct = savePhoneNumber(user, text, correct);
+                return setContactStatus(user, Status.CONTACT_INFO_RECEIVED, correct);
             case REPORT_TEXT:
-                return setReportStatus(user, currentStatus, Status.REPORT_PHOTO);
+                ReportDTO reportDTO = getReportDTO(user, currentStatus);
+                correct = fileService.validateTextData(text, currentStatus);
+                fileService.saveText(user, text, correct);
+                return setReportStatus(reportDTO, Status.REPORT_PHOTO, correct);
+            case DIALOG:
+                return textResponse.connectVolunteerAndUser(user, text);
         }
         return Status.NONE;
     }
 
     @Transactional
-    public Status checkPhotoStatus(long chatId) {
+    public Status checkStatusForPhoto(Message message) {
+        long chatId = message.chat().id();
+        PhotoSize[] photoSizes = message.photo();
         User user = getUser(chatId);
         Status currentStatus = user.getCurrentStatus();
+        boolean correct;
         switch (currentStatus) {
             case REPORT_PHOTO:
-                return setReportStatus(user, currentStatus, Status.REPORTED);
+                ReportDTO reportDTO = getReportDTO(user, currentStatus);
+                fileService.savePhoto(user, photoSizes, true);
+                //TODO Validator?
+                correct = saveReport(reportDTO);
+                return setReportStatus(reportDTO, Status.REPORTED, correct);
         }
         return Status.NONE;
     }
 
-
-//    public void createUserAndStartDialog(long chatId, int messageId, Message message) {
-//        Set<Dialog> dialogs = new HashSet<>();
-//        Dialog dialog = new Dialog(messageId, Shelter.NONE, Stage.START, Stage.START);
-//        User user = new User();
-//        dialogs.add(dialog);
-//        user.setOwner(false);
-//        user.setData(null);
-//        user.setChatId(chatId);
-//        user.setEmail(null);
-//        user.setFullName(message.chat().firstName() + " " + message.chat().lastName());
-//        user.setExpirationDate(null);
-//        user.setLastReportDate(null);
-//        user.setPhoneNumber(null);
-//        user.setPassport(null);
-//        user.setUserName(message.chat().username());
-//        user.setDialogs(dialogs);
-//        user.setPhase(Stage.NONE);
-//        userRepository.save(user);
-//    }
-
-//    public void createUserAndStartDialog(Message message) {
-//        int messageId = message.messageId();
-//        long chatId = message.chat().id();
-//        Action action = dialogService.startNewDialog(chatId, messageId);
-//        User user = userRepository.getUserByChatId(chatId);
-//        if (Objects.isNull(user)) {
-//            createUser(chatId, messageId, action, message);
-//        }
-//    }
-
-//
-//    public void createDialog(long chatId, int messageId) {
-//        User user = userRepository.getUserByChatId(chatId);
-//        Dialog dialog = new Dialog(messageId, Shelter.NONE, Stage.START, Stage.START);
-//        user.getDialogs().add(dialog);
-//        userRepository.save(user);
-//    }
-//
-//    public void updatePhase(long chatId, Stage stage) {
-//        User user = userRepository.getUserByChatId(chatId);
-//        user.setPhase(stage);
-//        userRepository.save(user);
-//    }
-//
-//    public void updateReportPath(User user, String path) {
-//        user.setData(path);
-//        userRepository.save(user);
-//    }
-//
-//    public void updateReportTime(User user) {
-//        user.setLastReportDate(LocalDateTime.now());
-//        userRepository.save(user);
-//    }
-//
-//    public void updatePhoneNumber(long chatId, String text) {
-//        User user = userRepository.getUserByChatId(chatId);
-//        user.setPhoneNumber(text);
-//        userRepository.save(user);
-//    }
-//
-//    public void updateData(long id, String fullName, String phoneNumber, String email, String passport) {
-//        User user = userRepository.getUserById(id);
-//        if (Objects.isNull(user)) {
-//            user = new User();
-//        }
-//        user.setFullName(fullName);
-//        user.setPhoneNumber(phoneNumber);
-//        user.setEmail(email);
-//        user.setPassport(passport);
-//        user.setExpirationDate(LocalDateTime.now().plusDays(30));
-//        user.setOwner(true);
-//        user.setPhase(Stage.NONE);
-//        userRepository.save(user);
-//    }
-
+    private boolean saveReport(ReportDTO reportDTO) {
+        if (Objects.nonNull(reportDTO)) {
+            User user = reportDTO.getUser();
+            Animal animal = reportDTO.getAnimal();
+            String path = fileService.getReportDirectory(user);
+            user.addReport(new Report(path, user, animal));
+            saveUser(user);
+            return true;
+        }
+        return false;
+    }
 }
 

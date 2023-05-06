@@ -24,7 +24,11 @@ public class CallBackQueryHandler {
     private final UserService userService;
 
     @Autowired
-    public CallBackQueryHandler(EditTextResponse editTextResponse, ActionService actionService, PhotoResponse photoResponse, TextResponse textResponse, UserService userService) {
+    public CallBackQueryHandler(EditTextResponse editTextResponse,
+                                ActionService actionService,
+                                PhotoResponse photoResponse,
+                                TextResponse textResponse,
+                                UserService userService) {
         this.editTextResponse = editTextResponse;
         this.actionService = actionService;
         this.photoResponse = photoResponse;

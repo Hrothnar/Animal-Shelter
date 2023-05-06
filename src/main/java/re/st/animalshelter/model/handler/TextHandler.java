@@ -8,7 +8,6 @@ import re.st.animalshelter.dto.ActionDTO;
 import re.st.animalshelter.enumeration.Command;
 import re.st.animalshelter.enumeration.Status;
 import re.st.animalshelter.model.response.TextResponse;
-import re.st.animalshelter.repository.animal.AnimalRepository;
 import re.st.animalshelter.service.UserService;
 
 @Component
@@ -17,7 +16,7 @@ public class TextHandler {
     private final TextResponse textResponse;
 
     @Autowired
-    public TextHandler(UserService userService, TextResponse textResponse, AnimalRepository animalRepository) {
+    public TextHandler(UserService userService, TextResponse textResponse) {
         this.userService = userService;
         this.textResponse = textResponse;
     }
@@ -28,10 +27,12 @@ public class TextHandler {
         if (message.text().equals(Command.START.getText())) {
             ActionDTO actionDTO = userService.createUserOrAction(message);
             textResponse.sendNewTextResponse(actionDTO);
-        } else {
-            Status status = userService.checkTextStatus(chatId);
+        } else if (message.text().equals(Command.FINISH.getText())) {
 
+        } else {
+            Status status = userService.checkStatusForText(message);
             textResponse.sendNewTextResponseByStatus(chatId, status);
+
         }
     }
 
