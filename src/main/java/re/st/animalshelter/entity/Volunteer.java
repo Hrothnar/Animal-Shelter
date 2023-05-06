@@ -14,9 +14,6 @@ public class Volunteer {
     private long id;
 
     @Column(unique = true)
-    private long userChatId;
-
-    @Column(unique = true)
     private long chatId;
 
     @Column(name = "user_name")
@@ -30,8 +27,6 @@ public class Volunteer {
 
     @OneToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY, mappedBy = "volunteer")
     private Set<Animal> animals = new HashSet<>();
-
-
 
 
     public void addAnimal(Animal animal) {
@@ -58,13 +53,6 @@ public class Volunteer {
         return id;
     }
 
-    public long getUserChatId() {
-        return userChatId;
-    }
-
-    public void setUserChatId(long chatId) {
-        this.userChatId = chatId;
-    }
 
     public String getFullName() {
         return fullName;

@@ -57,10 +57,6 @@ public abstract class Animal {
         return expirationDate;
     }
 
-    public String getExpirationDateAsString() {
-        return String.valueOf(expirationDate.getDayOfYear());
-    }
-
     public void setExpirationDate(LocalDateTime expirationDate) {
         this.expirationDate = expirationDate;
     }

@@ -3,7 +3,6 @@ package re.st.animalshelter.entity;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
-import org.springframework.transaction.annotation.Transactional;
 import re.st.animalshelter.entity.animal.Animal;
 import re.st.animalshelter.enumeration.Status;
 
@@ -21,6 +20,9 @@ public class User {
 
     @Column(unique = true)
     private long chatId;
+
+    @Column(name = "companion_chat_id")
+    private long companionChatId;
 
     @Column(length = 56)
     private String fullName;
@@ -100,7 +102,8 @@ public class User {
         stage.setUser(this);
     }
 
-    public void addReport(Report report, Animal animal) {
+    public void addReport(Report report) {
+        Animal animal = report.getAnimal();
         this.reports.add(report);
         animal.getReports().add(report);
         report.setUser(this);
@@ -201,5 +204,13 @@ public class User {
 
     public void setCurrentStatus(Status currentStatus) {
         this.currentStatus = currentStatus;
+    }
+
+    public long getCompanionChatId() {
+        return companionChatId;
+    }
+
+    public void setCompanionChatId(long volunteerChatId) {
+        this.companionChatId = volunteerChatId;
     }
 }

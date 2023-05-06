@@ -24,6 +24,17 @@ public class Report {
     @ManyToOne(cascade = {}, fetch = FetchType.LAZY)
     private Animal animal;
 
+    public Report(String path, User user, Animal animal) {
+        this.path = path;
+        this.user = user;
+        this.animal = animal;
+        this.time = LocalDateTime.now();
+    }
+
+    public Report() {
+
+    }
+
     public long getId() {
         return id;
     }
@@ -41,6 +52,7 @@ public class Report {
     }
 
     public void setPath(String path) {
+        this.time = LocalDateTime.now();
         this.path = path;
     }
 

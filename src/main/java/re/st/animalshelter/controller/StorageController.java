@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import re.st.animalshelter.enumeration.Button;
 import re.st.animalshelter.enumeration.Status;
 import re.st.animalshelter.enumeration.shelter.Shelter;
-import re.st.animalshelter.service.InformationService;
+import re.st.animalshelter.service.StorageService;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -19,11 +19,11 @@ import java.util.List;
 @Controller
 @RequestMapping("/storage")
 public class StorageController {
-    private final InformationService informationService;
+    private final StorageService storageService;
 
     @Autowired
-    public StorageController(InformationService informationService) {
-        this.informationService = informationService;
+    public StorageController(StorageService storageService) {
+        this.storageService = storageService;
     }
 
     @GetMapping("/menu")
@@ -47,7 +47,7 @@ public class StorageController {
                               @RequestParam("person_type") boolean owner,
                               @RequestParam("text") String text,
                               @RequestParam("file") MultipartFile file) {
-        informationService.saveInformation(button, shelter, status, owner, text, file);
+        storageService.saveInformation(button, shelter, status, owner, text, file);
         return "redirect:/storage/menu";
     }
 

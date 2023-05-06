@@ -1,8 +1,5 @@
 package re.st.animalshelter.enumeration;
 
-import java.util.Arrays;
-import java.util.Objects;
-
 public enum Status {
     NONE,
 
@@ -12,7 +9,10 @@ public enum Status {
     REPORTED,
     REPORT_TEXT,
     REPORT_PHOTO,
-    REPORT_WAS_NOT_SENT;
+    REPORT_WAS_NOT_SENT,
+
+    PREPARE_FOR_DIALOG,
+    DIALOG;
 
 
 }

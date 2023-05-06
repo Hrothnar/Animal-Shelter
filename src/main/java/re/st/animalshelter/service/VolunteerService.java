@@ -24,7 +24,7 @@ public class VolunteerService {
        return volunteerRepository.findById(id).orElseThrow(RuntimeException::new); //TODO
     }
 
-    public void save(Volunteer volunteer) {
+    public void saveVolunteer(Volunteer volunteer) {
         volunteerRepository.save(volunteer);
     }
 }
