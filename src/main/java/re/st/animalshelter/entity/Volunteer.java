@@ -22,10 +22,10 @@ public class Volunteer {
     @Column(name = "full_name", length = 56)
     private String fullName;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(cascade = {}, fetch = FetchType.LAZY)
     private Set<User> users = new HashSet<>();
 
-    @OneToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY, mappedBy = "volunteer")
+    @OneToMany(cascade = {}, fetch = FetchType.LAZY, mappedBy = "volunteer")
     private Set<Animal> animals = new HashSet<>();
 
 
@@ -40,12 +40,10 @@ public class Volunteer {
     }
 
     public Set<Animal> getAnimals() {
-//        return Collections.unmodifiableCollection(animals);
         return animals;
     }
 
     public Set<User> getUsers() {
-//        return Collections.unmodifiableCollection(users);
         return users;
     }
 

@@ -81,10 +81,10 @@ public class ButtonUtil {
 
     public InlineKeyboardMarkup showPets(long chatId) {
         InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
-        User user = userService.getUser(chatId);
+        User user = userService.getByChatId(chatId);
         Set<Animal> animals = user.getActiveAnimals();
         for (Animal animal : animals) {
-            keyboardMarkup.addRow(new InlineKeyboardButton("Порода: " + animal.getBreedAsString() + "  Возраст: " + animal.getAge()).callbackData(String.valueOf(animal.getId())));
+            keyboardMarkup.addRow(new InlineKeyboardButton(animal.getBreedAsString() + " -- Возраст: " + animal.getAge()).callbackData(String.valueOf(animal.getId())));
         }
         keyboardMarkup.addRow(new InlineKeyboardButton(Button.BACK.getText()).callbackData(Button.BACK.getCallBackQuery()));
         return keyboardMarkup;

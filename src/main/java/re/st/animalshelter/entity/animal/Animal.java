@@ -29,15 +29,15 @@ public abstract class Animal {
 
     private boolean active = true;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = {}, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = {}, fetch = FetchType.LAZY)
     @JoinColumn(name = "volunteer_id")
     private Volunteer volunteer;
 
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REFRESH, CascadeType.DETACH, CascadeType.REMOVE}, fetch = FetchType.LAZY, mappedBy = "animal", orphanRemoval = true)
+    @OneToMany(cascade = {}, fetch = FetchType.LAZY, mappedBy = "animal", orphanRemoval = true)
     @LazyCollection(value = LazyCollectionOption.TRUE)
     private Set<Report> reports = new HashSet<>();
 

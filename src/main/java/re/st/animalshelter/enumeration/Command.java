@@ -1,7 +1,7 @@
 package re.st.animalshelter.enumeration;
 
 public enum Command {
-    START("/start", "начать общение"),
+    START("/start", "начать общение c ботом"),
     FINISH("/finish", "закончить диалог с волонтёром");
 
     private final String text;

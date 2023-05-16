@@ -34,7 +34,7 @@ public class ActionService {
         int messageId = message.messageId();
         Action lastAction = getLastAction(messageId);
         Shelter shelter = lastAction.getShelter();
-        boolean owner = userService.getUser(chatId).isOwner();
+        boolean owner = userService.getByChatId(chatId).isOwner();
         return new ActionDTO(chatId, messageId, owner, button, shelter);
     }
 
@@ -53,7 +53,7 @@ public class ActionService {
         currentAction.setShelter(shelter);
         currentAction.setMessageId(messageId);
         currentAction.setButton(button);
-        User user = userService.getUser(chatId);
+        User user = userService.getByChatId(chatId);
         boolean owner = user.isOwner();
         user.addAction(currentAction);
         userService.saveUser(user);
@@ -64,7 +64,7 @@ public class ActionService {
     public ActionDTO returnLastAction(Message message) {
         int messageId = message.messageId();
         long chatId = message.chat().id();
-        User user = userService.getUser(chatId);
+        User user = userService.getByChatId(chatId);
         LinkedList<Action> actions = user.getActions().stream()
                 .filter(action -> action.getMessageId() == messageId)
                 .distinct()

@@ -18,10 +18,6 @@ public class TelegramBotListener implements UpdatesListener {
     private final TelegramBot telegramBot;
     private final Distributor distributor;
 
-//    private final Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
-//    private final Pattern pattern = Pattern.compile("(\\d{1,2}\\.\\d{1,2}\\.\\d{4} \\d{1,2}:\\d{1,2})\\s+([А-я\\d\\s,.?!:]+)");
-//    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
-
     @Autowired
     public TelegramBotListener(TelegramBot telegramBot, Distributor distributor) {
         this.telegramBot = telegramBot;

@@ -18,7 +18,7 @@ public class Stage {
     @Enumerated(value = EnumType.STRING)
     private Status dialogStatus;
 
-    @OneToOne(fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToOne(cascade = {}, fetch = FetchType.LAZY, orphanRemoval = true)
     @MapsId
     private User user;
 

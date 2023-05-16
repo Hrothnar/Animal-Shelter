@@ -8,57 +8,57 @@ import re.st.animalshelter.entity.Cell;
 import re.st.animalshelter.enumeration.Button;
 import re.st.animalshelter.enumeration.Status;
 import re.st.animalshelter.enumeration.shelter.Shelter;
-import re.st.animalshelter.repository.InformationRepository;
+import re.st.animalshelter.repository.StorageRepository;
 
 import java.io.IOException;
 
 @Service
 public class StorageService {
-    private final InformationRepository informationRepository;
+    private final StorageRepository storageRepository;
 
     @Autowired
-    public StorageService(InformationRepository informationRepository) {
-        this.informationRepository = informationRepository;
+    public StorageService(StorageRepository storageRepository) {
+        this.storageRepository = storageRepository;
     }
 
     public String getText(ActionDTO actionDTO) {
         Shelter shelter = actionDTO.getShelter();
         Button button = actionDTO.getButton();
         boolean owner = actionDTO.isOwner();
-        boolean dependsOnShelter = button.isResponseDependsOnShelter();
-        boolean dependsOnOwner = button.isResponseDependsOnOwner();
+        boolean dependsOnShelter = button.isShelterDependence();
+        boolean dependsOnOwner = button.isOwnerDependence();
         String text;
         if (dependsOnShelter) {
             text = dependsOnOwner
-                    ? informationRepository.findByButtonAndShelterAndOwner(button, shelter, owner).getText()
-                    : informationRepository.findByButtonAndShelter(button, shelter).getText();
+                    ? storageRepository.findByButtonAndShelterAndOwner(button, shelter, owner).getText()
+                    : storageRepository.findByButtonAndShelter(button, shelter).getText();
         } else {
             text = dependsOnOwner
-                    ? informationRepository.findByButtonAndOwner(button, owner).getText()
-                    : informationRepository.findByButton(button).getText();
+                    ? storageRepository.findByButtonAndOwner(button, owner).getText()
+                    : storageRepository.findByButton(button).getText();
         }
         return text;
     }
 
     public String getText(Status status) {
-        return informationRepository.findByStatus(status).getText();
+        return storageRepository.findByStatus(status).getText();
     }
 
     public byte[] getPhoto(ActionDTO actionDTO) {
         Shelter shelter = actionDTO.getShelter();
         Button button = actionDTO.getButton();
         boolean owner = actionDTO.isOwner();
-        boolean dependsOnShelter = button.isResponseDependsOnShelter();
-        boolean dependsOnOwner = button.isResponseDependsOnOwner();
+        boolean dependsOnShelter = button.isShelterDependence();
+        boolean dependsOnOwner = button.isOwnerDependence();
         byte[] photo;
         if (dependsOnShelter) {
             photo = dependsOnOwner
-                    ? informationRepository.findByButtonAndShelterAndOwner(button, shelter, owner).getPhoto()
-                    : informationRepository.findByButtonAndShelter(button, shelter).getPhoto();
+                    ? storageRepository.findByButtonAndShelterAndOwner(button, shelter, owner).getPhoto()
+                    : storageRepository.findByButtonAndShelter(button, shelter).getPhoto();
         } else {
             photo = dependsOnOwner
-                    ? informationRepository.findByButtonAndOwner(button, owner).getPhoto()
-                    : informationRepository.findByButton(button).getPhoto();
+                    ? storageRepository.findByButtonAndOwner(button, owner).getPhoto()
+                    : storageRepository.findByButton(button).getPhoto();
         }
         return photo;
     }
@@ -70,6 +70,6 @@ public class StorageService {
         } catch (IOException e) {
             throw new RuntimeException(e); //TODO
         }
-        informationRepository.save(new Cell(button, shelter, status, owner, text, bytes));
+        storageRepository.save(new Cell(button, shelter, status, owner, text, bytes));
     }
 }

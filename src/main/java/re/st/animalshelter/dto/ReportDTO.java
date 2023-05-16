@@ -12,10 +12,6 @@ public class ReportDTO {
         this.animal = animal;
     }
 
-    public ReportDTO() {
-
-    }
-
     public User getUser() {
         return user;
     }

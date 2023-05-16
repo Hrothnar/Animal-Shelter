@@ -6,6 +6,7 @@ import re.st.animalshelter.entity.Volunteer;
 import re.st.animalshelter.repository.VolunteerRepository;
 
 import java.util.LinkedList;
+import java.util.Optional;
 
 @Service
 public class VolunteerService {

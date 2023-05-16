@@ -11,5 +11,6 @@ import java.util.Optional;
 @Repository
 public interface VolunteerRepository extends JpaRepository<Volunteer, Long> {
     Optional<Volunteer> findById(long id);
+    Optional<Volunteer> findByChatId(long chatId);
     List<Volunteer> findAll();
 }

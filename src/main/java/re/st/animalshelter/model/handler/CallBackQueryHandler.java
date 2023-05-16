@@ -41,7 +41,6 @@ public class CallBackQueryHandler {
         long chatId = message.chat().id();
         Button button = Button.getButton(callbackQuery.data());
         ActionDTO actionDTO;
-        Status status;
         System.out.println("--------------------------------------------------------------------------");
         switch (button.getResponseType()) {
             case BACK_RESPONSE:
@@ -60,12 +59,17 @@ public class CallBackQueryHandler {
                 actionDTO = actionService.getCurrentAction(message, button);
                 photoResponse.sendNewPhotoResponse(actionDTO);
                 break;
-            case TEXT_RESPONSE:
-                status = userService.setInitialStatus(chatId, button);
-                textResponse.sendNewTextResponseByStatus(chatId, status);
+            case SIMPLE_TEXT_RESPONSE:
+
+
+                break;
+            case STATUS_RESPONSE:
+                Status currentStatus = userService.setInitialStatus(chatId, button);
+                textResponse.sendNewTextResponseByStatus(chatId, currentStatus);
                 break;
             default:
                 throw new RuntimeException("Нет подходящего обработчика"); //TODO
         }
     }
+
 }

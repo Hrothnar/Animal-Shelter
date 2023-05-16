@@ -28,19 +28,11 @@ public class Cell {
     @Column(nullable = false)
     private boolean owner;
 
-    @Column(length = 4048)
+    @Column(length = 4096)
     private String text;
 
-    @Column(length = 4048)
+    @Column(length = 4096)
     private byte[] photo;
-
-    public Cell(Button button, Shelter shelter, Status status, boolean owner, String text) {
-        this.button = button;
-        this.shelter = shelter;
-        this.status = status;
-        this.owner = owner;
-        this.text = text;
-    }
 
     public Cell(Button button, Shelter shelter, Status status, boolean owner, String text, byte[] photo) {
         this.button = button;
@@ -48,14 +40,6 @@ public class Cell {
         this.status = status;
         this.owner = owner;
         this.text = text;
-        this.photo = photo;
-    }
-
-    public Cell(Button button, Shelter shelter, Status status, boolean owner, byte[] photo) {
-        this.button = button;
-        this.shelter = shelter;
-        this.status = status;
-        this.owner = owner;
         this.photo = photo;
     }
 

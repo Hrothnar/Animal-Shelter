@@ -8,10 +8,11 @@ import com.pengrad.telegrambot.response.SendResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import re.st.animalshelter.dto.ActionDTO;
+import re.st.animalshelter.dto.NotifyDTO;
 import re.st.animalshelter.entity.User;
+import re.st.animalshelter.enumeration.Position;
 import re.st.animalshelter.enumeration.Status;
 import re.st.animalshelter.service.StorageService;
-import re.st.animalshelter.service.VolunteerService;
 import re.st.animalshelter.utility.ButtonUtil;
 
 @Component
@@ -49,22 +50,28 @@ public class TextResponse {
         }
     }
 
-    public void sendNewTextResponseByStatus(User user, String textForCompanion, Status status) {
-        String text;
-        long chatId;
-        if (status != Status.NONE) {
-            if (status != Status.DIALOG) {
-                chatId = user.getChatId();
-                text = storageService.getText(status);
-            } else {
-                chatId = user.getCompanionChatId();
-                text = textForCompanion;
-            }
-            SendMessage response = new SendMessage(chatId, text);
-            SendResponse execute = telegramBot.execute(response);
-            if (!execute.isOk()) {
-                System.out.println(execute.description());
-            }
+    public void sendTextToCompanion(User user, String text) {
+        long companionChatId = user.getCompanionChatId();
+        Position position = user.getPosition();
+        if (position == Position.VOLUNTEER) {
+            text = "Пользователь @" + user.getUserName() + ": " + text;
+        }
+        SendMessage response = new SendMessage(companionChatId, text);
+        SendResponse execute = telegramBot.execute(response);
+        if (!execute.isOk()) {
+            System.out.println(execute.description());
+        }
+    }
+
+    public void sendNotify(NotifyDTO notifyDTO) {
+        Status status = notifyDTO.getStatus();
+        switch (status) {
+            case DIALOG_FINISHED:
+                sendNewTextResponseByStatus(notifyDTO.getUserChatId(), status);
+                sendNewTextResponseByStatus(notifyDTO.getCompanionChatId(), status);
+                break;
+            case FAILED:
+                sendNewTextResponseByStatus(notifyDTO.getUserChatId(), status);
         }
     }
 }

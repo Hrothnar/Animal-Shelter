@@ -20,8 +20,7 @@ public class PhotoHandler {
 
     public void processPhotoMessage(Message message) {
         long chatId = message.chat().id();
-        Status status = userService.checkStatusForPhoto(message);
-
+        Status status = userService.handleStatusForPhoto(message);
         textResponse.sendNewTextResponseByStatus(chatId, status);
     }
 }

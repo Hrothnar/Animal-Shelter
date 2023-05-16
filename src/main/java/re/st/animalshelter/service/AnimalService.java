@@ -2,6 +2,8 @@ package re.st.animalshelter.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import re.st.animalshelter.dto.animal.CatDTO;
+import re.st.animalshelter.dto.animal.DogDTO;
 import re.st.animalshelter.entity.animal.Animal;
 import re.st.animalshelter.entity.animal.Cat;
 import re.st.animalshelter.entity.animal.Dog;
@@ -13,7 +15,7 @@ import re.st.animalshelter.repository.animal.DogRepository;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
-import java.util.LinkedList;
+import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,15 +31,19 @@ public class AnimalService {
         this.dogRepository = dogRepository;
     }
 
+    public void saveAnimal(Animal animal) {
+        animalRepository.save(animal);
+    }
+
     public void saveCat(int age, CatBreed breed, int amount) {
         for (int i = 0; i < amount; i++) {
-            animalRepository.save(new Cat(age, breed));
+            saveAnimal(new Cat(age, breed));
         }
     }
 
     public void saveDog(int age, DogBreed breed, int amount) {
         for (int i = 0; i < amount; i++) {
-            animalRepository.save(new Dog(age, breed));
+            saveAnimal(new Dog(age, breed));
         }
     }
 
@@ -52,22 +58,17 @@ public class AnimalService {
         animalRepository.save(animal);
     }
 
-    public LinkedList<Cat> getActiveCats() {
+    public LinkedHashSet<CatDTO> getActiveCatsAsDTO() {
         return catRepository.findAllByActiveIsTrueAndUserIsNull().stream()
-                .sorted(Comparator.comparing(Cat::getBreed))
-                .collect(Collectors.toCollection(LinkedList::new));
+                .map(CatDTO::new)
+                .sorted(Comparator.comparing(CatDTO::getBreed))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    public LinkedList<Dog> getActiveDogs() {
+    public LinkedHashSet<DogDTO> getActiveDogsAsDTO() {
         return dogRepository.findAllByActiveIsTrueAndUserIsNull().stream()
-                .sorted(Comparator.comparing(Dog::getBreed))
-                .collect(Collectors.toCollection(LinkedList::new));
+                .map(DogDTO::new)
+                .sorted(Comparator.comparing(DogDTO::getBreed))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
-
-    public void saveAnimal(Animal animal) {
-        animalRepository.save(animal);
-    }
-
-
-
 }

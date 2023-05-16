@@ -1,0 +1,5 @@
+public void saveAnimal(Animal animal) {
+        animalRepository.save(animal);
+    }  public void saveAnimal(Animal animal) {
+        animalRepository.save(animal);
+    }

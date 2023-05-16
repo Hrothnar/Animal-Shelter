@@ -82,13 +82,4 @@ public class Action {
     public void setUser(User user) {
         this.user = user;
     }
-
-    @Override
-    public String toString() {
-        return "Action{" +
-                "messageId=" + messageId +
-                ", button=" + button +
-                ", shelter=" + shelter +
-                '}';
-    }
 }

@@ -8,7 +8,7 @@ import re.st.animalshelter.enumeration.Status;
 import re.st.animalshelter.enumeration.shelter.Shelter;
 
 @Repository
-public interface InformationRepository extends JpaRepository<Cell, Long> {
+public interface StorageRepository extends JpaRepository<Cell, Long> {
     Cell findByButtonAndShelterAndOwner(Button button, Shelter shelter, boolean owner);
     Cell findByButtonAndOwner(Button button, boolean owner);
     Cell findByButtonAndShelter(Button button, Shelter shelter);

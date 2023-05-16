@@ -4,13 +4,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import re.st.animalshelter.dto.NotifyDTO;
+import re.st.animalshelter.entity.Report;
 import re.st.animalshelter.entity.User;
 import re.st.animalshelter.entity.animal.Animal;
-import re.st.animalshelter.service.AnimalService;
-import re.st.animalshelter.service.UserService;
-import re.st.animalshelter.service.VolunteerService;
+import re.st.animalshelter.model.response.TextResponse;
+import re.st.animalshelter.service.*;
 
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/user")
@@ -18,12 +22,23 @@ public class UserController {
     private final UserService userService;
     private final AnimalService animalService;
     private final VolunteerService volunteerService;
+    private final ReportService reportService;
+    private final FileService fileService;
+    private final TextResponse textResponse;
 
     @Autowired
-    public UserController(UserService userService, AnimalService animalService, VolunteerService volunteerService) {
+    public UserController(UserService userService,
+                          AnimalService animalService,
+                          VolunteerService volunteerService,
+                          ReportService reportService,
+                          FileService fileService,
+                          TextResponse textResponse) {
         this.userService = userService;
         this.animalService = animalService;
         this.volunteerService = volunteerService;
+        this.reportService = reportService;
+        this.fileService = fileService;
+        this.textResponse = textResponse;
     }
 
     @GetMapping("/menu")
@@ -32,15 +47,15 @@ public class UserController {
     }
 
     @GetMapping("/find")
-    public String findUser() {
+    public String findUser(Model model) {
+        model.addAttribute("users", userService.getAllUsers());
         return "user/user_find";
     }
 
     @PostMapping("/receive")
-    public String receive(@RequestParam("userName") String userName,
-                          @RequestParam("passport") String passport,
-                          @RequestParam("email") String email) {
-        long id = userService.getUserId(userName, email, passport);
+    public String receive(@RequestParam("userName") String userName, @RequestParam("user_id") long userId) {
+        System.out.println(userId + "   " + userName);
+        long id = userService.getUserId(userId, userName);
         return id != -1L ? "redirect:/user/" + id : "user/not_found";
     }
 
@@ -68,7 +83,7 @@ public class UserController {
         Set<Animal> animals = userService.getUserById(id).getActiveAnimals();
         model.addAttribute("id", id);
         model.addAttribute("animals", animals);
-        return "/user/add_time";
+        return "user/add_time";
     }
 
     @PostMapping("/{id}/save_time")
@@ -83,8 +98,8 @@ public class UserController {
     public String attachAnimal(@PathVariable("id") long id, Model model) {
         model.addAttribute("id", id);
         model.addAttribute("volunteers", volunteerService.getAllVolunteers());
-        model.addAttribute("cats", animalService.getActiveCats());
-        model.addAttribute("dogs", animalService.getActiveDogs());
+        model.addAttribute("cats", animalService.getActiveCatsAsDTO());
+        model.addAttribute("dogs", animalService.getActiveDogsAsDTO());
         return "user/attach_animal";
     }
 
@@ -96,43 +111,35 @@ public class UserController {
         return "redirect:/user/" + userId;
     }
 
+    @GetMapping("/{id}/report")
+    public String chooseUserReports(@PathVariable("id") long userId, Model model) {
+        LinkedList<Report> reports = userService.getUserById(userId).getReports().stream()
+                .sorted(Comparator.comparing(Report::getTime).reversed())
+                .collect(Collectors.toCollection(LinkedList::new));
+        model.addAttribute("reports", reports);
+        return "user/report";
+    }
 
+    @PostMapping("/{id}/show_report")
+    public String showReport(@PathVariable("id") long userId, @RequestParam("report_id") long reportId, Model model) {
+        Report report = reportService.getReportById(reportId);
+        String text = fileService.getText(report.getTextPath());
+        model.addAttribute("id", userId);
+        model.addAttribute("report", report);
+        model.addAttribute("text", text);
+        return "user/show_report";
+    }
 
+    @PostMapping("/{id}/update_report")
+    public String updateReport(@PathVariable("id") long userId,
+                               @RequestParam("report_id") long reportId,
+                               @RequestParam("button") String button) {
+        long chatId = userService.getUserById(userId).getChatId();
+        NotifyDTO notifyDTO = reportService.updateReport(chatId, reportId, button);
+        textResponse.sendNotify(notifyDTO);
+        return "redirect:/user/" + userId;
+    }
 
-
-
-
-
-
-//    @PostMapping("/find")
-//    public String find(HttpServletRequest request, Model model) {
-//        String userName = request.getParameter("userName");
-//        String email = request.getParameter("email");
-//        String passport = request.getParameter("passport");
-//        User user = userService.getUser(userName, email, passport);
-//        if (Objects.isNull(user)) {
-//            return "not_found";
-//        }
-//        model.addAttribute("user", user);
-//        return "show";
-//    }
-//
-//    @PostMapping("/edit")
-//    public String edit(HttpServletRequest request) {
-//        long id = Long.parseLong(request.getParameter("id"));
-//        String fullName = request.getParameter("fullName");
-//        String phoneNumber = request.getParameter("phoneNumber");
-//        String email = request.getParameter("email");
-//        String passport = request.getParameter("passport");
-//        userService.updateData(id, fullName, phoneNumber, email, passport);
-//        return "greeting";
-//    }
-//
-//    @GetMapping("/new")
-//    public String create(Model model) {
-//        model.addAttribute("user", new User());
-//        return "show";
-//    }
 
 }
 

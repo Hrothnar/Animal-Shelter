@@ -24,7 +24,8 @@ public class Distributor {
     public static final String EDIT_MULTIMEDIA_RESPONSE = "EDIT_MULTIMEDIA_RESPONSE";
     public static final String EDIT_TEXT_RESPONSE = "EDIT_TEXT_RESPONSE";
     public static final String PHOTO_RESPONSE = "PHOTO_RESPONSE";
-    public static final String TEXT_RESPONSE = "TEXT_RESPONSE";
+    public static final String SIMPLE_TEXT_RESPONSE = "TEXT_RESPONSE";
+    public static final String STATUS_RESPONSE = "STATUS_RESPONSE";
 
     public final static Logger LOGGER = Logger.getLogger(TelegramBotListener.class);
 
@@ -50,6 +51,7 @@ public class Distributor {
                 documentHandler.processDocumentMessage(message);
             } else {
                 LOGGER.error("Необрабатываемый запрос"); //TODO не забыть добавить ещё логики
+                throw new RuntimeException();
             }
         } else if (Objects.nonNull(update.callbackQuery())) {
             callBackQueryHandler.processCallBackQuery(update.callbackQuery());

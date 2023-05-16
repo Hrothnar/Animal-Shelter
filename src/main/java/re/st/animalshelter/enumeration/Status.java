@@ -11,8 +11,12 @@ public enum Status {
     REPORT_PHOTO,
     REPORT_WAS_NOT_SENT,
 
-    PREPARE_FOR_DIALOG,
-    DIALOG;
+    PREPARED_FOR_DIALOG,
+    DIALOG,
+    DIALOG_FINISHED,
+
+    PASSED,
+    FAILED;
 
 
 }
