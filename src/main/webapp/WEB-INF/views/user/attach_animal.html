@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Attach animal</title>
+</head>
+<body>
+<h2>Здесь вы можете закрепить за хозяином его нового питомца и так же назначить волонтёра.</h2>
+<h3>Вы можете видеть текущую нагрузку каждого волонтёра.
+    Старайтесь не назначать присматривать за питомцами сильно нагруженных волонтёров,
+    а распределяйте нагрузку равномерно.</h3>
+
+<form th:method="POST" th:action="@{/user/{id}/animal_attach(id=${id})}" th:object="${animal}">
+    <h3>Выберите питомца и волонтёра:</h3>
+    <label for="cat">Кошки:</label>
+    <select th:name="animal_id" id="cat">
+        <option th:each="animal : ${cats}" th:value="${animal.getId()}" th:text="${animal.getBreed().getText() + ' --  Возраст: ' + animal.getAge() + ' y.o.'}"></option>
+    </select>
+    <select th:name="volunteer_id">
+        <option th:each="volunteer : ${volunteers}" th:value="${volunteer.getId()}" th:text="${volunteer.getFullName() + ' -- Закреплено:' + volunteer.getAnimals().size()}"></option>
+    </select>
+    <input type="submit" value="Закрепить">
+</form>
+
+<br/>
+<form th:method="POST" th:action="@{/user/{id}/animal_attach(id=${id})}" th:object="${animal}">
+    <label for="dog">Собаки:</label>
+    <select th:name="animal_id" id="dog">
+        <option th:each="animal : ${dogs}" th:value="${animal.getId()}" th:text="${animal.getBreed().getText() + ' -- Возраст: ' + animal.getAge() + ' y.o.'}"></option>
+    </select>
+    <select th:name="volunteer_id">
+        <option th:each="volunteer : ${volunteers}" th:value="${volunteer.getId()}" th:text="${volunteer.getFullName() + ' - Закреплено:' + volunteer.getAnimals().size()}"></option>
+    </select>
+    <input type="submit" value="Закрепить">
+</form>
+
+</body>
+</html>

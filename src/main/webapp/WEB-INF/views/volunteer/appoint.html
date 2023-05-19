@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Appoint volunteer</title>
+</head>
+<body>
+<h2>Здесь вы можете назначить существующего пользователя волонтёром.</h2>
+<h4>Вы можете назначить пользователя по User Name или выбрать списке.</h4>
+<form method="POST" action="/volunteer/save_appoint">
+    <label for="userName">Введите User Name:</label>
+    <input type="text" name="userName" id="userName"/>
+    <br/>
+    <br/>
+    <label for="user">Выберите пользователя:</label>
+    <select th:name="user_id" id="user" th:object="${user}">
+        <option value="-1" text=" "></option>
+        <option th:each="user : ${users}" th:value="${user.getId()}" th:text="${user.getFullName() + ' -- @' + user.getUserName()}"></option>
+    </select>
+    <br/>
+    <br/>
+    <input type="submit" value="Назначить волонтёром"/>
+</form>
+</body>
+</html>

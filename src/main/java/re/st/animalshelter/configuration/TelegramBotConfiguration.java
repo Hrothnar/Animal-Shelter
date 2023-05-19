@@ -11,14 +11,13 @@ public class TelegramBotConfiguration {
     private final String token;
 
 
-    @Autowired //внедрение токена бота из переменной среды
+    @Autowired
     public TelegramBotConfiguration(@Value("${telegram.bot.token}") String token) {
         this.token = token;
     }
 
-    @Bean //создание bean класса TelegramBot
+    @Bean
     public TelegramBot getBot() {
         return new TelegramBot(token);
     }
-
 }

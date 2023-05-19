@@ -1,42 +1,40 @@
 package re.st.animalshelter.controller;
 
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import re.st.animalshelter.enumeration.Position;
+import re.st.animalshelter.service.UserService;
 
-@RestController
-@RequestMapping("petowner")
+@Controller
+@RequestMapping("/volunteer")
 public class VolunteerController {
+    private final UserService userService;
 
-    @GetMapping("/chat")
-    public ResponseEntity<?> chat() {
-        return null;
+    @Autowired
+    public VolunteerController(UserService userService) {
+        this.userService = userService;
     }
 
-    @GetMapping("/")
-    public ResponseEntity<?> showAllReports() {
-        return null;
+    @GetMapping("/menu")
+    public String menu() {
+        return "volunteer/volunteer_menu";
     }
 
-    @GetMapping("{id}")
-    public ResponseEntity<?> showOwnerReports(@PathVariable("id") String id) {
-        return null;
+    @GetMapping("/appoint")
+    public String create(Model model) {
+        model.addAttribute("users", userService.getAllByPosition(Position.USER));
+        return "volunteer/appoint";
     }
 
-    @PatchMapping("/add/{id}")
-    public ResponseEntity<?> addPetToOwner(@PathVariable("id") String id) {
-        return null;
+    @PostMapping("/save_appoint")
+    public String saveVolunteer(@RequestParam("userName")String userName,  @RequestParam("user_id") long userId) {
+        boolean exist = userService.attendVolunteer(userId, userName);
+        return exist ? "redirect:/volunteer/menu" : "user/not_found";
     }
-
-    @PatchMapping("/remove/{id}")
-    public ResponseEntity<?> removePetFromOwner(@PathVariable("id") String id) {
-        return null;
-    }
-
-    @DeleteMapping("/delete")
-    public ResponseEntity<?> deleteOldOwners() {
-        return null;
-    }
-
-
 }

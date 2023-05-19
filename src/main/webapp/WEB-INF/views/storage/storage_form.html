@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Add information</title>
+</head>
+<body>
+<h1>Заполните поля для внесения информации в хранилище.</h1>
+<h3>Если информационный блок по заданным параметрам уже присутствует в хранилище, информация в нём будет заменена.</h3>
+<br/>
+<form method="POST" action="/storage/receive" enctype="multipart/form-data">
+    <label for="code">Выберите событие:</label>
+    <select id="code" th:name="code">
+        <option th:each="command : ${commands}" th:value="${command.getCode()}" th:text="${command.getDescription()}"></option>
+        <option th:each="button : ${buttons}" th:value="${button.getCode()}" th:text="${button.getDescription()}"></option>
+        <option th:each="status : ${statuses}" th:value="${status.getCode()}" th:text="${status.getDescription()}"></option>
+    </select>
+    <br/>
+    <label for="person_type">Укажите для кого предназначается информация:</label>
+    <select id="person_type" th:name="person_type">
+        <option th:each="person_type : ${person_types}" th:value="${person_type}" th:text="${person_type}"></option>
+    </select>
+    <br/>
+    <label for="shelter">Выберите приют:</label>
+    <select id="shelter" th:name="shelter">
+        <option th:each="shelter : ${shelters}" th:value="${shelter}" th:text="${shelter.getDescription()}"></option>
+    </select>
+    <br/>
+    <label for="text">Введите текст, который будет отображаться пользователю:</label>
+    <textarea name="text" rows="10" cols="50" id="text" ></textarea>
+    <br/>
+    <label for="file">Приложите фото, которое будет отображаться пользователю:</label>
+    <input type="file" name="file" id="file" accept="image/*"/>
+    <br/>
+    <br/>
+    <input type="submit" value="Внести данные в хранилище"/>
+</form>
+
+</body>
+</html>
