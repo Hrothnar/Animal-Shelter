@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import re.st.animalshelter.dto.Answer;
 import re.st.animalshelter.entity.Cell;
-import re.st.animalshelter.enumeration.shelter.Shelter;
+import re.st.animalshelter.enumeration.Shelter;
 import re.st.animalshelter.repository.StorageRepository;
 
 import java.io.IOException;

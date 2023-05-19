@@ -1,6 +1,6 @@
 package re.st.animalshelter.dto;
 
-import re.st.animalshelter.enumeration.shelter.Shelter;
+import re.st.animalshelter.enumeration.Shelter;
 
 public class Answer {
     private final long chatId;

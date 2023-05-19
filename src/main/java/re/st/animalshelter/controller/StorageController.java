@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import re.st.animalshelter.enumeration.Button;
 import re.st.animalshelter.enumeration.Command;
 import re.st.animalshelter.enumeration.Status;
-import re.st.animalshelter.enumeration.shelter.Shelter;
+import re.st.animalshelter.enumeration.Shelter;
 import re.st.animalshelter.service.StorageService;
 
 import java.util.LinkedList;

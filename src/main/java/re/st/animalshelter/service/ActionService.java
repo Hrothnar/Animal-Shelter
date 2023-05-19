@@ -8,7 +8,7 @@ import re.st.animalshelter.dto.Answer;
 import re.st.animalshelter.entity.Action;
 import re.st.animalshelter.entity.User;
 import re.st.animalshelter.enumeration.Button;
-import re.st.animalshelter.enumeration.shelter.Shelter;
+import re.st.animalshelter.enumeration.Shelter;
 import re.st.animalshelter.repository.ActionRepository;
 
 import java.util.*;

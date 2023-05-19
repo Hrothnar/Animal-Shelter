@@ -9,8 +9,8 @@ import re.st.animalshelter.entity.Volunteer;
 import re.st.animalshelter.entity.animal.Animal;
 import re.st.animalshelter.enumeration.Position;
 import re.st.animalshelter.enumeration.Status;
-import re.st.animalshelter.model.response.particular.status.AddProbationTimeStatus;
-import re.st.animalshelter.model.response.particular.status.EndProbationStatus;
+import re.st.animalshelter.response.particular.status.AddProbationTimeStatus;
+import re.st.animalshelter.response.particular.status.EndProbationStatus;
 import re.st.animalshelter.repository.UserRepository;
 import re.st.animalshelter.utility.Distributor;
 

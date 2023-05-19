@@ -9,12 +9,11 @@ import re.st.animalshelter.entity.animal.Cat;
 import re.st.animalshelter.entity.animal.Dog;
 import re.st.animalshelter.enumeration.breed.CatBreed;
 import re.st.animalshelter.enumeration.breed.DogBreed;
-import re.st.animalshelter.model.response.particular.status.TestPeriodDone;
+import re.st.animalshelter.response.particular.status.TestPeriodDone;
 import re.st.animalshelter.repository.animal.AnimalRepository;
 import re.st.animalshelter.repository.animal.CatRepository;
 import re.st.animalshelter.repository.animal.DogRepository;
 
-import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.stream.Collectors;

@@ -1,10 +1,10 @@
 27-04-2023 07:37 ERROR TelegramBotListener:256 - Ответ не был отправлен
 java.lang.RuntimeException
-	at re.st.animalshelter.listener.TelegramBotListener.send(TelegramBotListener.java:256)
-	at re.st.animalshelter.listener.TelegramBotListener.sendEditedTextResponse(TelegramBotListener.java:238)
-	at re.st.animalshelter.listener.TelegramBotListener.processBack(TelegramBotListener.java:151)
-	at re.st.animalshelter.listener.TelegramBotListener.processCallbackQuery(TelegramBotListener.java:105)
-	at re.st.animalshelter.listener.TelegramBotListener.process(TelegramBotListener.java:78)
+	at re.st.animalshelter.TelegramBotListener.send(TelegramBotListener.java:256)
+	at re.st.animalshelter.TelegramBotListener.sendEditedTextResponse(TelegramBotListener.java:238)
+	at re.st.animalshelter.TelegramBotListener.processBack(TelegramBotListener.java:151)
+	at re.st.animalshelter.TelegramBotListener.processCallbackQuery(TelegramBotListener.java:105)
+	at re.st.animalshelter.TelegramBotListener.process(TelegramBotListener.java:78)
 	at com.pengrad.telegrambot.impl.UpdatesHandler$1.onResponse(UpdatesHandler.java:73)
 	at com.pengrad.telegrambot.impl.UpdatesHandler$1.onResponse(UpdatesHandler.java:49)
 	at com.pengrad.telegrambot.impl.TelegramBotClient$1.onResponse(TelegramBotClient.java:53)

@@ -32,7 +32,7 @@ import re.st.animalshelter.enumeration.Position;
 import re.st.animalshelter.enumeration.Status;
 import re.st.animalshelter.enumeration.breed.CatBreed;
 import re.st.animalshelter.enumeration.breed.DogBreed;
-import re.st.animalshelter.enumeration.shelter.Shelter;
+import re.st.animalshelter.enumeration.Shelter;
 import re.st.animalshelter.service.AnimalService;
 import re.st.animalshelter.service.StorageService;
 import re.st.animalshelter.service.UserService;
