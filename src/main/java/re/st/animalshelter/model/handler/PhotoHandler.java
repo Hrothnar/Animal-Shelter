@@ -3,25 +3,25 @@ package re.st.animalshelter.model.handler;
 import com.pengrad.telegrambot.model.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import re.st.animalshelter.enumeration.Status;
-import re.st.animalshelter.model.response.TextResponse;
+import org.springframework.transaction.annotation.Transactional;
+import re.st.animalshelter.entity.User;
 import re.st.animalshelter.service.UserService;
+import re.st.animalshelter.utility.Initializer;
 
 @Component
 public class PhotoHandler {
     private final UserService userService;
-    private final TextResponse textResponse;
+    private final Initializer initializer;
 
     @Autowired
-    public PhotoHandler(UserService userService, TextResponse textResponse) {
+    public PhotoHandler(UserService userService, Initializer initializer) {
         this.userService = userService;
-        this.textResponse = textResponse;
+        this.initializer = initializer;
     }
 
+    @Transactional
     public void processPhotoMessage(Message message) {
-        long chatId = message.chat().id();
-        Status status = userService.checkStatusForPhoto(message);
-
-        textResponse.sendNewTextResponseByStatus(chatId, status);
+        User user = userService.getByChatId(message.chat().id());
+        initializer.getStatus(user.getCurrentCode()).execute(message);
     }
 }

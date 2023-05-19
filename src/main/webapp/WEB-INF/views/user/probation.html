@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Probation</title>
+</head>
+<body>
+<h2>Здесь вы можете уведомить хозяина об исходе испытательного срока.</h2>
+<br/>
+<form th:method="POST" th:action="@{/user/{id}/save_probation(id=${id})}" th:object="${animal}">
+    <label for="animal">Выберите питомца:</label>
+    <select th:name="animal_id" id="animal">
+        <option th:each="animal : ${animals}" th:value="${animal.getId()}" th:text="${animal.getBreed().getText() + ' --  Возраст: ' + animal.getAge() + ' y.o.  Дата окончания срока: ' + animal.getExpirationDate()}"></option>
+    </select>
+    <br/>
+    <br/>
+    <button type="submit" name="button" value="pass">Испытательный период успешно завершён</button>
+    <br/>
+    <br/>
+    <button type="submit" name="button" value="fail">Испытательный период не пройден</button>
+    <br/>
+    <br/>
+</form>
+
+</body>
+</html>

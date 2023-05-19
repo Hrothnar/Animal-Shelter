@@ -1,89 +1,76 @@
 package re.st.animalshelter.enumeration;
 
 import re.st.animalshelter.enumeration.shelter.Shelter;
-import re.st.animalshelter.model.Distributor;
 
-import java.util.Arrays;
-import java.util.Objects;
+import java.util.Collections;
+import java.util.LinkedList;
 
 public enum Button {
-    NONE("NONE", "none", null, false, false),
-    START("Старт", "/start", null, false, true),
-    BACK("Вернуться", "back", Distributor.BACK_RESPONSE, false, false),
+    UNKNOWN(Dependence.ANY, Dependence.ANY, "b-1", "Неизвестная кнопка"),
+    NONE(Dependence.ANY, Dependence.ANY, "b0", "666"),
+    BACK(Dependence.ANY, Dependence.ANY, "b1", "Вернуться"),
 
-    DOG_SHELTER("Приют для собак", "dog shelter", Distributor.EDIT_TEXT_RESPONSE, false, false),
-    CAT_SHELTER("Приют для кошек", "cat shelter", Distributor.EDIT_TEXT_RESPONSE, false, false),
+    DOG_SHELTER(Dependence.ANY, Dependence.ANY, "b2", "Приют для собак"),
+    CAT_SHELTER(Dependence.ANY, Dependence.ANY, "b3", "Приют для кошек"),
 
-    LOOK_AT_THE_MAP("Схема проезда", "look at map", Distributor.PHOTO_RESPONSE, true, false),
-
-    LEAVE_CONTACT_INFORMATION("Оставить данные для связи", "leave contact information", Distributor.TEXT_RESPONSE, false, false),
-    CALL_A_VOLUNTEER("Позвать волонтёра", "call a volunteer", Distributor.TEXT_RESPONSE, false, false),
-    UNKNOWN("Неизвестная кнопка", "unknown", Distributor.TEXT_RESPONSE, false, false),
-
-    SHELTER_INFO("Узнать информацию о приюте", "shelter info", Distributor.EDIT_TEXT_RESPONSE, true, false),
-    DRIVER_PERMIT("Оформить разрешение на проезд", "driver permit", Distributor.EDIT_TEXT_RESPONSE, false, false),
-    TAKE_AN_ANIMAL("Как приютить питомца?", "take an animal", Distributor.EDIT_TEXT_RESPONSE, true, false),
-    RULES("Правила знакомства", "rules", Distributor.EDIT_TEXT_RESPONSE, true, false),
-    DOCUMENTS_FOR_ANIMAL("Документы для оформления животного", "documents for animal", Distributor.EDIT_TEXT_RESPONSE, false, false),
-    DISABLED_ANIMAL("Животное с ограниченными возможностями", "disabled animal", Distributor.EDIT_TEXT_RESPONSE, false, false),
-    CYNOLOGIST("Рекомендации кинологов и контакты", "cynologist", Distributor.EDIT_TEXT_RESPONSE, true, false),
-    SEND_REPORT("Отправить отчёт о питомце", "send report", Distributor.EDIT_TEXT_RESPONSE, false, true);
+    MAP(Dependence.ANY, Dependence.ANY, "b4", "Схема проезда"),
+    CALL_VOLUNTEER(Dependence.ANY, Dependence.ANY, "b5", "Позвать волонтёра"),
+    SHELTER_INFO(Dependence.ANY, Dependence.ANY, "b6", "Узнать информацию о приюте"),
+    DRIVER_PERMIT(Dependence.ANY, Dependence.ANY, "b7", "Оформить разрешение на проезд"),
+    TAKE_ANIMAL(Dependence.ANY, Dependence.ANY, "b8", "Как приютить питомца?"),
+    RULES(Dependence.ANY, Dependence.ANY, "b9", "Правила знакомства"),
+    DOCUMENTS(Dependence.ANY, Dependence.ANY, "b10", "Документы для оформления животного"),
+    DISABLED_ANIMAL(Dependence.ANY, Dependence.ANY, "b11", "Животное с ограниченными возможностями"),
+    CYNOLOGIST(Dependence.ANY, Dependence.DOG, "b12", "Рекомендации кинологов и контакты"),
+    LEAVE_CONTACT_INFO(Dependence.USER, Dependence.ANY, "b13", "Оставить данные для связи"),
+    REPORT(Dependence.OWNER, Dependence.ANY, "b14", "Отправить отчёт о питомце");
 
 
+    private final String code;
+    private final String description;
+    private final Dependence person;
+    private final Dependence shelter;
 
-    private String callBackQuery;
-    private final String text;
-    private final String responseType;
-    private final boolean responseDependsOnShelter;
-    private final boolean responseDependsOnOwner;
-
-    Button(String text, String callBackQuery, String responseType, boolean responseDependsOnShelter, boolean responseDependsOnOwner) {
-        this.text = text;
-        this.callBackQuery = callBackQuery;
-        this.responseDependsOnShelter = responseDependsOnShelter;
-        this.responseDependsOnOwner = responseDependsOnOwner;
-        this.responseType = responseType;
+    Button(Dependence person, Dependence shelter, String code, String description) {
+        this.person = person;
+        this.shelter = shelter;
+        this.code = code;
+        this.description = description;
     }
 
-    public String getText() {
-        return this.text;
+    public String getDescription() {
+        return this.description;
     }
 
-    public String getCallBackQuery() {
-        return this.callBackQuery;
+    public String getCode() {
+        return this.code;
     }
 
-    public String getResponseType() {
-        return responseType;
+    public Dependence getPerson() {
+        return person;
     }
 
-    public boolean isResponseDependsOnShelter() {
-        return responseDependsOnShelter;
+    public Dependence getShelter() {
+        return shelter;
     }
 
-    public boolean isResponseDependsOnOwner() {
-        return responseDependsOnOwner;
+    public static Dependence convertToDependence(boolean owner) {
+        return owner ? Dependence.OWNER : Dependence.USER;
     }
 
-    public Button setCallBackQuery(String callBackQuery) {
-        this.callBackQuery = callBackQuery;
-        return this;
-    }
-
-    public static Button getButton(String string) {
-        return Arrays.stream(Button.values())
-                .filter(e -> Objects.equals(e.callBackQuery, string))
-                .findFirst()
-                .orElse(UNKNOWN.setCallBackQuery(string));
-    }
-
-    public static Shelter getShelter(Button button) {
-        switch (button) {
-            case CAT_SHELTER:
-                return Shelter.CAT;
-            case DOG_SHELTER:
-                return Shelter.DOG;
+    public static Dependence convertToDependence(Shelter shelter) {
+        switch (shelter) {
+            case NONE: return Dependence.ANY;
+            case CAT: return Dependence.CAT;
+            case DOG: return Dependence.DOG;
         }
-        throw new RuntimeException("Ошибка в выборе приюта");
+        throw new RuntimeException(); //TODO
+    }
+
+    public static LinkedList<Button> getValidButtons() {
+        LinkedList<Button> buttons = new LinkedList<>();
+        Collections.addAll(buttons, DOG_SHELTER, CAT_SHELTER, MAP, CALL_VOLUNTEER, SHELTER_INFO, DRIVER_PERMIT, TAKE_ANIMAL);
+        Collections.addAll(buttons, RULES, DOCUMENTS, DISABLED_ANIMAL, CYNOLOGIST, LEAVE_CONTACT_INFO, REPORT);
+        return buttons;
     }
 }

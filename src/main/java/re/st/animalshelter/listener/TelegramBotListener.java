@@ -6,8 +6,8 @@ import com.pengrad.telegrambot.model.Update;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Component;
-import re.st.animalshelter.model.Distributor;
-import re.st.animalshelter.utility.CommandUtil;
+import re.st.animalshelter.utility.Distributor;
+import re.st.animalshelter.service.CommandService;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -17,10 +17,6 @@ import java.util.List;
 public class TelegramBotListener implements UpdatesListener {
     private final TelegramBot telegramBot;
     private final Distributor distributor;
-
-//    private final Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
-//    private final Pattern pattern = Pattern.compile("(\\d{1,2}\\.\\d{1,2}\\.\\d{4} \\d{1,2}:\\d{1,2})\\s+([А-я\\d\\s,.?!:]+)");
-//    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
     @Autowired
     public TelegramBotListener(TelegramBot telegramBot, Distributor distributor) {
@@ -39,6 +35,6 @@ public class TelegramBotListener implements UpdatesListener {
     @PostConstruct
     private void init() {
         telegramBot.setUpdatesListener(this);
-        new CommandUtil().addCommands(telegramBot);
+        new CommandService().addCommands(telegramBot);
     }
 }

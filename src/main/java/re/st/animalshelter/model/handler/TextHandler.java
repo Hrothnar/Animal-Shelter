@@ -4,40 +4,33 @@ import com.pengrad.telegrambot.model.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import re.st.animalshelter.dto.ActionDTO;
 import re.st.animalshelter.entity.User;
-import re.st.animalshelter.enumeration.Command;
-import re.st.animalshelter.enumeration.Status;
-import re.st.animalshelter.model.response.TextResponse;
+import re.st.animalshelter.model.response.particular.util.Controller;
 import re.st.animalshelter.service.UserService;
-import re.st.animalshelter.service.VolunteerService;
+import re.st.animalshelter.utility.Initializer;
+
+import java.util.Optional;
 
 @Component
 public class TextHandler {
     private final UserService userService;
-    private final TextResponse textResponse;
+    private final Initializer initializer;
 
     @Autowired
-    public TextHandler(UserService userService, TextResponse textResponse) {
+    public TextHandler(UserService userService, Initializer initializer) {
         this.userService = userService;
-        this.textResponse = textResponse;
+        this.initializer = initializer;
     }
 
     @Transactional
     public void processTextMessage(Message message) {
-        Long chatId = message.chat().id();
-        String text = message.text();
-        if (text.equals(Command.START.getText())) {
-            ActionDTO actionDTO = userService.createUserOrAction(message);
-            textResponse.sendNewTextResponse(actionDTO);
-        } else if (text.equals(Command.FINISH.getText())) {
-            userService.discardDialog(chatId);
+        long chatId = message.chat().id();
+        Optional<Controller> optional = initializer.getCommandByValue(message.text());
+        if (optional.isPresent()) {
+            optional.get().execute(message);
         } else {
-            User user = userService.getUser(chatId);
-            Status status = userService.checkStatusForText(message);
-            textResponse.sendNewTextResponseByStatus(user, text, status);
+            User user = userService.getByChatId(chatId);
+            initializer.getStatus(user.getCurrentCode()).execute(message);
         }
     }
-
-
 }

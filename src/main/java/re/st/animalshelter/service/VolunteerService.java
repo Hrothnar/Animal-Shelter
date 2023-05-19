@@ -20,11 +20,11 @@ public class VolunteerService {
         return new LinkedList<>(volunteerRepository.findAll());
     }
 
-    public Volunteer getVolunteerById(long id) {
+    public Volunteer getById(long id) {
        return volunteerRepository.findById(id).orElseThrow(RuntimeException::new); //TODO
     }
 
-    public void saveVolunteer(Volunteer volunteer) {
+    public void save(Volunteer volunteer) {
         volunteerRepository.save(volunteer);
     }
 }
