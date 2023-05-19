@@ -1,6 +1,5 @@
 package re.st.animalshelter.entity;
 
-import re.st.animalshelter.enumeration.Button;
 import re.st.animalshelter.enumeration.shelter.Shelter;
 
 import javax.persistence.*;
@@ -8,32 +7,25 @@ import java.time.LocalDateTime;
 
 @Entity(name = "actions")
 public class Action {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-
     @Column(nullable = false)
     private int messageId;
-
     @Column(nullable = false)
-    @Enumerated(value = EnumType.STRING)
-    private Button button;
-
+    private String code;
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
     private Shelter shelter;
-
     @Column(nullable = false)
     private LocalDateTime lastUpdate;
-
     @ManyToOne(cascade = {}, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    public Action(int messageId, Button button, Shelter shelter) {
+    public Action(int messageId, String code, Shelter shelter) {
         this.messageId = messageId;
-        this.button = button;
+        this.code = code;
         this.shelter = shelter;
         this.lastUpdate = LocalDateTime.now();
     }
@@ -54,12 +46,12 @@ public class Action {
         this.messageId = messageId;
     }
 
-    public Button getButton() {
-        return button;
+    public String getCode() {
+        return code;
     }
 
-    public void setButton(Button button) {
-        this.button = button;
+    public void setCode(String button) {
+        this.code = button;
         this.lastUpdate = LocalDateTime.now();
     }
 

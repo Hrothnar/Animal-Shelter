@@ -1,11 +1,9 @@
 package re.st.animalshelter.entity;
 
-import org.hibernate.Hibernate;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import re.st.animalshelter.entity.animal.Animal;
 import re.st.animalshelter.enumeration.Position;
-import re.st.animalshelter.enumeration.Status;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -14,72 +12,41 @@ import java.util.stream.Collectors;
 
 @Entity(name = "users")
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-
     @Column(unique = true)
     private long chatId;
-
     @Column(name = "companion_chat_id")
     private long companionChatId;
-
     @Column(length = 56)
     private String fullName;
-
     @Column(unique = true)
     private String userName;
-
     @Column(unique = true)
     private String email;
-
     @Column(length = 16)
     private String phoneNumber;
-
     @Column(unique = true, length = 16)
     private String passport;
-
     @Column(nullable = false)
     private boolean owner;
-
     @Column(nullable = false)
-    @Enumerated(value = EnumType.STRING)
-    private Status currentStatus;
-
+    private String currentCode;
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
     private Position position;
-
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true)
     private Stage stage;
-
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.LAZY, mappedBy = "users")
-    @LazyCollection(value = LazyCollectionOption.TRUE)
-    private Set<Volunteer> volunteers = new HashSet<>();
-
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.LAZY, mappedBy = "user")
     @LazyCollection(value = LazyCollectionOption.TRUE)
     private Set<Animal> animals = new HashSet<>();
-
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true)
     @LazyCollection(value = LazyCollectionOption.TRUE)
     private Set<Action> actions = new HashSet<>();
-
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true)
     @LazyCollection(value = LazyCollectionOption.TRUE)
     private Set<Report> reports = new HashSet<>();
-
-
-    public void addVolunteer(Volunteer volunteer) {
-        this.volunteers.add(volunteer);
-        volunteer.getUsers().add(this);
-    }
-
-    private void removeVolunteer(Volunteer volunteer) {
-        this.volunteers.remove(volunteer);
-        volunteer.getUsers().remove(this);
-    }
 
     public void addAnimal(Animal animal) {
         this.animals.add(animal);
@@ -183,10 +150,6 @@ public class User {
         this.stage = stage;
     }
 
-    public Set<Volunteer> getVolunteers() {
-        return volunteers;
-    }
-
     public Set<Animal> getAnimals() {
         return animals;
     }
@@ -199,12 +162,12 @@ public class User {
         return actions;
     }
 
-    public Status getCurrentStatus() {
-        return currentStatus;
+    public String getCurrentCode() {
+        return currentCode;
     }
 
-    public void setCurrentStatus(Status currentStatus) {
-        this.currentStatus = currentStatus;
+    public void setCurrentCode(String currentStatus) {
+        this.currentCode = currentStatus;
     }
 
     public long getCompanionChatId() {

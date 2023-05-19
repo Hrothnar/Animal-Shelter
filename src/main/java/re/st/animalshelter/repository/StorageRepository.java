@@ -7,11 +7,12 @@ import re.st.animalshelter.enumeration.Button;
 import re.st.animalshelter.enumeration.Status;
 import re.st.animalshelter.enumeration.shelter.Shelter;
 
+import java.util.Optional;
+
 @Repository
 public interface StorageRepository extends JpaRepository<Cell, Long> {
-    Cell findByButtonAndShelterAndOwner(Button button, Shelter shelter, boolean owner);
-    Cell findByButtonAndOwner(Button button, boolean owner);
-    Cell findByButtonAndShelter(Button button, Shelter shelter);
-    Cell findByButton(Button button);
-    Cell findByStatus(Status status);
+    Optional<Cell> findByCode(String code);
+    Optional<Cell> findByCodeAndShelter(String code, Shelter shelter);
+    Optional<Cell> findByCodeAndOwner(String code, boolean owner);
+    Optional<Cell> findByCodeAndShelterAndOwner(String code, Shelter shelter, boolean owner);
 }

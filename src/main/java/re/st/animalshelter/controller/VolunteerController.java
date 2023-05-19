@@ -28,7 +28,7 @@ public class VolunteerController {
 
     @GetMapping("/appoint")
     public String create(Model model) {
-        model.addAttribute("users", userService.getAllUsersByPosition(Position.USER));
+        model.addAttribute("users", userService.getAllByPosition(Position.USER));
         return "volunteer/appoint";
     }
 

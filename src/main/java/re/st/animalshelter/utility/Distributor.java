@@ -1,4 +1,4 @@
-package re.st.animalshelter.model;
+package re.st.animalshelter.utility;
 
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
@@ -20,13 +20,7 @@ public class Distributor {
     private final PhotoHandler photoHandler;
     private final DocumentHandler documentHandler;
 
-    public static final String BACK_RESPONSE = "BACK_RESPONSE";
-    public static final String EDIT_MULTIMEDIA_RESPONSE = "EDIT_MULTIMEDIA_RESPONSE";
-    public static final String EDIT_TEXT_RESPONSE = "EDIT_TEXT_RESPONSE";
-    public static final String PHOTO_RESPONSE = "PHOTO_RESPONSE";
-    public static final String SIMPLE_TEXT_RESPONSE = "TEXT_RESPONSE";
-    public static final String STATUS_RESPONSE = "STATUS_RESPONSE";
-
+    public final static String PASS = "pass";
     public final static Logger LOGGER = Logger.getLogger(TelegramBotListener.class);
 
     @Autowired
@@ -57,6 +51,4 @@ public class Distributor {
             callBackQueryHandler.processCallBackQuery(update.callbackQuery());
         }
     }
-
-
 }

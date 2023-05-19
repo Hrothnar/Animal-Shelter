@@ -1,43 +1,29 @@
 package re.st.animalshelter.entity;
 
-import re.st.animalshelter.enumeration.Button;
-import re.st.animalshelter.enumeration.Status;
 import re.st.animalshelter.enumeration.shelter.Shelter;
 
 import javax.persistence.*;
 
 @Entity(name = "storage")
 public class Cell {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Button button;
-
+    private String code;
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Shelter shelter;
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Status status;
-
     @Column(nullable = false)
     private boolean owner;
-
     @Column(length = 4096)
     private String text;
-
     @Column(length = 4096)
     private byte[] photo;
 
-    public Cell(Button button, Shelter shelter, Status status, boolean owner, String text, byte[] photo) {
-        this.button = button;
+    public Cell(String code, Shelter shelter,  boolean owner, String text, byte[] photo) {
+        this.code = code;
         this.shelter = shelter;
-        this.status = status;
         this.owner = owner;
         this.text = text;
         this.photo = photo;
@@ -51,12 +37,12 @@ public class Cell {
         return id;
     }
 
-    public Button getButton() {
-        return button;
+    public String getCode() {
+        return code;
     }
 
-    public void setButton(Button button) {
-        this.button = button;
+    public void setCode(String button) {
+        this.code = button;
     }
 
     public Shelter getShelter() {
@@ -89,13 +75,5 @@ public class Cell {
 
     public void setPhoto(byte[] photo) {
         this.photo = photo;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
     }
 }

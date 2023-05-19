@@ -6,7 +6,6 @@ import re.st.animalshelter.entity.Volunteer;
 import re.st.animalshelter.repository.VolunteerRepository;
 
 import java.util.LinkedList;
-import java.util.Optional;
 
 @Service
 public class VolunteerService {
@@ -21,11 +20,11 @@ public class VolunteerService {
         return new LinkedList<>(volunteerRepository.findAll());
     }
 
-    public Volunteer getVolunteerById(long id) {
+    public Volunteer getById(long id) {
        return volunteerRepository.findById(id).orElseThrow(RuntimeException::new); //TODO
     }
 
-    public void saveVolunteer(Volunteer volunteer) {
+    public void save(Volunteer volunteer) {
         volunteerRepository.save(volunteer);
     }
 }

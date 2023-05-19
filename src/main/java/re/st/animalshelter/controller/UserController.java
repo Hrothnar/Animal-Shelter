@@ -4,11 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import re.st.animalshelter.dto.NotifyDTO;
 import re.st.animalshelter.entity.Report;
 import re.st.animalshelter.entity.User;
 import re.st.animalshelter.entity.animal.Animal;
-import re.st.animalshelter.model.response.TextResponse;
 import re.st.animalshelter.service.*;
 
 import java.util.Comparator;
@@ -24,21 +22,18 @@ public class UserController {
     private final VolunteerService volunteerService;
     private final ReportService reportService;
     private final FileService fileService;
-    private final TextResponse textResponse;
 
     @Autowired
     public UserController(UserService userService,
                           AnimalService animalService,
                           VolunteerService volunteerService,
                           ReportService reportService,
-                          FileService fileService,
-                          TextResponse textResponse) {
+                          FileService fileService) {
         this.userService = userService;
         this.animalService = animalService;
         this.volunteerService = volunteerService;
         this.reportService = reportService;
         this.fileService = fileService;
-        this.textResponse = textResponse;
     }
 
     @GetMapping("/menu")
@@ -48,14 +43,13 @@ public class UserController {
 
     @GetMapping("/find")
     public String findUser(Model model) {
-        model.addAttribute("users", userService.getAllUsers());
+        model.addAttribute("users", userService.getAll());
         return "user/user_find";
     }
 
     @PostMapping("/receive")
     public String receive(@RequestParam("userName") String userName, @RequestParam("user_id") long userId) {
-        System.out.println(userId + "   " + userName);
-        long id = userService.getUserId(userId, userName);
+        long id = userService.getId(userId, userName);
         return id != -1L ? "redirect:/user/" + id : "user/not_found";
     }
 
@@ -67,7 +61,7 @@ public class UserController {
 
     @GetMapping("/{id}/update")
     public String updateUser(@PathVariable long id, Model model) {
-        User user = userService.getUserById(id);
+        User user = userService.getById(id);
         model.addAttribute("user", user);
         return "user/update";
     }
@@ -80,7 +74,7 @@ public class UserController {
 
     @GetMapping("/{id}/time")
     public String addTime(@PathVariable("id") long id, Model model) {
-        Set<Animal> animals = userService.getUserById(id).getActiveAnimals();
+        Set<Animal> animals = userService.getById(id).getActiveAnimals();
         model.addAttribute("id", id);
         model.addAttribute("animals", animals);
         return "user/add_time";
@@ -90,7 +84,23 @@ public class UserController {
     public String saveTime(@PathVariable("id") long userId,
                            @RequestParam("animal_id") long animalId,
                            @RequestParam("time") int time) {
-        animalService.updateExpirationTime(animalId, time);
+        userService.addProbationTime(userId, animalId, time);
+        return "redirect:/user/" + userId;
+    }
+
+    @GetMapping("/{id}/probation")
+    public String endProbation(@PathVariable("id") long id, Model model) {
+        Set<Animal> animals = userService.getById(id).getActiveAnimals();
+        model.addAttribute("id", id);
+        model.addAttribute("animals", animals);
+        return "user/probation";
+    }
+
+    @PostMapping("/{id}/save_probation")
+    public String saveProbation(@PathVariable("id") long userId,
+                                @RequestParam("animal_id") long animalId,
+                                @RequestParam("button") String button) {
+        userService.updateProbation(userId, animalId, button);
         return "redirect:/user/" + userId;
     }
 
@@ -113,7 +123,7 @@ public class UserController {
 
     @GetMapping("/{id}/report")
     public String chooseUserReports(@PathVariable("id") long userId, Model model) {
-        LinkedList<Report> reports = userService.getUserById(userId).getReports().stream()
+        LinkedList<Report> reports = userService.getById(userId).getReports().stream()
                 .sorted(Comparator.comparing(Report::getTime).reversed())
                 .collect(Collectors.toCollection(LinkedList::new));
         model.addAttribute("reports", reports);
@@ -134,12 +144,9 @@ public class UserController {
     public String updateReport(@PathVariable("id") long userId,
                                @RequestParam("report_id") long reportId,
                                @RequestParam("button") String button) {
-        long chatId = userService.getUserById(userId).getChatId();
-        NotifyDTO notifyDTO = reportService.updateReport(chatId, reportId, button);
-        textResponse.sendNotify(notifyDTO);
+        long chatId = userService.getById(userId).getChatId();
+        reportService.updateReport(chatId, reportId, button);
         return "redirect:/user/" + userId;
     }
-
-
 }
 

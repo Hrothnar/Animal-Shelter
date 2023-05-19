@@ -6,8 +6,8 @@ import com.pengrad.telegrambot.model.Update;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Component;
-import re.st.animalshelter.model.Distributor;
-import re.st.animalshelter.utility.CommandUtil;
+import re.st.animalshelter.utility.Distributor;
+import re.st.animalshelter.service.CommandService;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -35,6 +35,6 @@ public class TelegramBotListener implements UpdatesListener {
     @PostConstruct
     private void init() {
         telegramBot.setUpdatesListener(this);
-        new CommandUtil().addCommands(telegramBot);
+        new CommandService().addCommands(telegramBot);
     }
 }

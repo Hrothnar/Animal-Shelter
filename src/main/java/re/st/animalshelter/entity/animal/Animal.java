@@ -5,7 +5,6 @@ import org.hibernate.annotations.LazyCollectionOption;
 import re.st.animalshelter.entity.Report;
 import re.st.animalshelter.entity.User;
 import re.st.animalshelter.entity.Volunteer;
-import re.st.animalshelter.enumeration.Status;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -15,28 +14,20 @@ import java.util.Set;
 @Entity(name = "animals")
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Animal {
-
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE)
     private long id;
-
-    @Enumerated(value = EnumType.STRING)
     @Column(name = "report_status")
-    private Status reportStatus;
-
+    private String reportCode;
     @Column(name = "expiration_date")
     private LocalDateTime expirationDate;
-
-    private boolean active = true;
-
+    private boolean active;
     @ManyToOne(cascade = {}, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
-
     @ManyToOne(cascade = {}, fetch = FetchType.LAZY)
     @JoinColumn(name = "volunteer_id")
     private Volunteer volunteer;
-
     @OneToMany(cascade = {}, fetch = FetchType.LAZY, mappedBy = "animal", orphanRemoval = true)
     @LazyCollection(value = LazyCollectionOption.TRUE)
     private Set<Report> reports = new HashSet<>();
@@ -45,12 +36,12 @@ public abstract class Animal {
         return id;
     }
 
-    public Status getReportStatus() {
-        return reportStatus;
+    public String getReportCode() {
+        return reportCode;
     }
 
-    public void setReportStatus(Status reportStatus) {
-        this.reportStatus = reportStatus;
+    public void setReportCode(String reportStatus) {
+        this.reportCode = reportStatus;
     }
 
     public LocalDateTime getExpirationDate() {
@@ -91,6 +82,13 @@ public abstract class Animal {
 
     public void setReports(Set<Report> reports) {
         this.reports = reports;
+    }
+
+    public String getProbationEnd() {
+        int day = expirationDate.getDayOfMonth();
+        int month = expirationDate.getMonthValue();
+        int year = expirationDate.getYear();
+        return day + "." + month + "." + year + "г.";
     }
 
     public abstract String getBreedAsString();

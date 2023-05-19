@@ -6,7 +6,7 @@ import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.request.SendMessage;
-import com.pengrad.telegrambot.response.BaseResponse;
+import com.pengrad.telegrambot.response.SendResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
-import re.st.animalshelter.dto.ActionDTO;
+import re.st.animalshelter.dto.Answer;
 import re.st.animalshelter.entity.Action;
 import re.st.animalshelter.entity.User;
 import re.st.animalshelter.enumeration.Button;
@@ -30,7 +30,7 @@ import re.st.animalshelter.enumeration.shelter.Shelter;
 import re.st.animalshelter.listener.TelegramBotListener;
 import re.st.animalshelter.service.StorageService;
 import re.st.animalshelter.service.UserService;
-import re.st.animalshelter.utility.ButtonUtil;
+import re.st.animalshelter.utility.Keyboard;
 
 import java.util.Comparator;
 import java.util.List;
@@ -48,10 +48,8 @@ public class TelegramBotListenerTest {
     private StorageService storageService;
     @Autowired
     private UserService userService;
-    @Autowired
-    private ButtonUtil buttonUtil;
     @Mock
-    private BaseResponse baseResponse;
+    private SendResponse sendResponse;
     @Mock
     private Update update;
     @Mock
@@ -70,10 +68,10 @@ public class TelegramBotListenerTest {
     @Test
     @Transactional
     public void createUserOrAction_shouldCreateUserAndGiveCorrectAnswer() {
-        ActionDTO actionDTO = new ActionDTO(CHAT_ID, MESSAGE_ID, false, Button.START, Shelter.NONE);
-        InlineKeyboardMarkup expectedKeyboard = buttonUtil.getKeyboard(actionDTO);
-        createAndSaveTextToStorage1();
-        String expectedText = storageService.getText(actionDTO);
+        Answer answer = new Answer(CHAT_ID, MESSAGE_ID, false, Command.START.getCode(), Shelter.NONE);
+        InlineKeyboardMarkup expectedKeyboard = Keyboard.collectButtons(answer, Keyboard.START);
+        fillStorage();
+        String expectedText = storageService.getByCodeAndOwner(answer).getText();
         Mockito.when(telegramBot.execute(Mockito.any())).then(invocation -> {
             SendMessage sendMessage = invocation.getArgument(0);
             String text = (String) sendMessage.getParameters().get("text");
@@ -81,11 +79,12 @@ public class TelegramBotListenerTest {
 
             Assertions.assertEquals(expectedText, text);
             Assertions.assertEquals(expectedKeyboard, keyboard);
-            return baseResponse;
+            return sendResponse;
         });
+        Mockito.when(sendResponse.isOk()).thenReturn(true);
         Mockito.when(update.message()).thenReturn(message);
         Mockito.when(message.chat()).thenReturn(chat);
-        Mockito.when(message.text()).thenReturn(Command.START.getText());
+        Mockito.when(message.text()).thenReturn(Command.START.getValue());
         Mockito.when(message.messageId()).thenReturn(MESSAGE_ID);
         Mockito.when(chat.firstName()).thenReturn("Tom");
         Mockito.when(chat.lastName()).thenReturn("Johnson");
@@ -101,17 +100,17 @@ public class TelegramBotListenerTest {
         Assertions.assertNotNull(foundUser.getStage());
         Assertions.assertEquals(1, actions.size());
         Assertions.assertNotNull(actions.stream().filter(action -> action.getMessageId() == MESSAGE_ID + 1));
-        Assertions.assertEquals(Button.START, actions.stream().findAny().get().getButton());
+        Assertions.assertEquals(Command.START.getCode(), actions.stream().findAny().get().getCode());
         Assertions.assertEquals(foundUser, actions.stream().findAny().get().getUser());
     }
 
     @Test
     @Transactional
     public void createUserOrAction_shouldFindOwnerAndGiveCorrectAnswer() {
-        ActionDTO actionDTO = new ActionDTO(CHAT_ID, MESSAGE_ID, true, Button.START, Shelter.NONE);
-        InlineKeyboardMarkup expectedKeyboard = buttonUtil.getKeyboard(actionDTO);
-        createAndSaveTextToStorage2();
-        String expectedText = storageService.getText(actionDTO);
+        Answer answer = new Answer(CHAT_ID, MESSAGE_ID, true, Command.START.getCode(), Shelter.NONE);
+        InlineKeyboardMarkup expectedKeyboard = Keyboard.collectButtons(answer, Keyboard.START);
+        fillStorage();
+        String expectedText = storageService.getByCodeAndOwner(answer).getText();
         Mockito.when(telegramBot.execute(Mockito.any())).then(invocation -> {
             SendMessage sendMessage = invocation.getArgument(0);
             String text = (String) sendMessage.getParameters().get("text");
@@ -119,13 +118,14 @@ public class TelegramBotListenerTest {
 
             Assertions.assertEquals(expectedText, text);
             Assertions.assertEquals(expectedKeyboard, keyboard);
-            return baseResponse;
+            return sendResponse;
         });
         User user = createUser();
 
+        Mockito.when(sendResponse.isOk()).thenReturn(true);
         Mockito.when(update.message()).thenReturn(message);
         Mockito.when(message.chat()).thenReturn(chat);
-        Mockito.when(message.text()).thenReturn(Command.START.getText());
+        Mockito.when(message.text()).thenReturn(Command.START.getValue());
         Mockito.when(message.messageId()).thenReturn(MESSAGE_ID);
         Mockito.when(chat.firstName()).thenReturn("Tom");
         Mockito.when(chat.lastName()).thenReturn("Johnson");
@@ -141,10 +141,10 @@ public class TelegramBotListenerTest {
         Assertions.assertEquals(2, actions.size());
         Assertions.assertNotNull(actions.stream().filter(action -> action.getMessageId() == MESSAGE_ID + 1));
         Assertions.assertEquals(user, actions.stream().findAny().get().getUser());
-        Assertions.assertEquals(Button.TAKE_AN_ANIMAL, actions.stream()
+        Assertions.assertEquals(Button.TAKE_ANIMAL.getCode(), actions.stream()
                 .min(Comparator.comparing(Action::getLastUpdate))
                 .get()
-                .getButton());
+                .getCode());
     }
 
 
@@ -155,25 +155,20 @@ public class TelegramBotListenerTest {
         user.setChatId(CHAT_ID);
         user.setPosition(Position.USER);
         user.setOwner(true);
-        user.setCurrentStatus(Status.NONE);
-        user.addAction(new Action(MESSAGE_ID, Button.TAKE_AN_ANIMAL, Shelter.CAT));
-        userService.saveUser(user);
+        user.setCurrentCode(Status.NONE.getCode());
+        user.addAction(new Action(MESSAGE_ID, Button.TAKE_ANIMAL.getCode(), Shelter.CAT));
+        userService.save(user);
         return user;
     }
 
-    private void createAndSaveTextToStorage1() {
-        String importText = "Приветствую! Если вы ищете себе или своим близким нового друга, мы можем вам помочь!  \n" +
+    private void fillStorage() {
+        String text1 = "Доброго времени суток. Выберите интересующий вас приют.";
+        String text2 = "Приветствую! Если вы ищете себе или своим близким нового друга, мы можем вам помочь!  \n" +
                 "Наш приют располагает большим числом животных, среди которых вы не несомненно найдёте нового члена семьи, будь то всем привычные пушистые друзья или кто-то экзотический...  \n" +
                 "Пожалуйста, выберите какой приют вас сейчас интересует:\n";
-        storageService.saveInformation(Button.START, Shelter.NONE, Status.NONE, false, importText, new MockMultipartFile("file", new byte[]{}));
+        storageService.saveInformation(Command.START.getCode(), Shelter.NONE, "Пользователь", text1, new MockMultipartFile("file", new byte[]{}));
+        storageService.saveInformation(Command.START.getCode(), Shelter.NONE, "Пользователь", text2, new MockMultipartFile("file", new byte[]{}));
     }
-
-    private void createAndSaveTextToStorage2() {
-        String importText = "Доброго времени суток. Выберите интересующий вас приют.";
-        storageService.saveInformation(Button.START, Shelter.NONE, Status.NONE, true, importText, new MockMultipartFile("file", new byte[]{}));
-    }
-
-
 }
 
 

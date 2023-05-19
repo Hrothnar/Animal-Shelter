@@ -1,12 +1,18 @@
 package re.st.animalshelter.integration;
 
+import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.response.SendResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -21,18 +27,20 @@ import re.st.animalshelter.entity.Volunteer;
 import re.st.animalshelter.entity.animal.Animal;
 import re.st.animalshelter.entity.animal.Cat;
 import re.st.animalshelter.entity.animal.Dog;
-import re.st.animalshelter.enumeration.Button;
+import re.st.animalshelter.enumeration.Command;
 import re.st.animalshelter.enumeration.Position;
 import re.st.animalshelter.enumeration.Status;
 import re.st.animalshelter.enumeration.breed.CatBreed;
 import re.st.animalshelter.enumeration.breed.DogBreed;
 import re.st.animalshelter.enumeration.shelter.Shelter;
 import re.st.animalshelter.service.AnimalService;
+import re.st.animalshelter.service.StorageService;
 import re.st.animalshelter.service.UserService;
 import re.st.animalshelter.service.VolunteerService;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
 @TestPropertySource(locations = "classpath:test.properties")
@@ -48,6 +56,13 @@ public class UserControllerTest {
     private AnimalService animalService;
     @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    private StorageService storageService;
+    @MockBean
+    private TelegramBot telegramBot;
+    @Mock
+    private SendResponse sendResponse;
+
 
     private final static long CHAT_ID = 11;
     private final static int MESSAGE_ID = 22;
@@ -83,7 +98,7 @@ public class UserControllerTest {
     @Test
     @Transactional
     public void receive_shouldShowUserNotFoundPage() throws Exception {
-        long userId = userService.getUserId(0, "TJ User Name");
+        long userId = userService.getId(0, "TJ User Name");
         mockMvc.perform(MockMvcRequestBuilders.post("/user/receive")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .param("user_id", "0")
@@ -129,7 +144,7 @@ public class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
                 .andExpect(MockMvcResultMatchers.redirectedUrl("/user/" + userId));
 
-        User foundUser = userService.getUserById(userId);
+        User foundUser = userService.getById(userId);
 
         Assertions.assertNotEquals(phoneNumber, foundUser.getPhoneNumber());
         Assertions.assertNotEquals(email, foundUser.getEmail());
@@ -159,20 +174,25 @@ public class UserControllerTest {
     @Transactional
     public void saveTime_shouldAddTimeToChosenAnimal() throws Exception {
         User user = createUserAndAnimals();
+        fillStorage();
         Animal animal = user.getActiveAnimals().stream().findAny().get();
         LocalDateTime expectedExpirationDate = animal.getExpirationDate();
         long animalId = animal.getId();
         long userId = user.getId();
+
+        Mockito.when(telegramBot.execute(Mockito.any())).thenReturn(sendResponse);
+        Mockito.when(sendResponse.isOk()).thenReturn(true);
+
         mockMvc.perform(MockMvcRequestBuilders.post("/user/{id}/save_time", userId)
                         .param("animal_id", String.valueOf(animalId))
-                        .param("time", "7"))
+                        .param("time", "14"))
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
                 .andExpect(MockMvcResultMatchers.redirectedUrl("/user/" + userId));
 
-        User foundUser = userService.getUserById(userId);
+        User foundUser = userService.getById(userId);
         Animal foundAnimal = foundUser.getActiveAnimals().stream().filter(e -> e.getId() == animalId).findFirst().get();
 
-        Assertions.assertTrue(expectedExpirationDate.plusDays(6).isBefore(foundAnimal.getExpirationDate()));
+        Assertions.assertTrue(expectedExpirationDate.plusDays(13).isBefore(foundAnimal.getExpirationDate()));
         Assertions.assertNotSame(expectedExpirationDate, foundAnimal.getExpirationDate());
     }
 
@@ -194,14 +214,14 @@ public class UserControllerTest {
         ModelAndView modelAndView = mvcResult.getModelAndView();
         long userIdFromModel = (long) modelAndView.getModel().get("id");
         LinkedList<Volunteer> volunteersFromModel = (LinkedList<Volunteer>) modelAndView.getModel().get("volunteers");
-        LinkedList<Dog> dogsFromModel = (LinkedList<Dog>) modelAndView.getModel().get("dogs");
-        LinkedList<Cat> catsFromModel = (LinkedList<Cat>) modelAndView.getModel().get("cats");
+        LinkedHashSet<Dog> dogsFromModel = (LinkedHashSet<Dog>) modelAndView.getModel().get("dogs");
+        LinkedHashSet<Cat> catsFromModel = (LinkedHashSet<Cat>) modelAndView.getModel().get("cats");
         LinkedList<Animal> animalsFromModel = new LinkedList<>();
         animalsFromModel.addAll(dogsFromModel);
         animalsFromModel.addAll(catsFromModel);
 
         Assertions.assertEquals(userId, userIdFromModel);
-        Assertions.assertEquals(4, animalsFromModel.toArray().length);
+        Assertions.assertEquals(2, animalsFromModel.toArray().length);
         Assertions.assertArrayEquals(volunteers.toArray(), volunteersFromModel.toArray());
         Assertions.assertEquals(volunteer.getUserName(), volunteersFromModel.stream().findFirst().get().getUserName());
     }
@@ -221,14 +241,13 @@ public class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
                 .andExpect(MockMvcResultMatchers.redirectedUrl("/user/" + userId));
 
-        User founUser = userService.getUserById(userId);
-        Volunteer foundVolunteer = volunteerService.getVolunteerById(volunteerId);
-        Animal foundAnimal = animalService.getAnimalById(animalId);
+        User founUser = userService.getById(userId);
+        Volunteer foundVolunteer = volunteerService.getById(volunteerId);
+        Animal foundAnimal = animalService.getById(animalId);
 
         Assertions.assertEquals(founUser, foundAnimal.getUser());
-        Assertions.assertEquals(founUser, foundVolunteer.getUsers().stream().findAny().get());
         Assertions.assertEquals(foundAnimal, foundVolunteer.getAnimals().stream().findAny().get());
-        Assertions.assertEquals(Status.REPORT_WAS_NOT_SENT, foundAnimal.getReportStatus());
+        Assertions.assertEquals(Status.NONE.getCode(), foundAnimal.getReportCode());
         Assertions.assertTrue(founUser.isOwner());
     }
 
@@ -242,17 +261,21 @@ public class UserControllerTest {
         user.setEmail("johnson@mail.ru");
         user.setPassport("3324 9943");
         user.setPhoneNumber("+79293341122");
-        user.setCurrentStatus(Status.NONE);
-        user.addAction(new Action(MESSAGE_ID, Button.START, Shelter.NONE));
+        user.setCurrentCode(Status.NONE.getCode());
+        user.addAction(new Action(MESSAGE_ID, Command.START.getCode(), Shelter.NONE));
 
         Cat cat = new Cat(2, CatBreed.ABYSSINIAN);
         cat.setExpirationDate(LocalDateTime.now().plusDays(30));
+        cat.setActive(true);
         Dog dog = new Dog(4, DogBreed.POODLE);
+        dog.setActive(true);
         dog.setExpirationDate(LocalDateTime.now().plusDays(30));
 
         user.addAnimal(cat);
         user.addAnimal(dog);
-        userService.saveUser(user);
+        animalService.save(cat);
+        animalService.save(dog);
+        userService.save(user);
         return user;
     }
 
@@ -261,7 +284,16 @@ public class UserControllerTest {
         volunteer.setChatId(user.getChatId());
         volunteer.setUserName(user.getUserName());
         volunteer.setFullName(user.getFullName());
-        volunteerService.saveVolunteer(volunteer);
+        volunteerService.save(volunteer);
         return volunteer;
+    }
+
+    private void fillStorage() {
+        String text = "Уведомляем, что на основании ваших отчётов, " +
+                "нами было принято решение увеличить срок испытательного периода для {0}." +
+                " Мы добавили к сроку {1} и теперь испытательный период оканчивается {2}. " +
+                "Для избежания отказа о попечительстве над животным, рекомендуем добросовестно " +
+                "выполнять отчётность, а главное соблюдать условия содержания питомца.";
+        storageService.saveInformation(Status.ADD_TIME.getCode(), Shelter.NONE, "Любой", text, new MockMultipartFile("file", new byte[]{}));
     }
 }

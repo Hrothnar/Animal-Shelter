@@ -8,29 +8,21 @@ import java.time.LocalDateTime;
 
 @Entity(name = "reports")
 public class Report {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-
     @Column(nullable = false)
     private LocalDateTime time;
-
     @Column(name = "photo_path")
     private String photoPath;
-
     @Column(name = "text_path")
     private String textPath;
-
-    @Enumerated(EnumType.STRING)
-    private Status status;
-
+    @Column(name = "report_code")
+    private String reportCode;
     @ManyToOne(cascade = {}, fetch = FetchType.LAZY)
     private User user;
-
     @ManyToOne(cascade = {}, fetch = FetchType.LAZY)
     private Animal animal;
-
 
     public long getId() {
         return id;
@@ -87,18 +79,18 @@ public class Report {
         return breedAsString + " -- " + age + " y.o.";
     }
 
-    public Status getStatus() {
-        return status;
+    public String getReportCode() {
+        return reportCode;
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
+    public void setReportCode(String status) {
+        this.reportCode = status;
     }
 
     public String getStatusAsString() {
-        if (this.status == Status.NONE) {
+        if (reportCode.equals(Status.NONE.getCode())) {
             return "Не просмотрен";
-        } else if (this.status == Status.PASSED) {
+        } else if (reportCode.equals(Status.REPORT_PASSED.getCode())) {
             return "Принят";
         } else {
             return "Завален";

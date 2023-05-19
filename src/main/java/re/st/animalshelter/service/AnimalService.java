@@ -9,6 +9,7 @@ import re.st.animalshelter.entity.animal.Cat;
 import re.st.animalshelter.entity.animal.Dog;
 import re.st.animalshelter.enumeration.breed.CatBreed;
 import re.st.animalshelter.enumeration.breed.DogBreed;
+import re.st.animalshelter.model.response.particular.status.TestPeriodDone;
 import re.st.animalshelter.repository.animal.AnimalRepository;
 import re.st.animalshelter.repository.animal.CatRepository;
 import re.st.animalshelter.repository.animal.DogRepository;
@@ -23,39 +24,38 @@ public class AnimalService {
     private final AnimalRepository animalRepository;
     private final CatRepository catRepository;
     private final DogRepository dogRepository;
+    private final TestPeriodDone testPeriodDone;
 
     @Autowired
-    public AnimalService(AnimalRepository animalRepository, CatRepository catRepository, DogRepository dogRepository) {
+    public AnimalService(AnimalRepository animalRepository, CatRepository catRepository, DogRepository dogRepository, TestPeriodDone testPeriodDone) {
         this.animalRepository = animalRepository;
         this.catRepository = catRepository;
         this.dogRepository = dogRepository;
+        this.testPeriodDone = testPeriodDone;
     }
 
-    public void saveAnimal(Animal animal) {
+    public void save(Animal animal) {
         animalRepository.save(animal);
     }
 
     public void saveCat(int age, CatBreed breed, int amount) {
         for (int i = 0; i < amount; i++) {
-            saveAnimal(new Cat(age, breed));
+            Cat cat = new Cat(age, breed);
+            cat.setActive(true);
+            save(cat);
         }
     }
 
     public void saveDog(int age, DogBreed breed, int amount) {
         for (int i = 0; i < amount; i++) {
-            saveAnimal(new Dog(age, breed));
+            Dog dog = new Dog(age, breed);
+            dog.setActive(true);
+            save(dog);
         }
     }
 
-    public Animal getAnimalById(long id) {
+    public Animal getById(long id) {
         return animalRepository.findById(id).orElseThrow(RuntimeException::new); //TODO
-    }
-
-    public void updateExpirationTime(long animalId, int time) {
-        Animal animal = getAnimalById(animalId);
-        LocalDateTime expirationDate = animal.getExpirationDate();
-        animal.setExpirationDate(expirationDate.plusDays(time));
-        animalRepository.save(animal);
     }
 
     public LinkedHashSet<CatDTO> getActiveCatsAsDTO() {

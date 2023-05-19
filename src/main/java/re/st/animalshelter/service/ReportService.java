@@ -2,20 +2,22 @@ package re.st.animalshelter.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import re.st.animalshelter.dto.NotifyDTO;
 import re.st.animalshelter.entity.Report;
 import re.st.animalshelter.enumeration.Status;
+import re.st.animalshelter.model.response.particular.status.ReportFailedStatus;
 import re.st.animalshelter.repository.ReportRepository;
+import re.st.animalshelter.utility.Distributor;
 
 @Service
 public class ReportService {
     private final ReportRepository reportRepository;
+    private final ReportFailedStatus reportFailedStatus;
 
-    private final static String PASS = "pass";
 
     @Autowired
-    public ReportService(ReportRepository reportRepository) {
+    public ReportService(ReportRepository reportRepository, ReportFailedStatus reportFailedStatus) {
         this.reportRepository = reportRepository;
+        this.reportFailedStatus = reportFailedStatus;
     }
 
     public void saveReport(Report report) {
@@ -26,19 +28,14 @@ public class ReportService {
         return reportRepository.findById(id).orElseThrow(RuntimeException::new);//TODO
     }
 
-    public NotifyDTO updateReport(long chatId, long reportId, String button) {
-        NotifyDTO notifyDTO = new NotifyDTO();
+    public void updateReport(long chatId, long reportId, String button) {
         Report report = getReportById(reportId);
-        if (button.equals(PASS)) {
-            report.setStatus(Status.PASSED);
-            notifyDTO.setUserChatId(chatId);
-            notifyDTO.setStatus(Status.PASSED);
+        if (button.equals(Distributor.PASS)) {
+            report.setReportCode(Status.REPORT_PASSED.getCode());
         } else {
-            report.setStatus(Status.FAILED);
-            notifyDTO.setUserChatId(chatId);
-            notifyDTO.setStatus(Status.FAILED);
+            report.setReportCode(Status.REPORT_FAILED.getCode());
+            reportFailedStatus.execute(chatId);
         }
         saveReport(report);
-        return notifyDTO;
     }
 }

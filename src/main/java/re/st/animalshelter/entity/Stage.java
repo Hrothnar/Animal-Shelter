@@ -1,31 +1,22 @@
 package re.st.animalshelter.entity;
 
-import re.st.animalshelter.enumeration.Status;
-
 import javax.persistence.*;
 
 @Entity(name = "stages")
 public class Stage {
-
     @Id
     private long id;
-
-    @Column(name = "contact_info_status")
-    @Enumerated(value = EnumType.STRING)
-    private Status contactInfoStatus;
-
-    @Column(name = "dialog_status")
-    @Enumerated(value = EnumType.STRING)
-    private Status dialogStatus;
-
+    @Column(name = "contact_info_code")
+    private String contactInfoCode;
+    @Column(name = "dialog_code")
+    private String dialogCode;
     @OneToOne(cascade = {}, fetch = FetchType.LAZY, orphanRemoval = true)
     @MapsId
     private User user;
 
-
-    public Stage(Status contactInfoStatus, Status dialogStatus) {
-        this.contactInfoStatus = contactInfoStatus;
-        this.dialogStatus = dialogStatus;
+    public Stage(String contactInfoCode, String dialogCode) {
+        this.contactInfoCode = contactInfoCode;
+        this.dialogCode = dialogCode;
     }
 
     public Stage() {
@@ -36,20 +27,20 @@ public class Stage {
         return id;
     }
 
-    public Status getContactInfoStatus() {
-        return contactInfoStatus;
+    public String getContactInfoCode() {
+        return contactInfoCode;
     }
 
-    public void setContactInfoStatus(Status contactInfoStatus) {
-        this.contactInfoStatus = contactInfoStatus;
+    public void setContactInfoCode(String contactInfoStatus) {
+        this.contactInfoCode = contactInfoStatus;
     }
 
-    public Status getDialogStatus() {
-        return dialogStatus;
+    public String getDialogCode() {
+        return dialogCode;
     }
 
-    public void setDialogStatus(Status dialogStatus) {
-        this.dialogStatus = dialogStatus;
+    public void setDialogCode(String dialogStatus) {
+        this.dialogCode = dialogStatus;
     }
 
     public User getUser() {

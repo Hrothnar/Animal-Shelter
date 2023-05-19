@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import re.st.animalshelter.enumeration.Button;
+import re.st.animalshelter.enumeration.Command;
 import re.st.animalshelter.enumeration.Status;
 import re.st.animalshelter.enumeration.shelter.Shelter;
 import re.st.animalshelter.service.StorageService;
@@ -33,21 +34,21 @@ public class StorageController {
 
     @GetMapping("/add")
     public String getForm(Model model) {
-        model.addAttribute("buttons", Button.values());
+        model.addAttribute("buttons", Button.getValidButtons());
+        model.addAttribute("statuses", Status.getValidStatuses());
+        model.addAttribute("commands", Command.getValidCommands());
         model.addAttribute("shelters", Shelter.values());
-        model.addAttribute("statuses", Status.values());
-        model.addAttribute("person_types", new LinkedList<>(List.of(true, false)));
+        model.addAttribute("person_types", new LinkedList<>(List.of(StorageService.ANY, StorageService.USER, StorageService.OWNER)));
         return "storage/storage_form";
     }
 
     @PostMapping("/receive")
-    public String receiveData(@RequestParam("button") Button button,
+    public String receiveData(@RequestParam("code") String code,
                               @RequestParam("shelter") Shelter shelter,
-                              @RequestParam("status") Status status,
-                              @RequestParam("person_type") boolean owner,
+                              @RequestParam("person_type") String person,
                               @RequestParam("text") String text,
                               @RequestParam("file") MultipartFile file) {
-        storageService.saveInformation(button, shelter, status, owner, text, file);
+        storageService.saveInformation(code, shelter, person, text, file);
         return "redirect:/storage/menu";
     }
 

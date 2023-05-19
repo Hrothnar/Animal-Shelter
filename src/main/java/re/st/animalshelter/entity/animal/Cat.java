@@ -6,14 +6,11 @@ import javax.persistence.*;
 
 @Entity(name = "cats")
 public class Cat extends Animal {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-
     @Column(nullable = false)
     private int age;
-
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
     private CatBreed breed;
@@ -22,6 +19,7 @@ public class Cat extends Animal {
         this.age = age;
         this.breed = breed;
     }
+
 
     public Cat() {
 

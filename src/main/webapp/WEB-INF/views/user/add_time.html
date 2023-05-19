@@ -2,10 +2,10 @@
 <html lang="en" xmlns:th="http://thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Animal expiration date</title>
+    <title>Add probation time</title>
 </head>
 <body>
-<h2>Вы можете увеличить срок тестового периода для пользователя </h2>
+<h2>Здесь вы можете увеличить срок испытательного периода для хозяина и кго питомца</h2>
 <br/>
 <form th:method="POST" th:action="@{/user/{id}/save_time(id=${id})}" th:object="${animal}">
     <label for="animal">Выберите питомца:</label>
@@ -14,8 +14,8 @@
     </select>
     <br/>
     <br/>
-    <input type="radio" name="time" th:value="7">Добавить неделю к сроку</input>
     <input type="radio" name="time" th:value="14">Добавить две недели к сроку</input>
+    <input type="radio" name="time" th:value="30">Добавить месяц к сроку</input>
     <br/>
     <br/>
     <input type="submit" value="Сохранить">
