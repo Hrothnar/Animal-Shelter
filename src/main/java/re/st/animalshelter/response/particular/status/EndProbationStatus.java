@@ -24,7 +24,7 @@ public class EndProbationStatus {
     public void execute(long chatId, Animal animal, Status status) {
         String type = animal instanceof Cat ? "кошки породы " : "собаки породы ";
         String text = storageService.getByCode(status.getCode()).getText();
-        text = MessageFormat.format(text,type + animal.getBreedAsString().toLowerCase() + " , возрастом " + animal.getAge() + "y.");
+        text = MessageFormat.format(text,type + animal.getGeneralInfo());
         textResponse.sendNewTextResponse(chatId, text);
     }
 }

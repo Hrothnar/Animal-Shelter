@@ -1,8 +1,11 @@
 package re.st.animalshelter.entity.animal;
 
 import re.st.animalshelter.enumeration.breed.CatBreed;
+import re.st.animalshelter.utility.Distributor;
 
 import javax.persistence.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Entity(name = "cats")
 public class Cat extends Animal {
@@ -30,11 +33,6 @@ public class Cat extends Animal {
         return id;
     }
 
-    @Override
-    public String getBreedAsString() {
-        return breed.getText();
-    }
-
     public void setId(long id) {
         this.id = id;
     }
@@ -53,5 +51,11 @@ public class Cat extends Animal {
 
     public void setBreed(CatBreed breed) {
         this.breed = breed;
+    }
+
+    @Override
+    public String getGeneralInfo() {
+        String years = Distributor.conjugate(this.age);
+        return breed.getText() + ", возраст: " + age + years;
     }
 }

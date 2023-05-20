@@ -31,7 +31,7 @@ public class DogController {
                           @RequestParam("breed") DogBreed breed,
                           @RequestParam("amount") int amount) {
         animalService.saveDog(age, breed, amount);
-        return "animal/animal_menu";
+        return "animal/menu";
     }
 
 }

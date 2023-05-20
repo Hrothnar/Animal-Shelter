@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Actions</title>
+</head>
+<body>
+<h2>Выберите действие, которое хотите совершить с волонтёром.</h2>
+<br/>
+<a th:href="@{/volunteer/{id}/attach_animal(id=${id})}">Закрепить питомца</a>
+<br/>
+<a th:href="@{/volunteer/{id}/remove_animal(id=${id})}">Открепить питомца</a>
+<br/>
+<a th:href="@{/volunteer/{id}/remove(id=${id})}">Снять с должности</a>
+<br/>
+<br/>
+<a href="/">Вернуться в главное меню</a>
+</body>
+</html>

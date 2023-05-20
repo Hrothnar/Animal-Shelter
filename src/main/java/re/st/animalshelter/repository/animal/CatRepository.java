@@ -10,5 +10,7 @@ import java.util.Set;
 @Repository
 public interface CatRepository extends JpaRepository<Cat, Long> {
     List<Cat> findAllByActiveIsTrueAndUserIsNull();
+    List<Cat> findAllByActiveIsTrueAndUserNotNullAndVolunteerIsNull();
+    List<Cat> findAllByActiveIsTrueAndUserIsNullAndVolunteerIsNull();
 
 }

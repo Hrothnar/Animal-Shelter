@@ -21,17 +21,12 @@ import re.st.animalshelter.service.UserService;
 @Component
 public class StartCommand implements Sender {
     private final UserService userService;
-    private final Keyboard keyboard;
     private final TextResponse textResponse;
     private final StorageService storageService;
 
     @Autowired
-    public StartCommand(UserService userService,
-                        Keyboard keyboard,
-                        TextResponse textResponse,
-                        StorageService storageService) {
+    public StartCommand(UserService userService, TextResponse textResponse, StorageService storageService) {
         this.userService = userService;
-        this.keyboard = keyboard;
         this.textResponse = textResponse;
         this.storageService = storageService;
     }

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Find volunteer</title>
+</head>
+<body>
+<h2>Здесь вы можете найти волонтёра по User Name или выбрать в списке.</h2>
+<br/>
+<form method="post" action="/volunteer/receive">
+    <label for="userName">Введите User Name:</label>
+    <input id="userName" type="text" name="userName"/>
+    <br/>
+    <br/>
+    <label for="volunteer">Выберите волонтёра:</label>
+    <select th:name="volunteer_id" id="volunteer" th:object="${volunteer}">
+        <option value="-1" text=" "></option>
+        <option th:each="volunteer : ${volunteers}" th:value="${volunteer.getId()}"
+                th:text="${volunteer.getFullName() + ' | @' + volunteer.getUserName()}"></option>
+    </select>
+    <br/>
+    <br/>
+    <input type="submit" value="Подтвердить"/>
+</form>
+
+</body>
+</html>

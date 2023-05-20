@@ -5,17 +5,18 @@
     <title>Add probation time</title>
 </head>
 <body>
-<h2>Здесь вы можете увеличить срок испытательного периода для хозяина и кго питомца</h2>
+<h2>Здесь вы можете увеличить срок испытательного периода для хозяина и его питомца.</h2>
 <br/>
 <form th:method="POST" th:action="@{/user/{id}/save_time(id=${id})}" th:object="${animal}">
     <label for="animal">Выберите питомца:</label>
     <select th:name="animal_id" id="animal">
-        <option th:each="animal : ${animals}" th:value="${animal.getId()}" th:text="${animal.getBreed().getText() + ' --  Возраст: ' + animal.getAge() + ' y.o.  Дата окончания срока: ' + animal.getExpirationDate()}"></option>
+        <option th:each="animal : ${animals}" th:value="${animal.getId()}"
+                th:text="${animal.getGeneralInfo()  + ' | Испытательный период истекает: ' + animal.getExpirationDate()}"></option>
     </select>
     <br/>
     <br/>
-    <input type="radio" name="time" th:value="14">Добавить две недели к сроку</input>
-    <input type="radio" name="time" th:value="30">Добавить месяц к сроку</input>
+    <input type="radio" name="time" th:value="14" required size="1">Добавить две недели к сроку</input>
+    <input type="radio" name="time" th:value="30" required size="1">Добавить месяц к сроку</input>
     <br/>
     <br/>
     <input type="submit" value="Сохранить">
