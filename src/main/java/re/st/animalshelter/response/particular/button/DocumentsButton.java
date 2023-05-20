@@ -19,7 +19,7 @@ public class DocumentsButton implements Sender {
     private final EditTextResponse editTextResponse;
 
     @Autowired
-    public DocumentsButton(ActionService actionService, Keyboard keyboard, StorageService storageService, EditTextResponse editTextResponse) {
+    public DocumentsButton(ActionService actionService, StorageService storageService, EditTextResponse editTextResponse) {
         this.actionService = actionService;
         this.storageService = storageService;
         this.editTextResponse = editTextResponse;

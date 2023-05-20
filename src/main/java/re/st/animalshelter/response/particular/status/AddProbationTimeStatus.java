@@ -25,7 +25,7 @@ public class AddProbationTimeStatus {
         String type = animal instanceof Cat ? "кошки породы " : "собаки породы ";
         String days = time == 14 ? "две недели" : "один месяц";
         String text = storageService.getByCode(status.getCode()).getText();
-        text = MessageFormat.format(text, type + animal.getBreedAsString().toLowerCase() + " , возрастом " + animal.getAge() + "y.", days, animal.getProbationEnd());
+        text = MessageFormat.format(text, type + animal.getGeneralInfo(), days, animal.getProbationEnd());
         textResponse.sendNewTextResponse(chatId, text);
     }
 }

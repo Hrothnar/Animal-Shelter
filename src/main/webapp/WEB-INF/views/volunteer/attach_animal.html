@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Attach volunteer to animal</title>
+</head>
+<body>
+<h2>Здесь вы можете закрепить волонтёра за питомцами, которые ещё не имеют такового.</h2>
+
+<form th:method="POST" th:action="@{/volunteer/{id}/save_animal(id=${id})}" th:object="${animal}">
+    <h3>Выберите питомца:</h3>
+    <label for="cat">Кошки:</label>
+    <select th:name="animal_id" id="cat" required size="1">
+        <option th:each="animal : ${cats}" th:value="${animal.getId()}"
+                th:text="${animal.getGeneralInfo()}"></option>
+    </select>
+    <input type="submit" value="Закрепить">
+</form>
+<br/>
+<form th:method="POST" th:action="@{/volunteer/{id}/save_animal(id=${id})}" th:object="${animal}">
+    <label for="dog">Собаки:</label>
+    <select th:name="animal_id" id="dog" required size="1">
+        <option th:each="animal : ${dogs}" th:value="${animal.getId()}"
+                th:text="${animal.getGeneralInfo()}"></option>
+    </select>
+    <input type="submit" value="Закрепить">
+</form>
+
+</body>
+</html>

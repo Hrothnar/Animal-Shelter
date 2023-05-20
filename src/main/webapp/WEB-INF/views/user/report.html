@@ -2,21 +2,16 @@
 <html lang="en" xmlns:th="http://thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Reports</title>
+    <title>Report</title>
 </head>
+<h2>Отчёт пользователя:</h2>
 <body>
-<h2>Вы можете выбрать отчёт владельца за интересующую вас дату и оценить его содержательность.</h2>
-<br/>
-<form th:method="POST" th:action="@{/user/{id}/show_report/(id=${id})}" th:object="${report}">
-    <label for="report">Выберите отчёт</label>
-    <select th:name="report_id" id="report">
-        <option th:each="report : ${reports}" th:value="${report.getId()}"
-                th:text="${report.getAnimalData() + ' от: ' + report.getTimeAsString() + '  | ' + report.getStatusAsString() + ' |'}"></option>
-    </select>
-    <br/>
-    <br/>
-    <input type="submit" value="Выбрать">
+<form th:method="POST" th:action="@{/user/{id}/update_report(id=${id})}" th:object="${report}">
+    <input type="hidden" th:value="${report.getId()}" name="report_id"/>
+        <img th:src="${'/' + report.getPhotoPath()}" alt="Фото не представлено" width="500" height="auto" style="float: left; margin-right: 10px;">
+        <h3 th:text="${text}"></h3>
+        <button type="submit" name="button" value="pass">Подтвердить отчёт</button>
+        <button type="submit" name="button" value="fail">Уведомить пользователя о плохом отчёте</button>
 </form>
-
 </body>
 </html>

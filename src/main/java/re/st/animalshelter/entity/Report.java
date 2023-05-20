@@ -73,10 +73,8 @@ public class Report {
         return dayOfMonth + "." + monthValue + "." + year;
     }
 
-    public String getAnimalData() {
-        String breedAsString = animal.getBreedAsString();
-        int age = animal.getAge();
-        return breedAsString + " -- " + age + " y.o.";
+    public String getAnimalInfo() {
+        return animal.getGeneralInfo();
     }
 
     public String getReportCode() {

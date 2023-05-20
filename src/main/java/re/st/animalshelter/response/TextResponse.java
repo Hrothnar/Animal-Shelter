@@ -27,8 +27,7 @@ public class TextResponse {
 
     public void sendNewTextResponse(long chatId, String text) {
         SendMessage response = new SendMessage(chatId, text);
-        SendResponse execute = telegramBot.execute(response);
-        if (!execute.isOk()) {
+        if (!telegramBot.execute(response).isOk()) {
             throw new RuntimeException(); //TODO
         }
     }

@@ -38,23 +38,23 @@ public class UserController {
 
     @GetMapping("/menu")
     public String getMenu() {
-        return "user/user_menu";
+        return "user/menu";
     }
 
     @GetMapping("/find")
     public String findUser(Model model) {
         model.addAttribute("users", userService.getAll());
-        return "user/user_find";
+        return "user/find";
     }
 
     @PostMapping("/receive")
-    public String receive(@RequestParam("userName") String userName, @RequestParam("user_id") long userId) {
-        long id = userService.getId(userId, userName);
-        return id != -1L ? "redirect:/user/" + id : "user/not_found";
+    public String foundUser(@RequestParam("userName") String userName, @RequestParam("user_id") long id) {
+        boolean exist = userService.isExist(id, userName);
+        return exist ? "redirect:/user/" + id : "not_found";
     }
 
     @GetMapping("/{id}")
-    public String getUserAction(@PathVariable long id, Model model) {
+    public String getUserActions(@PathVariable long id, Model model) {
         model.addAttribute("id", id);
         return "user/actions";
     }
@@ -81,11 +81,11 @@ public class UserController {
     }
 
     @PostMapping("/{id}/save_time")
-    public String saveTime(@PathVariable("id") long userId,
+    public String saveTime(@PathVariable("id") long id,
                            @RequestParam("animal_id") long animalId,
                            @RequestParam("time") int time) {
-        userService.addProbationTime(userId, animalId, time);
-        return "redirect:/user/" + userId;
+        userService.addProbationTime(id, animalId, time);
+        return "redirect:/user/" + id;
     }
 
     @GetMapping("/{id}/probation")
@@ -97,56 +97,56 @@ public class UserController {
     }
 
     @PostMapping("/{id}/save_probation")
-    public String saveProbation(@PathVariable("id") long userId,
+    public String saveProbation(@PathVariable("id") long id,
                                 @RequestParam("animal_id") long animalId,
                                 @RequestParam("button") String button) {
-        userService.updateProbation(userId, animalId, button);
-        return "redirect:/user/" + userId;
+        userService.updateProbation(id, animalId, button);
+        return "redirect:/user/" + id;
     }
 
     @GetMapping("/{id}/animal")
     public String attachAnimal(@PathVariable("id") long id, Model model) {
         model.addAttribute("id", id);
         model.addAttribute("volunteers", volunteerService.getAllVolunteers());
-        model.addAttribute("cats", animalService.getActiveCatsAsDTO());
-        model.addAttribute("dogs", animalService.getActiveDogsAsDTO());
+        model.addAttribute("cats", animalService.getCatsWithoutOwner());
+        model.addAttribute("dogs", animalService.getDogsWithoutOwner());
         return "user/attach_animal";
     }
 
     @PostMapping("/{id}/animal_attach")
-    public String saveAttachedAnimal(@PathVariable("id") long userId,
+    public String saveAttachedAnimal(@PathVariable("id") long id,
                                      @RequestParam("animal_id") long animalId,
                                      @RequestParam("volunteer_id") long volunteerId) {
-        userService.attachAnimal(userId, animalId, volunteerId);
-        return "redirect:/user/" + userId;
+        userService.attachAnimal(id, animalId, volunteerId);
+        return "redirect:/user/" + id;
     }
 
-    @GetMapping("/{id}/report")
-    public String chooseUserReports(@PathVariable("id") long userId, Model model) {
-        LinkedList<Report> reports = userService.getById(userId).getReports().stream()
+    @GetMapping("/{id}/reports")
+    public String chooseUserReports(@PathVariable("id") long id, Model model) {
+        LinkedList<Report> reports = userService.getById(id).getReports().stream()
                 .sorted(Comparator.comparing(Report::getTime).reversed())
                 .collect(Collectors.toCollection(LinkedList::new));
         model.addAttribute("reports", reports);
+        return "user/reports";
+    }
+
+    @PostMapping("/{id}/report")
+    public String showReport(@PathVariable("id") long id, @RequestParam("report_id") long reportId, Model model) {
+        Report report = reportService.getReportById(reportId);
+        String text = fileService.getText(report.getTextPath());
+        model.addAttribute("id", id);
+        model.addAttribute("report", report);
+        model.addAttribute("text", text);
         return "user/report";
     }
 
-    @PostMapping("/{id}/show_report")
-    public String showReport(@PathVariable("id") long userId, @RequestParam("report_id") long reportId, Model model) {
-        Report report = reportService.getReportById(reportId);
-        String text = fileService.getText(report.getTextPath());
-        model.addAttribute("id", userId);
-        model.addAttribute("report", report);
-        model.addAttribute("text", text);
-        return "user/show_report";
-    }
-
     @PostMapping("/{id}/update_report")
-    public String updateReport(@PathVariable("id") long userId,
+    public String updateReport(@PathVariable("id") long id,
                                @RequestParam("report_id") long reportId,
                                @RequestParam("button") String button) {
-        long chatId = userService.getById(userId).getChatId();
+        long chatId = userService.getById(id).getChatId();
         reportService.updateReport(chatId, reportId, button);
-        return "redirect:/user/" + userId;
+        return "redirect:/user/" + id;
     }
 }
 

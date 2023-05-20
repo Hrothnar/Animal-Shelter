@@ -13,11 +13,13 @@
 <form th:method="POST" th:action="@{/user/{id}/animal_attach(id=${id})}" th:object="${animal}">
     <h3>Выберите питомца и волонтёра:</h3>
     <label for="cat">Кошки:</label>
-    <select th:name="animal_id" id="cat">
-        <option th:each="animal : ${cats}" th:value="${animal.getId()}" th:text="${animal.getBreed().getText() + ' --  Возраст: ' + animal.getAge() + ' y.o.'}"></option>
+    <select th:name="animal_id" id="cat" required size="1">
+        <option th:each="animal : ${cats}" th:value="${animal.getId()}"
+                th:text="${animal.getGeneralInfo()}"></option>
     </select>
-    <select th:name="volunteer_id">
-        <option th:each="volunteer : ${volunteers}" th:value="${volunteer.getId()}" th:text="${volunteer.getFullName() + ' -- Закреплено:' + volunteer.getAnimals().size()}"></option>
+    <select th:name="volunteer_id" required size="1">
+        <option th:each="volunteer : ${volunteers}" th:value="${volunteer.getId()}"
+                th:text="${volunteer.getFullName() + ' | Закреплено:' + volunteer.getAnimals().size()}"></option>
     </select>
     <input type="submit" value="Закрепить">
 </form>
@@ -25,11 +27,13 @@
 <br/>
 <form th:method="POST" th:action="@{/user/{id}/animal_attach(id=${id})}" th:object="${animal}">
     <label for="dog">Собаки:</label>
-    <select th:name="animal_id" id="dog">
-        <option th:each="animal : ${dogs}" th:value="${animal.getId()}" th:text="${animal.getBreed().getText() + ' -- Возраст: ' + animal.getAge() + ' y.o.'}"></option>
+    <select th:name="animal_id" id="dog" required size="1">
+        <option th:each="animal : ${dogs}" th:value="${animal.getId()}"
+                th:text="${animal.getGeneralInfo()}"></option>
     </select>
-    <select th:name="volunteer_id">
-        <option th:each="volunteer : ${volunteers}" th:value="${volunteer.getId()}" th:text="${volunteer.getFullName() + ' - Закреплено:' + volunteer.getAnimals().size()}"></option>
+    <select th:name="volunteer_id" required size="1">
+        <option th:each="volunteer : ${volunteers}" th:value="${volunteer.getId()}"
+                th:text="${volunteer.getFullName() + ' | Закреплено:' + volunteer.getAnimals().size()}"></option>
     </select>
     <input type="submit" value="Закрепить">
 </form>

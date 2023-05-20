@@ -29,7 +29,7 @@ public class StorageController {
 
     @GetMapping("/menu")
     public String menu() {
-        return "storage/storage_menu";
+        return "storage/menu";
     }
 
     @GetMapping("/add")

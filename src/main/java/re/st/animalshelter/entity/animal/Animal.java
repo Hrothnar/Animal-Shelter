@@ -28,7 +28,7 @@ public abstract class Animal {
     @ManyToOne(cascade = {}, fetch = FetchType.LAZY)
     @JoinColumn(name = "volunteer_id")
     private Volunteer volunteer;
-    @OneToMany(cascade = {}, fetch = FetchType.LAZY, mappedBy = "animal", orphanRemoval = true)
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.LAZY, mappedBy = "animal")
     @LazyCollection(value = LazyCollectionOption.TRUE)
     private Set<Report> reports = new HashSet<>();
 
@@ -91,6 +91,5 @@ public abstract class Animal {
         return day + "." + month + "." + year + "г.";
     }
 
-    public abstract String getBreedAsString();
-    public abstract int getAge();
+    public abstract String getGeneralInfo();
 }

@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -62,10 +63,8 @@ public class UserService {
         return userRepository.findByCompanionChatId(chatId).orElseThrow(RuntimeException::new);//TODO
     }
 
-    public long getId(long id, String userName) {
-        return userRepository.findUserByIdOrUserName(id, userName)
-                .map(User::getId)
-                .orElse(-1L);
+    public boolean isExist(long id, String userName) {
+        return userRepository.findUserByIdOrUserName(id, userName).isPresent();
     }
 
     public LinkedList<User> getAll() {
@@ -99,7 +98,6 @@ public class UserService {
         Volunteer volunteer = volunteerService.getById(volunteerId);
         volunteer.addAnimal(animal);
         user.addAnimal(animal);
-//        user.addVolunteer(volunteer);
         user.setOwner(true);
         volunteerService.save(volunteer);
         save(user);
@@ -119,6 +117,15 @@ public class UserService {
             return true;
         }
         return false;
+    }
+
+    public void removeVolunteer(long volunteerId) {
+        Volunteer volunteer = volunteerService.getById(volunteerId);
+        User volunteerAsUser = getByChatId(volunteer.getChatId());
+        volunteerAsUser.setPosition(Position.USER);
+        volunteer.getAnimals().forEach(animal -> animal.setVolunteer(null));
+        volunteerService.remove(volunteer);
+        save(volunteerAsUser);
     }
 
     public ReportDTO findReportingAnimal(User user, String code) {
@@ -152,11 +159,11 @@ public class UserService {
         if (button.equals(Distributor.PASS)) {
             animal.setActive(false);
             endProbation(user, animal);
-            endProbationStatus.execute(user.getChatId(), animal,Status.PROBATION_SUCCESSFULLY_COMPLETED);
+            endProbationStatus.execute(user.getChatId(), animal, Status.PROBATION_SUCCESSFULLY_COMPLETED);
         } else {
             user.removeAnimal(animal);
             endProbation(user, animal);
-            endProbationStatus.execute(user.getChatId(), animal,Status.PROBATION_NOT_COMPLETED);
+            endProbationStatus.execute(user.getChatId(), animal, Status.PROBATION_NOT_COMPLETED);
         }
     }
 

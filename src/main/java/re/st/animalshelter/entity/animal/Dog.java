@@ -1,8 +1,10 @@
 package re.st.animalshelter.entity.animal;
 
 import re.st.animalshelter.enumeration.breed.DogBreed;
+import re.st.animalshelter.utility.Distributor;
 
 import javax.persistence.*;
+import java.util.regex.Pattern;
 
 @Entity(name = "dogs")
 public class Dog extends Animal {
@@ -29,11 +31,6 @@ public class Dog extends Animal {
         return id;
     }
 
-    @Override
-    public String getBreedAsString() {
-        return breed.getText();
-    }
-
     public void setId(long id) {
         this.id = id;
     }
@@ -52,5 +49,11 @@ public class Dog extends Animal {
 
     public void setBreed(DogBreed breed) {
         this.breed = breed;
+    }
+
+    @Override
+    public String getGeneralInfo() {
+        String years = Distributor.conjugate(this.age);
+        return breed.getText() + ", возраст: " + age + years;
     }
 }
