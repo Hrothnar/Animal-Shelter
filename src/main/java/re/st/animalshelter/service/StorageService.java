@@ -6,7 +6,10 @@ import org.springframework.web.multipart.MultipartFile;
 import re.st.animalshelter.dto.Answer;
 import re.st.animalshelter.entity.Cell;
 import re.st.animalshelter.enumeration.Shelter;
+import re.st.animalshelter.exception.DataConvertingException;
+import re.st.animalshelter.exception.StorageException;
 import re.st.animalshelter.repository.StorageRepository;
+import re.st.animalshelter.utility.Distributor;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -25,15 +28,15 @@ public class StorageService {
     }
 
     public Cell getByCodeAndShelter(Answer answer) {
-        return storageRepository.findByCodeAndShelter(answer.getCode(), answer.getShelter()).orElseThrow(RuntimeException::new);
+        return storageRepository.findByCodeAndShelter(answer.getCode(), answer.getShelter()).orElseThrow(() -> new StorageException("Unable to get data"));
     }
 
     public Cell getByCodeAndOwner(Answer answer) {
-        return storageRepository.findByCodeAndOwner(answer.getCode(), answer.isOwner()).orElseThrow(RuntimeException::new);
+        return storageRepository.findByCodeAndOwner(answer.getCode(), answer.isOwner()).orElseThrow(() -> new StorageException("Unable to get data"));
     }
 
     public Cell getByCode(String code) {
-        return storageRepository.findByCode(code).orElseThrow(RuntimeException::new); //TODO
+        return storageRepository.findByCode(code).orElseThrow(() -> new StorageException("Unable to get data"));
     }
 
     public void saveInformation(String code, Shelter shelter, String person, String text, MultipartFile file) {
@@ -43,7 +46,8 @@ public class StorageService {
         try {
             bytes = file.getBytes();
         } catch (IOException e) {
-            throw new RuntimeException(e); //TODO
+            Distributor.LOGGER.error("Unable to get bytes from input file");
+            throw new DataConvertingException("Unable to get bytes from input file");
         }
         Optional<Cell> optional = storageRepository.findByCodeAndShelterAndOwner(code, shelter, owner);
         if (optional.isPresent()) {

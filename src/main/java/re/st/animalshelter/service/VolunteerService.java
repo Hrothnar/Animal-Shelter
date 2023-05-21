@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import re.st.animalshelter.entity.Volunteer;
 import re.st.animalshelter.entity.animal.Animal;
+import re.st.animalshelter.exception.VolunteerNotFoundException;
 import re.st.animalshelter.repository.VolunteerRepository;
 
 import java.util.LinkedList;
@@ -24,11 +25,11 @@ public class VolunteerService {
     }
 
     public Volunteer getById(long id) {
-       return volunteerRepository.findById(id).orElseThrow(RuntimeException::new); //TODO
+       return volunteerRepository.findById(id).orElseThrow(() -> new VolunteerNotFoundException("Volunteer not found"));
     }
 
     public Volunteer getByChatId(long chatId) {
-        return volunteerRepository.findByChatId(chatId).orElseThrow(RuntimeException::new); //TODO
+        return volunteerRepository.findByChatId(chatId).orElseThrow(() -> new VolunteerNotFoundException("Volunteer not found"));
     }
 
     public void save(Volunteer volunteer) {

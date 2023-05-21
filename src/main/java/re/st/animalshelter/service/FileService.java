@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import re.st.animalshelter.entity.User;
+import re.st.animalshelter.exception.IORuntimeException;
+import re.st.animalshelter.utility.Distributor;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -39,7 +41,8 @@ public class FileService {
             Files.createDirectories(reportsDirectoryAsPath);
             Files.write(completePath, bytes);
         } catch (IOException e) {
-            throw new RuntimeException(e); //TODO
+            Distributor.LOGGER.error("IO exception");
+            throw new IORuntimeException("IO exception");
         }
         return completePath;
     }
@@ -60,7 +63,8 @@ public class FileService {
                 completePath = Path.of(preparedPath + "." + extension);
                 Files.write(completePath, bytes);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                Distributor.LOGGER.error("IO exception");
+                throw new IORuntimeException("IO exception");
             }
         }
         return completePath;
@@ -84,7 +88,8 @@ public class FileService {
             try {
                 text = Files.readString(path);
             } catch (IOException e) {
-                throw new RuntimeException(e); //TODO
+                Distributor.LOGGER.error("IO exception");
+                throw new IORuntimeException("IO exception");
             }
         }
         return text;

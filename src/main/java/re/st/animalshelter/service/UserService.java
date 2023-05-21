@@ -9,6 +9,8 @@ import re.st.animalshelter.entity.Volunteer;
 import re.st.animalshelter.entity.animal.Animal;
 import re.st.animalshelter.enumeration.Position;
 import re.st.animalshelter.enumeration.Status;
+import re.st.animalshelter.exception.AnimalNotFoundException;
+import re.st.animalshelter.exception.UserNotFoundException;
 import re.st.animalshelter.response.particular.status.AddProbationTimeStatus;
 import re.st.animalshelter.response.particular.status.EndProbationStatus;
 import re.st.animalshelter.repository.UserRepository;
@@ -43,11 +45,11 @@ public class UserService {
     }
 
     public User getByChatId(long chatId) {
-        return userRepository.findByChatId(chatId).orElseThrow(RuntimeException::new); //TODO
+        return userRepository.findByChatId(chatId).orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
     public User getById(long id) {
-        return userRepository.findById(id).orElseThrow(RuntimeException::new); //TODO
+        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
     public void save(User user) {
@@ -59,7 +61,7 @@ public class UserService {
     }
 
     public User getByCompanionChatId(Long chatId) {
-        return userRepository.findByCompanionChatId(chatId).orElseThrow(RuntimeException::new);//TODO
+        return userRepository.findByCompanionChatId(chatId).orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
     public long getId(long id, String userName) {
@@ -134,7 +136,8 @@ public class UserService {
         if (optional.isPresent()) {
             return new ReportDTO(user, optional.get());
         }
-        throw new RuntimeException();//TODO
+        Distributor.LOGGER.error("Animal not found");
+        throw new AnimalNotFoundException("Animal not found");
     }
 
     public void setReportStatus(ReportDTO reportDTO, Status reportStatus, Status userStatus) {
