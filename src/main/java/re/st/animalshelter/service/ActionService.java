@@ -29,6 +29,14 @@ public class ActionService {
         return actionRepository.findLastActionByMessageId(messageId).orElseThrow(RuntimeException::new); //TODO
     }
 
+    public List<Action> getAllActions() {
+        return actionRepository.findAll();
+    }
+
+    public void removeAction(Action action) {
+        actionRepository.delete(action);
+    }
+
     @Transactional
     public Answer rememberShelter(Message message, Shelter shelter) {
         long chatId = message.chat().id();

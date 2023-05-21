@@ -39,7 +39,7 @@ public class VolunteerController {
     }
 
     @PostMapping("/save_appoint")
-    public String saveVolunteer(@RequestParam("userName")String userName,  @RequestParam("user_id") long userId) {
+    public String saveVolunteer(@RequestParam("userName") String userName, @RequestParam("user_id") long userId) {
         boolean exist = userService.attendVolunteer(userId, userName);
         return exist ? "redirect:/volunteer/menu" : "not_found";
     }
@@ -52,8 +52,8 @@ public class VolunteerController {
 
     @PostMapping("/receive")
     public String foundVolunteer(@RequestParam("userName") String userName, @RequestParam("volunteer_id") long id) {
-        boolean exist = volunteerService.isExist(id, userName);
-        return exist ? "redirect:/volunteer/" + id : "not_found";
+        long volunteerId = volunteerService.getId(id, userName);
+        return volunteerId != -1L ? "redirect:/volunteer/" + volunteerId : "not_found";
     }
 
     @GetMapping("/{id}")
@@ -80,7 +80,6 @@ public class VolunteerController {
     public String saveAnimal(@PathVariable("id") long id, @RequestParam("animal_id") long animalId) {
         volunteerService.attachAnimal(id, animalId);
         return "redirect:/volunteer/" + id;
-
     }
 
     @GetMapping("/{id}/remove_animal")
