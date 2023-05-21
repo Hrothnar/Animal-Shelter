@@ -39,7 +39,7 @@ public class StorageController {
         model.addAttribute("commands", Command.getValidCommands());
         model.addAttribute("shelters", Shelter.values());
         model.addAttribute("person_types", new LinkedList<>(List.of(StorageService.ANY, StorageService.USER, StorageService.OWNER)));
-        return "storage/storage_form";
+        return "storage/form";
     }
 
     @PostMapping("/receive")

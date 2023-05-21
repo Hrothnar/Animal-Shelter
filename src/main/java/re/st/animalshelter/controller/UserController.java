@@ -49,8 +49,8 @@ public class UserController {
 
     @PostMapping("/receive")
     public String foundUser(@RequestParam("userName") String userName, @RequestParam("user_id") long id) {
-        boolean exist = userService.isExist(id, userName);
-        return exist ? "redirect:/user/" + id : "not_found";
+        long userId = userService.getId(id, userName);
+        return userId != -1L ? "redirect:/user/" + userId : "not_found";
     }
 
     @GetMapping("/{id}")

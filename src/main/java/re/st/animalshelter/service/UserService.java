@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -63,8 +62,8 @@ public class UserService {
         return userRepository.findByCompanionChatId(chatId).orElseThrow(RuntimeException::new);//TODO
     }
 
-    public boolean isExist(long id, String userName) {
-        return userRepository.findUserByIdOrUserName(id, userName).isPresent();
+    public long getId(long id, String userName) {
+        return userRepository.findUserByIdOrUserName(id, userName).map(User::getId).orElse(-1L);
     }
 
     public LinkedList<User> getAll() {
@@ -174,6 +173,9 @@ public class UserService {
         volunteer.removeAnimal(animal);
         animalService.save(animal);
         volunteerService.save(volunteer);
+        if (user.getActiveAnimals().size() == 0) {
+            user.setOwner(false);
+        }
         save(user);
     }
 

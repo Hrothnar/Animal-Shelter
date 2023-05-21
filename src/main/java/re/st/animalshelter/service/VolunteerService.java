@@ -35,8 +35,8 @@ public class VolunteerService {
         volunteerRepository.save(volunteer);
     }
 
-    public boolean isExist(long id, String userName) {
-        return volunteerRepository.findByIdOrUserName(id, userName).isPresent();
+    public long getId(long id, String userName) {
+        return volunteerRepository.findByIdOrUserName(id, userName).map(Volunteer::getId).orElse(-1L);
     }
 
     public void remove(Volunteer volunteer) {
