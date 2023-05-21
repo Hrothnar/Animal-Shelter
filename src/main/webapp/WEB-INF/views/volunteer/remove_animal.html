@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Remove animal</title>
+</head>
+<body>
+<h2>Здесь вы можете открепить питомца от волонтёра.</h2>
+
+<form th:method="POST" th:action="@{/volunteer/{id}/save_removed_animal(id=${id})}" th:object="${animal}">
+    <label for="animal">Выберите животного:</label>
+    <select th:name="animal_id" id="animal" required size="1">
+        <option th:each="animal : ${animals}" th:value="${animal.getId()}"
+                th:text="${animal.getGeneralInfo() + ' | ' + animal.getUser().getFullName()}"></option>
+    </select>
+    <input type="submit" value="Открепить">
+</form>
+
+</body>
+</html>

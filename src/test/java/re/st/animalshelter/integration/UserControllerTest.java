@@ -32,7 +32,7 @@ import re.st.animalshelter.enumeration.Position;
 import re.st.animalshelter.enumeration.Status;
 import re.st.animalshelter.enumeration.breed.CatBreed;
 import re.st.animalshelter.enumeration.breed.DogBreed;
-import re.st.animalshelter.enumeration.shelter.Shelter;
+import re.st.animalshelter.enumeration.Shelter;
 import re.st.animalshelter.service.AnimalService;
 import re.st.animalshelter.service.StorageService;
 import re.st.animalshelter.service.UserService;
@@ -63,7 +63,6 @@ public class UserControllerTest {
     @Mock
     private SendResponse sendResponse;
 
-
     private final static long CHAT_ID = 11;
     private final static int MESSAGE_ID = 22;
     private final static long USER_ID = 33;
@@ -76,7 +75,7 @@ public class UserControllerTest {
     @Test
     @Transactional
     public void receive_shouldRedirectToUserPage() throws Exception {
-        User user = createUserAndAnimals();
+        User user = createUserAndPets();
         String userName = user.getUserName();
         long userId = user.getId();
         mockMvc.perform(MockMvcRequestBuilders.post("/user/receive")
@@ -91,22 +90,17 @@ public class UserControllerTest {
                         .param("userName", ""))
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
                 .andExpect(MockMvcResultMatchers.redirectedUrl("/user/" + userId));
-
-        Assertions.assertTrue(userId != -1L);
     }
 
     @Test
     @Transactional
     public void receive_shouldShowUserNotFoundPage() throws Exception {
-        long userId = userService.getId(0, "TJ User Name");
         mockMvc.perform(MockMvcRequestBuilders.post("/user/receive")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .param("user_id", "0")
                         .param("userName", "TJ User Name"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.view().name("user/not_found"));
-
-        Assertions.assertTrue(userId == -1L);
+                .andExpect(MockMvcResultMatchers.view().name("not_found"));
     }
 
     @Test
@@ -119,7 +113,7 @@ public class UserControllerTest {
     @Test
     @Transactional
     public void updateUser_shouldFindUserAndShowUpdatePage() throws Exception {
-        long userId = createUserAndAnimals().getId();
+        long userId = createUserAndPets().getId();
         mockMvc.perform(MockMvcRequestBuilders.get("/user/{id}/update", userId))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.view().name("user/update"));
@@ -128,7 +122,7 @@ public class UserControllerTest {
     @Test
     @Transactional
     public void saveUpdate_shouldSaveUpdatedUser() throws Exception {
-        User user = createUserAndAnimals();
+        User user = createUserAndPets();
         String phoneNumber = user.getPhoneNumber();
         String passport = user.getPassport();
         String userName = user.getUserName();
@@ -156,7 +150,7 @@ public class UserControllerTest {
     @Test
     @Transactional
     public void addTime_shouldShowAddTimePage() throws Exception {
-        User user = createUserAndAnimals();
+        User user = createUserAndPets();
         long userId = user.getId();
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/user/{id}/time", userId))
                 .andExpect(MockMvcResultMatchers.model().attributeExists("animals", "id"))
@@ -173,7 +167,7 @@ public class UserControllerTest {
     @Test
     @Transactional
     public void saveTime_shouldAddTimeToChosenAnimal() throws Exception {
-        User user = createUserAndAnimals();
+        User user = createUserAndPets();
         fillStorage();
         Animal animal = user.getActiveAnimals().stream().findAny().get();
         LocalDateTime expectedExpirationDate = animal.getExpirationDate();
@@ -199,7 +193,7 @@ public class UserControllerTest {
     @Test
     @Transactional
     public void attachAnimal_shouldShowCorrectPage() throws Exception {
-        User user = createUserAndAnimals();
+        User user = createUserAndPets();
         long userId = user.getId();
         Volunteer volunteer = attendVolunteer(user);
         animalService.saveCat(2, CatBreed.ABYSSINIAN, 2);
@@ -229,7 +223,7 @@ public class UserControllerTest {
     @Test
     @Transactional
     public void saveAttachedAnimal_shouldAttachAnimalAndVolunteer() throws Exception {
-        User user = createUserAndAnimals();
+        User user = createUserAndPets();
         Animal animal = user.getActiveAnimals().stream().findFirst().get();
         Volunteer volunteer = attendVolunteer(user);
         long animalId = animal.getId();
@@ -251,7 +245,7 @@ public class UserControllerTest {
         Assertions.assertTrue(founUser.isOwner());
     }
 
-    private User createUserAndAnimals() {
+    private User createUserAndPets() {
         User user = new User();
         user.setUserName("TJ User Name");
         user.setFullName("Tom Johnson");
@@ -294,6 +288,6 @@ public class UserControllerTest {
                 " Мы добавили к сроку {1} и теперь испытательный период оканчивается {2}. " +
                 "Для избежания отказа о попечительстве над животным, рекомендуем добросовестно " +
                 "выполнять отчётность, а главное соблюдать условия содержания питомца.";
-        storageService.saveInformation(Status.ADD_TIME.getCode(), Shelter.NONE, "Любой", text, new MockMultipartFile("file", new byte[]{}));
+        storageService.saveInformation(Status.ADD_TIME.getCode(), Shelter.NONE, StorageService.ANY, text, new MockMultipartFile("file", new byte[]{}));
     }
 }

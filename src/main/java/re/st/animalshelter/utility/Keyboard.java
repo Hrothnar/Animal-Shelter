@@ -2,7 +2,6 @@ package re.st.animalshelter.utility;
 
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
-import org.springframework.stereotype.Service;
 import re.st.animalshelter.dto.Answer;
 import re.st.animalshelter.entity.User;
 import re.st.animalshelter.entity.animal.Animal;
@@ -11,7 +10,6 @@ import re.st.animalshelter.enumeration.Dependence;
 
 import java.util.*;
 
-@Service
 public class Keyboard {
     public final static LinkedList<Button> START = new LinkedList<>(List.of(Button.CAT_SHELTER, Button.DOG_SHELTER));
     public final static LinkedList<Button> SHELTER = new LinkedList<>(List.of(Button.SHELTER_INFO, Button.TAKE_ANIMAL, Button.REPORT, Button.CALL_VOLUNTEER, Button.BACK));
@@ -38,7 +36,7 @@ public class Keyboard {
         InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
         Set<Animal> animals = user.getActiveAnimals();
         for (Animal animal : animals) {
-            keyboardMarkup.addRow(new InlineKeyboardButton(animal.getBreedAsString() + " -- Возраст: " + animal.getAge()).callbackData(String.valueOf(animal.getId())));
+            keyboardMarkup.addRow(new InlineKeyboardButton(animal.getGeneralInfo()).callbackData(String.valueOf(animal.getId())));
         }
         keyboardMarkup.addRow(new InlineKeyboardButton(Button.BACK.getDescription()).callbackData(Button.BACK.getCode()));
         return keyboardMarkup;

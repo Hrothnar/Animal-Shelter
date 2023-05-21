@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Reports</title>
+</head>
+<body>
+<h2>Вы можете выбрать отчёт владельца за интересующую вас дату и оценить его содержательность.</h2>
+<br/>
+<form th:method="POST" th:action="@{/user/{id}/report(id=${id})}" th:object="${report}">
+    <label for="report">Выберите отчёт</label>
+    <select th:name="report_id" id="report">
+        <option th:each="report : ${reports}" th:value="${report.getId()}"
+                th:text="${report.getAnimalInfo() + ' от: ' + report.getTimeAsString() + ' | ' + report.getStatusAsString()}"></option>
+    </select>
+    <br/>
+    <br/>
+    <input type="submit" value="Выбрать">
+</form>
+
+</body>
+</html>

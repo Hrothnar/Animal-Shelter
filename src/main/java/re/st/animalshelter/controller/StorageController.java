@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import re.st.animalshelter.enumeration.Button;
 import re.st.animalshelter.enumeration.Command;
 import re.st.animalshelter.enumeration.Status;
-import re.st.animalshelter.enumeration.shelter.Shelter;
+import re.st.animalshelter.enumeration.Shelter;
 import re.st.animalshelter.service.StorageService;
 
 import java.util.LinkedList;
@@ -29,7 +29,7 @@ public class StorageController {
 
     @GetMapping("/menu")
     public String menu() {
-        return "storage/storage_menu";
+        return "storage/menu";
     }
 
     @GetMapping("/add")
@@ -39,7 +39,7 @@ public class StorageController {
         model.addAttribute("commands", Command.getValidCommands());
         model.addAttribute("shelters", Shelter.values());
         model.addAttribute("person_types", new LinkedList<>(List.of(StorageService.ANY, StorageService.USER, StorageService.OWNER)));
-        return "storage/storage_form";
+        return "storage/form";
     }
 
     @PostMapping("/receive")

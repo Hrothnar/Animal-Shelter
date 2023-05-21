@@ -1,7 +1,5 @@
 package re.st.animalshelter.enumeration;
 
-import re.st.animalshelter.enumeration.shelter.Shelter;
-
 import java.util.Collections;
 import java.util.LinkedList;
 

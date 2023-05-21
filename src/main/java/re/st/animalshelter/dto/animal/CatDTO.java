@@ -2,8 +2,10 @@ package re.st.animalshelter.dto.animal;
 
 import re.st.animalshelter.entity.animal.Cat;
 import re.st.animalshelter.enumeration.breed.CatBreed;
+import re.st.animalshelter.utility.Distributor;
 
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 public class CatDTO {
     private final long id;
@@ -26,6 +28,11 @@ public class CatDTO {
 
     public CatBreed getBreed() {
         return breed;
+    }
+
+    public String getGeneralInfo() {
+        String years = Distributor.conjugate(this.age);
+        return breed.getText() + ", возраст: " + age + years;
     }
 
     @Override

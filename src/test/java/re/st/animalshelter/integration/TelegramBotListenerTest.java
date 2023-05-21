@@ -26,8 +26,8 @@ import re.st.animalshelter.enumeration.Button;
 import re.st.animalshelter.enumeration.Command;
 import re.st.animalshelter.enumeration.Position;
 import re.st.animalshelter.enumeration.Status;
-import re.st.animalshelter.enumeration.shelter.Shelter;
-import re.st.animalshelter.listener.TelegramBotListener;
+import re.st.animalshelter.enumeration.Shelter;
+import re.st.animalshelter.TelegramBotListener;
 import re.st.animalshelter.service.StorageService;
 import re.st.animalshelter.service.UserService;
 import re.st.animalshelter.utility.Keyboard;
@@ -166,7 +166,7 @@ public class TelegramBotListenerTest {
         String text2 = "Приветствую! Если вы ищете себе или своим близким нового друга, мы можем вам помочь!  \n" +
                 "Наш приют располагает большим числом животных, среди которых вы не несомненно найдёте нового члена семьи, будь то всем привычные пушистые друзья или кто-то экзотический...  \n" +
                 "Пожалуйста, выберите какой приют вас сейчас интересует:\n";
-        storageService.saveInformation(Command.START.getCode(), Shelter.NONE, "Пользователь", text1, new MockMultipartFile("file", new byte[]{}));
+        storageService.saveInformation(Command.START.getCode(), Shelter.NONE, "Хозяин", text1, new MockMultipartFile("file", new byte[]{}));
         storageService.saveInformation(Command.START.getCode(), Shelter.NONE, "Пользователь", text2, new MockMultipartFile("file", new byte[]{}));
     }
 }

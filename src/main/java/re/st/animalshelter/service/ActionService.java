@@ -8,7 +8,7 @@ import re.st.animalshelter.dto.Answer;
 import re.st.animalshelter.entity.Action;
 import re.st.animalshelter.entity.User;
 import re.st.animalshelter.enumeration.Button;
-import re.st.animalshelter.enumeration.shelter.Shelter;
+import re.st.animalshelter.enumeration.Shelter;
 import re.st.animalshelter.repository.ActionRepository;
 
 import java.util.*;
@@ -27,6 +27,14 @@ public class ActionService {
 
     public Action getLastAction(int messageId) {
         return actionRepository.findLastActionByMessageId(messageId).orElseThrow(RuntimeException::new); //TODO
+    }
+
+    public List<Action> getAllActions() {
+        return actionRepository.findAll();
+    }
+
+    public void removeAction(Action action) {
+        actionRepository.delete(action);
     }
 
     @Transactional

@@ -1,5 +1,7 @@
 package re.st.animalshelter.entity;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import re.st.animalshelter.entity.animal.Animal;
 
 import javax.persistence.*;
@@ -17,7 +19,8 @@ public class Volunteer {
     private String userName;
     @Column(name = "full_name", length = 56)
     private String fullName;
-    @OneToMany(cascade = {}, fetch = FetchType.LAZY, mappedBy = "volunteer")
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.LAZY, mappedBy = "volunteer")
+    @LazyCollection(value = LazyCollectionOption.TRUE)
     private Set<Animal> animals = new HashSet<>();
 
     public void addAnimal(Animal animal) {

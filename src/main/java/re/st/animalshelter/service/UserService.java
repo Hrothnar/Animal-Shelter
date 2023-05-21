@@ -9,8 +9,8 @@ import re.st.animalshelter.entity.Volunteer;
 import re.st.animalshelter.entity.animal.Animal;
 import re.st.animalshelter.enumeration.Position;
 import re.st.animalshelter.enumeration.Status;
-import re.st.animalshelter.model.response.particular.status.AddProbationTimeStatus;
-import re.st.animalshelter.model.response.particular.status.EndProbationStatus;
+import re.st.animalshelter.response.particular.status.AddProbationTimeStatus;
+import re.st.animalshelter.response.particular.status.EndProbationStatus;
 import re.st.animalshelter.repository.UserRepository;
 import re.st.animalshelter.utility.Distributor;
 
@@ -63,9 +63,7 @@ public class UserService {
     }
 
     public long getId(long id, String userName) {
-        return userRepository.findUserByIdOrUserName(id, userName)
-                .map(User::getId)
-                .orElse(-1L);
+        return userRepository.findUserByIdOrUserName(id, userName).map(User::getId).orElse(-1L);
     }
 
     public LinkedList<User> getAll() {
@@ -99,7 +97,6 @@ public class UserService {
         Volunteer volunteer = volunteerService.getById(volunteerId);
         volunteer.addAnimal(animal);
         user.addAnimal(animal);
-//        user.addVolunteer(volunteer);
         user.setOwner(true);
         volunteerService.save(volunteer);
         save(user);
@@ -119,6 +116,15 @@ public class UserService {
             return true;
         }
         return false;
+    }
+
+    public void removeVolunteer(long volunteerId) {
+        Volunteer volunteer = volunteerService.getById(volunteerId);
+        User volunteerAsUser = getByChatId(volunteer.getChatId());
+        volunteerAsUser.setPosition(Position.USER);
+        volunteer.getAnimals().forEach(animal -> animal.setVolunteer(null));
+        volunteerService.remove(volunteer);
+        save(volunteerAsUser);
     }
 
     public ReportDTO findReportingAnimal(User user, String code) {
@@ -152,11 +158,11 @@ public class UserService {
         if (button.equals(Distributor.PASS)) {
             animal.setActive(false);
             endProbation(user, animal);
-            endProbationStatus.execute(user.getChatId(), animal,Status.PROBATION_SUCCESSFULLY_COMPLETED);
+            endProbationStatus.execute(user.getChatId(), animal, Status.PROBATION_SUCCESSFULLY_COMPLETED);
         } else {
             user.removeAnimal(animal);
             endProbation(user, animal);
-            endProbationStatus.execute(user.getChatId(), animal,Status.PROBATION_NOT_COMPLETED);
+            endProbationStatus.execute(user.getChatId(), animal, Status.PROBATION_NOT_COMPLETED);
         }
     }
 
@@ -167,6 +173,9 @@ public class UserService {
         volunteer.removeAnimal(animal);
         animalService.save(animal);
         volunteerService.save(volunteer);
+        if (user.getActiveAnimals().size() == 0) {
+            user.setOwner(false);
+        }
         save(user);
     }
 

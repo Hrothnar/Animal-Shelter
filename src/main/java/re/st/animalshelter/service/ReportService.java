@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import re.st.animalshelter.entity.Report;
 import re.st.animalshelter.enumeration.Status;
-import re.st.animalshelter.model.response.particular.status.ReportFailedStatus;
+import re.st.animalshelter.response.particular.status.ReportFailedStatus;
 import re.st.animalshelter.repository.ReportRepository;
 import re.st.animalshelter.utility.Distributor;
 

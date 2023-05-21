@@ -8,6 +8,6 @@ public class MenuController {
 
     @GetMapping()
     public String getMenu() {
-        return "menu";
+        return "main_menu";
     }
 }
