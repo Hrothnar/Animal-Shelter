@@ -9,6 +9,7 @@ import re.st.animalshelter.entity.Action;
 import re.st.animalshelter.entity.User;
 import re.st.animalshelter.enumeration.Button;
 import re.st.animalshelter.enumeration.Shelter;
+import re.st.animalshelter.exception.ActionException;
 import re.st.animalshelter.repository.ActionRepository;
 
 import java.util.*;
@@ -26,7 +27,7 @@ public class ActionService {
     }
 
     public Action getLastAction(int messageId) {
-        return actionRepository.findLastActionByMessageId(messageId).orElseThrow(RuntimeException::new); //TODO
+        return actionRepository.findLastActionByMessageId(messageId).orElseThrow(() -> new ActionException("Failed to get last action"));
     }
 
     public List<Action> getAllActions() {

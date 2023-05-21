@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import re.st.animalshelter.entity.Report;
 import re.st.animalshelter.enumeration.Status;
+import re.st.animalshelter.exception.ReportNotFoundException;
 import re.st.animalshelter.response.particular.status.ReportFailedStatus;
 import re.st.animalshelter.repository.ReportRepository;
 import re.st.animalshelter.utility.Distributor;
@@ -25,7 +26,7 @@ public class ReportService {
     }
 
     public Report getReportById(long id) {
-        return reportRepository.findById(id).orElseThrow(RuntimeException::new);//TODO
+        return reportRepository.findById(id).orElseThrow(() -> new ReportNotFoundException("Report not found"));
     }
 
     public void updateReport(long chatId, long reportId, String button) {

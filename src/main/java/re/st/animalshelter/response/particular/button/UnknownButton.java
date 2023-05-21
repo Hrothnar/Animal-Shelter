@@ -6,10 +6,13 @@ import re.st.animalshelter.dto.ReportDTO;
 import re.st.animalshelter.entity.User;
 import re.st.animalshelter.entity.animal.Animal;
 import re.st.animalshelter.enumeration.Status;
+import re.st.animalshelter.exception.AnimalNotFoundException;
+import re.st.animalshelter.exception.CBQParsingException;
 import re.st.animalshelter.response.TextResponse;
 import re.st.animalshelter.response.particular.connect.Controller;
 import re.st.animalshelter.service.StorageService;
 import re.st.animalshelter.service.UserService;
+import re.st.animalshelter.utility.Distributor;
 
 @Component
 public class UnknownButton implements Controller {
@@ -45,11 +48,13 @@ public class UnknownButton implements Controller {
         try {
             animalId = Long.parseLong(callBackQuery);
         } catch (Exception e) {
-            throw new RuntimeException(); //TODO
+            Distributor.LOGGER.error("CallBachQuery is not correct and it can't be parsed");
+            throw new CBQParsingException("CallBachQuery is not correct and it can't be parsed");
         }
         Animal animal = user.getActiveAnimals().stream()
                 .filter(a -> a.getId() == animalId)
-                .findFirst().orElseThrow(RuntimeException::new);//TODO
+                .findFirst()
+                .orElseThrow(() -> new AnimalNotFoundException("Animal not found"));
         return new ReportDTO(user, animal);
     }
 }

@@ -11,6 +11,9 @@ import org.springframework.stereotype.Component;
 import re.st.animalshelter.dto.Answer;
 import re.st.animalshelter.entity.User;
 import re.st.animalshelter.enumeration.Position;
+import re.st.animalshelter.exception.FileGettingException;
+import re.st.animalshelter.exception.MessageSendingException;
+import re.st.animalshelter.utility.Distributor;
 
 import java.io.IOException;
 
@@ -27,7 +30,8 @@ public class PhotoResponse {
         long chatId = answer.getChatId();
         SendPhoto response = new SendPhoto(chatId, photo).caption(text);
         if (!telegramBot.execute(response).isOk()) {
-            throw new RuntimeException(); //TODO
+            Distributor.LOGGER.error("Message was not sent");
+            throw new MessageSendingException("Message was not sent, check input data");
         }
     }
 
@@ -41,7 +45,8 @@ public class PhotoResponse {
         }
         SendPhoto response = new SendPhoto(companionChatId, bytes).caption(text);
         if (!telegramBot.execute(response).isOk()) {
-            throw new RuntimeException(); //TODO
+            Distributor.LOGGER.error("Message was not sent");
+            throw new MessageSendingException("Message was not sent, check input data");
         }
     }
 
@@ -54,7 +59,8 @@ public class PhotoResponse {
         try {
             bytes = telegramBot.getFileContent(file);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            Distributor.LOGGER.error("Failed to get photo");
+            throw new FileGettingException("Failed to get photo");
         }
         return bytes;
     }
