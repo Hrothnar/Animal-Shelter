@@ -170,16 +170,18 @@ public class UserService {
     }
 
     private void endProbation(User user, Animal animal) {
-        Volunteer volunteer = animal.getVolunteer();
         animal.setExpirationDate(null);
         animal.setReportCode(Status.NONE.getCode());
-        volunteer.removeAnimal(animal);
         animalService.save(animal);
-        volunteerService.save(volunteer);
         if (user.getActiveAnimals().size() == 0) {
             user.setOwner(false);
         }
         save(user);
+        Volunteer volunteer = animal.getVolunteer();
+        if (volunteer != null) {
+            volunteer.removeAnimal(animal);
+            volunteerService.save(volunteer);
+        }
     }
 
     public void addProbationTime(long userId, long animalId, int time) {

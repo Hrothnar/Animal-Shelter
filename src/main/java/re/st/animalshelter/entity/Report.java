@@ -11,13 +11,13 @@ public class Report {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column(nullable = false)
+    @Column(name = "time", nullable = false)
     private LocalDateTime time;
-    @Column(name = "photo_path")
+    @Column(name = "photo_path", length = 64)
     private String photoPath;
-    @Column(name = "text_path")
+    @Column(name = "text_path", length = 64)
     private String textPath;
-    @Column(name = "report_code")
+    @Column(name = "report_code", nullable = false, length = 4)
     private String reportCode;
     @ManyToOne(cascade = {}, fetch = FetchType.LAZY)
     private User user;

@@ -10,17 +10,17 @@ public class Action {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column(nullable = false)
+    @Column(name = "message_id", nullable = false)
     private int messageId;
-    @Column(nullable = false)
+    @Column(name = "code", nullable = false, length = 4)
     private String code;
-    @Column(nullable = false)
+    @Column(name = "shelter", nullable = false, length = 16)
     @Enumerated(value = EnumType.STRING)
     private Shelter shelter;
-    @Column(nullable = false)
+    @Column(name = "last_update", nullable = false)
     private LocalDateTime lastUpdate;
     @ManyToOne(cascade = {}, fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     public Action(int messageId, String code, Shelter shelter) {

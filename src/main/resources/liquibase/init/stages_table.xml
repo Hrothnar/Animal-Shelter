@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog 
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd
+                   http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.5.xsd">
+
+    <changeSet id="stages_table.1" author="Kirill">
+
+        <preConditions>
+            <not>
+                <tableExists tableName="stages"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="stages">
+            <column name="user_id" type="BIGINT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="contact_info_code" type="VARCHAR(4)"/>
+            <column name="dialog_code" type="VARCHAR(4)"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="stages"
+                                 baseColumnNames="user_id"
+                                 constraintName="FK_USER_ID"
+                                 referencedTableName="users"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+
+</databaseChangeLog>

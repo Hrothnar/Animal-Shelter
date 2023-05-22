@@ -13,12 +13,12 @@ public class Volunteer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column(unique = true)
+    @Column(name = "chat_id", nullable = false, unique = true)
     private long chatId;
-    @Column(name = "user_name")
-    private String userName;
-    @Column(name = "full_name", length = 56)
+    @Column(name = "full_name", nullable = false, length = 64)
     private String fullName;
+    @Column(name = "user_name", nullable = false, length = 16)
+    private String userName;
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.LAZY, mappedBy = "volunteer")
     @LazyCollection(value = LazyCollectionOption.TRUE)
     private Set<Animal> animals = new HashSet<>();
