@@ -61,16 +61,10 @@
 <!--            версия 3.1.1 не работает (провозился с этим пару часов, чтобы это понять)-->
         </dependency>
 
-        <!--                <dependency>-->
-        <!--                    <groupId>org.springframework.boot</groupId>-->
-        <!--                    <artifactId>spring-boot-starter-thymeleaf</artifactId>-->
-        <!--                </dependency>-->
-
-
-        <!--                <dependency>-->
-        <!--                    <groupId>org.liquibase</groupId>-->
-        <!--                    <artifactId>liquibase-core</artifactId>-->
-        <!--                </dependency>-->
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.postgresql</groupId>

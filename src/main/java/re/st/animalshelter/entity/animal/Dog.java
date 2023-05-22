@@ -4,16 +4,15 @@ import re.st.animalshelter.enumeration.breed.DogBreed;
 import re.st.animalshelter.utility.Distributor;
 
 import javax.persistence.*;
-import java.util.regex.Pattern;
 
 @Entity(name = "dogs")
 public class Dog extends Animal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column(nullable = false)
+    @Column(name = "age", nullable = false)
     private int age;
-    @Column(nullable = false)
+    @Column(name = "breed", nullable = false, length = 32)
     @Enumerated(value = EnumType.STRING)
     private DogBreed breed;
 

@@ -17,7 +17,7 @@ public abstract class Animal {
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE)
     private long id;
-    @Column(name = "report_status")
+    @Column(name = "report_code")
     private String reportCode;
     @Column(name = "expiration_date")
     private LocalDateTime expirationDate;

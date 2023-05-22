@@ -9,16 +9,16 @@ public class Cell {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column(nullable = false)
+    @Column(name = "code", nullable = false, length = 4)
     private String code;
-    @Column(nullable = false)
+    @Column(name = "shelter", nullable = false, length = 16)
     @Enumerated(EnumType.STRING)
     private Shelter shelter;
-    @Column(nullable = false)
+    @Column(name = "owner", nullable = false)
     private boolean owner;
-    @Column(length = 4096)
+    @Column(name = "text", length = 4096)
     private String text;
-    @Column(length = 4096)
+    @Column(name = "photo")
     private byte[] photo;
 
     public Cell(String code, Shelter shelter,  boolean owner, String text, byte[] photo) {

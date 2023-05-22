@@ -6,9 +6,9 @@ import javax.persistence.*;
 public class Stage {
     @Id
     private long id;
-    @Column(name = "contact_info_code")
+    @Column(name = "contact_info_code", length = 4)
     private String contactInfoCode;
-    @Column(name = "dialog_code")
+    @Column(name = "dialog_code", length = 4)
     private String dialogCode;
     @OneToOne(cascade = {}, fetch = FetchType.LAZY, orphanRemoval = true)
     @MapsId

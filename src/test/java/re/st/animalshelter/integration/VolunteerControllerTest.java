@@ -1,15 +1,11 @@
 package re.st.animalshelter.integration;
 
-import com.pengrad.telegrambot.TelegramBot;
-import com.pengrad.telegrambot.response.SendResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
@@ -31,7 +27,6 @@ import re.st.animalshelter.enumeration.Status;
 import re.st.animalshelter.enumeration.breed.CatBreed;
 import re.st.animalshelter.enumeration.breed.DogBreed;
 import re.st.animalshelter.service.AnimalService;
-import re.st.animalshelter.service.StorageService;
 import re.st.animalshelter.service.UserService;
 import re.st.animalshelter.service.VolunteerService;
 
@@ -54,16 +49,9 @@ public class VolunteerControllerTest {
     private AnimalService animalService;
     @Autowired
     private MockMvc mockMvc;
-    @Autowired
-    private StorageService storageService;
-    @MockBean
-    private TelegramBot telegramBot;
-    @Mock
-    private SendResponse sendResponse;
 
     private final static long CHAT_ID = 11;
     private final static int MESSAGE_ID = 22;
-    private final static long USER_ID = 33;
 
     @AfterEach
     public void clean() {
