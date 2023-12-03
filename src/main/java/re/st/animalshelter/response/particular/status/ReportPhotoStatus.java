@@ -8,6 +8,7 @@ import re.st.animalshelter.dto.ReportDTO;
 import re.st.animalshelter.entity.Report;
 import re.st.animalshelter.entity.User;
 import re.st.animalshelter.enumeration.Status;
+import re.st.animalshelter.exception.ReportNotFoundException;
 import re.st.animalshelter.response.TextResponse;
 import re.st.animalshelter.response.particular.connect.Controller;
 import re.st.animalshelter.service.FileService;
@@ -56,7 +57,7 @@ public class ReportPhotoStatus implements Controller {
     private void updateReport(ReportDTO reportDTO, Path path) {
         Report report = reportDTO.getUser().getReports().stream()
                 .max(Comparator.comparing(Report::getId))
-                .orElseThrow(RuntimeException::new); //TODO
+                .orElseThrow(() -> new ReportNotFoundException("Report not found"));
         report.setPhotoPath(path.toString());
         reportService.saveReport(report);
     }

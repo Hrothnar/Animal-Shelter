@@ -11,6 +11,7 @@ import re.st.animalshelter.entity.animal.Cat;
 import re.st.animalshelter.entity.animal.Dog;
 import re.st.animalshelter.enumeration.breed.CatBreed;
 import re.st.animalshelter.enumeration.breed.DogBreed;
+import re.st.animalshelter.exception.AnimalNotFoundException;
 import re.st.animalshelter.repository.animal.AnimalRepository;
 import re.st.animalshelter.repository.animal.CatRepository;
 import re.st.animalshelter.repository.animal.DogRepository;
@@ -44,7 +45,7 @@ public class AnimalService {
     }
 
     public Animal getById(long id) {
-        return animalRepository.findById(id).orElseThrow(RuntimeException::new); //TODO
+        return animalRepository.findById(id).orElseThrow(() -> new AnimalNotFoundException("Animal not found"));
     }
 
     public List<Cat> getCatsWithoutVolunteer() {

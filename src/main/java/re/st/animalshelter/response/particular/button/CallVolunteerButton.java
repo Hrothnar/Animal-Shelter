@@ -12,6 +12,7 @@ import re.st.animalshelter.service.StorageService;
 import re.st.animalshelter.service.UserService;
 
 import java.util.LinkedList;
+import java.util.Optional;
 
 @Component
 public class CallVolunteerButton implements Controller {
@@ -30,13 +31,13 @@ public class CallVolunteerButton implements Controller {
     public void execute(Message message) {
         User user = userService.getByChatId(message.chat().id());
         long chatId = user.getChatId();
-        LinkedList<User> volunteersAsUsers = userService.getAllByPosition(Position.VOLUNTEER); //TODO
+        LinkedList<User> volunteersAsUsers = userService.getAllByPosition(Position.VOLUNTEER);
 //        Optional<User> optional = volunteersAsUsers.stream()
 //                .filter(volunteerAsUser -> volunteerAsUser.getCompanionChatId() == 0)
 //                .findAny();
-//        if (optional.isPresent()) {
-        User volunteerAsUser = volunteersAsUsers.get(0);
-//            User volunteerAsUser = optional.get();
+        Optional<User> optional = Optional.of(volunteersAsUsers.get(0)); //TODO Change to the correct method
+        if (optional.isPresent()) {
+            User volunteerAsUser = optional.get();
             volunteerAsUser.setCompanionChatId(chatId);
             user.setCompanionChatId(volunteerAsUser.getChatId());
             volunteerAsUser.getStage().setDialogCode(Status.DIALOG.getCode());
@@ -45,6 +46,6 @@ public class CallVolunteerButton implements Controller {
             userService.save(user);
             String text = storageService.getByCode(Status.DIALOG_PREPARED.getCode()).getText();
             textResponse.sendNewTextResponse(chatId, text);
-//        }
+        }
     }
 }

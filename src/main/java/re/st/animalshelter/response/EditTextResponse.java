@@ -6,6 +6,8 @@ import com.pengrad.telegrambot.request.EditMessageText;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import re.st.animalshelter.dto.Answer;
+import re.st.animalshelter.exception.MessageSendingException;
+import re.st.animalshelter.utility.Distributor;
 
 @Component
 public class EditTextResponse {
@@ -21,7 +23,8 @@ public class EditTextResponse {
         int messageId = answer.getMessageId();
         EditMessageText response = new EditMessageText(chatId, messageId, text).replyMarkup(keyboard);
         if (!telegramBot.execute(response).isOk()) {
-            throw new RuntimeException(); //TODO
+            Distributor.LOGGER.error("Message was not sent");
+            throw new MessageSendingException("Message was not sent, check input data");
         }
     }
 }

@@ -1,5 +1,8 @@
 package re.st.animalshelter.enumeration;
 
+import re.st.animalshelter.exception.ShelterNotFoundException;
+import re.st.animalshelter.utility.Distributor;
+
 import java.util.Collections;
 import java.util.LinkedList;
 
@@ -62,7 +65,8 @@ public enum Button {
             case CAT: return Dependence.CAT;
             case DOG: return Dependence.DOG;
         }
-        throw new RuntimeException(); //TODO
+        Distributor.LOGGER.error("No such shelter");
+        throw new ShelterNotFoundException("No such shelter");
     }
 
     public static LinkedList<Button> getValidButtons() {

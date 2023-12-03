@@ -15,25 +15,25 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column(unique = true)
+    @Column(name = "chat_id", nullable = false, unique = true)
     private long chatId;
-    @Column(name = "companion_chat_id")
+    @Column(name = "companion_chat_id", nullable = false, unique = true)
     private long companionChatId;
-    @Column(length = 56)
+    @Column(name = "full_name", nullable = false, length = 64)
     private String fullName;
-    @Column(unique = true)
+    @Column(name = "user_name", nullable = false, unique = true)
     private String userName;
-    @Column(unique = true)
+    @Column(name = "email", unique = true)
     private String email;
-    @Column(length = 16)
+    @Column(name = "phone_number", length = 16)
     private String phoneNumber;
-    @Column(unique = true, length = 16)
+    @Column(name = "passport_number", unique = true, length = 16)
     private String passport;
-    @Column(nullable = false)
+    @Column(name = "owner", nullable = false)
     private boolean owner;
-    @Column(nullable = false)
+    @Column(name = "status_code", nullable = false, length = 4)
     private String currentCode;
-    @Column(nullable = false)
+    @Column(name = "position", nullable = false, length = 32)
     @Enumerated(value = EnumType.STRING)
     private Position position;
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true)
@@ -80,6 +80,10 @@ public class User {
         animal.getReports().add(report);
         report.setUser(this);
         report.setAnimal(animal);
+    }
+
+    public Set<Animal> getActiveAnimals() {
+        return animals.stream().filter(Animal::isActive).collect(Collectors.toSet());
     }
 
     public long getId() {
@@ -152,10 +156,6 @@ public class User {
 
     public Set<Animal> getAnimals() {
         return animals;
-    }
-
-    public Set<Animal> getActiveAnimals() {
-        return animals.stream().filter(Animal::isActive).collect(Collectors.toSet());
     }
 
     public Set<Action> getActions() {

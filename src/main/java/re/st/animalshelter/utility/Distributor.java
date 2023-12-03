@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import re.st.animalshelter.TelegramBotListener;
+import re.st.animalshelter.exception.UpdateHandlingException;
 import re.st.animalshelter.handler.CallBackQueryHandler;
 import re.st.animalshelter.handler.DocumentHandler;
 import re.st.animalshelter.handler.PhotoHandler;
@@ -45,8 +46,8 @@ public class Distributor {
             } else if (Objects.nonNull(message.document())) {
                 documentHandler.processDocumentMessage(message);
             } else {
-                LOGGER.error("Необрабатываемый запрос"); //TODO не забыть добавить ещё логики
-                throw new RuntimeException();
+                LOGGER.error("No correct handler");
+                throw new UpdateHandlingException("No correct handler");
             }
         } else if (Objects.nonNull(update.callbackQuery())) {
             callBackQueryHandler.processCallBackQuery(update.callbackQuery());
